@@ -4,13 +4,14 @@ using UnityEngine.InputSystem.Interactions;
 
 [DefaultExecutionOrder(-100)]
 [RequireComponent(typeof(Rigidbody), typeof(PlayerJump), typeof(PlayerDodge))]
-[RequireComponent(typeof(PlayerResources))]
+[RequireComponent(typeof(PlayerResources), typeof(PlayerMelee))]
 public class PlayerMotor : MonoBehaviour
 {
     [Header("Inputs")]
     [SerializeField] private InputActionReference moveAction;
     [SerializeField] private InputActionReference jumpAction;
     [SerializeField] private InputActionReference dodgeSprintAction;
+    [SerializeField] private InputActionReference attackAction;
 
     [Header("Referencias")]
     [SerializeField] private Transform movementCamera;
@@ -38,6 +39,22 @@ public class PlayerMotor : MonoBehaviour
     [SerializeField, Min(0f)] private float sprintStaminaPerSecond = 15f;
     [SerializeField, Min(0f)] private float minStaminaToResumeSprint = 20f;
 
+    [Header("Carregamento do garfo")]
+    [SerializeField, Min(0.05f)] private float chargeDuration = 0.6f;
+    [SerializeField, Min(0.05f)] private float followupChargeDuration = 0.25f;
+    [SerializeField, Range(0f, 1f)] private float chargingMovementMultiplier = 0.2f;
+
+    private PlayerMelee melee;
+    private enum ChargeIntent { None, Up, Down }
+    private ChargeIntent chargeIntent;
+    private bool attackPressed;
+    private bool attackReleased;
+    private bool attackHeld;
+    private bool queuedLightAttack;
+    private PlayerMelee.AttackType queuedChargedAttack;
+    private bool airAttackUsed;
+    private float chargeTimer;
+
     private Rigidbody body;
     private PlayerResources resources;
     private PlayerJump jump;
@@ -56,18 +73,36 @@ public class PlayerMotor : MonoBehaviour
 
     public bool IsDead => resources != null && resources.IsDead;
     public bool IsGrounded { get; private set; }
+    public float HorizontalSpeed => body != null
+        ? Vector3.ProjectOnPlane(body.linearVelocity, Vector3.up).magnitude : 0f;
+    public bool IsMoving => HorizontalSpeed > 0.1f;
+    public bool IsRising => !IsGrounded && body != null && body.linearVelocity.y > 0.1f;
+    public bool IsFalling => !IsGrounded && !IsRising;
     public bool IsSprinting { get; private set; }
+    public bool IsAttacking => melee != null && melee.IsActive;
+    public bool IsCharging { get; private set; }
+    public bool IsChargingDown => IsCharging && chargeIntent == ChargeIntent.Down;
+    public float ChargeProgress => IsCharging
+        ? Mathf.Clamp01(chargeTimer / Mathf.Max(0.05f,
+            IsChargingDown ? followupChargeDuration : chargeDuration)) : 0f;
+    public bool BlocksStaminaRegeneration =>
+        IsDodging || IsSprinting || IsAttacking || IsCharging ||
+        queuedLightAttack || queuedChargedAttack != PlayerMelee.AttackType.None;
+
+    public bool CanStartAttack =>
+        !IsDead && !IsDodging && !IsAttacking &&
+        melee != null && melee.enabled;
     public bool IsDodging => dodge != null && dodge.IsActive;
     public bool IsInvulnerable =>
         !IsDead && IsDodging && dodge.IsInvulnerable;
 
     // As permissoes para as acoes ficam centralizadas aqui.
     public bool CanJump =>
-        !IsDead && IsGrounded && !IsDodging &&
-        jump != null && jump.enabled;
+        !IsDead && IsGrounded && !IsDodging && !IsAttacking && !IsCharging &&
+        queuedChargedAttack == PlayerMelee.AttackType.None && jump != null && jump.enabled;
 
     public bool CanDodge =>
-        !IsDead && IsGrounded && !IsDodging &&
+        !IsDead && IsGrounded && !IsDodging && !IsAttacking &&
         dodge != null && dodge.enabled &&
         resources != null && resources.CurrentStamina >= dodgeStaminaCost;
 
@@ -77,6 +112,7 @@ public class PlayerMotor : MonoBehaviour
         resources = GetComponent<PlayerResources>();
         jump = GetComponent<PlayerJump>();
         dodge = GetComponent<PlayerDodge>();
+        melee = GetComponent<PlayerMelee>();
     }
 
     private void OnEnable()
@@ -87,6 +123,7 @@ public class PlayerMotor : MonoBehaviour
         moveAction.action.Enable();
         jumpAction.action.Enable();
         dodgeSprintAction.action.Enable();
+        attackAction.action.Enable();
     }
 
     private void OnDisable()
@@ -97,6 +134,7 @@ public class PlayerMotor : MonoBehaviour
         moveAction.action.Disable();
         jumpAction.action.Disable();
         dodgeSprintAction.action.Disable();
+        attackAction.action.Disable();
 
         StopActions();
         IsGrounded = false;
@@ -127,6 +165,13 @@ public class PlayerMotor : MonoBehaviour
             jumpRequested = true;
 
         jumpHeld = jumpAction.action.IsPressed();
+
+        if (attackAction.action.WasPressedThisFrame())
+            attackPressed = true;
+        if (attackAction.action.WasReleasedThisFrame())
+            attackReleased = true;
+
+        attackHeld = attackAction.action.IsPressed();
     }
 
     private void FixedUpdate()
@@ -140,6 +185,9 @@ public class PlayerMotor : MonoBehaviour
         }
 
         UpdateAirControlReference();
+
+        if (IsGrounded)
+            airAttackUsed = false;
 
         float resumeThreshold = Mathf.Min(
             minStaminaToResumeSprint, resources.MaxStamina
@@ -161,6 +209,7 @@ public class PlayerMotor : MonoBehaviour
                     body.rotation * Vector3.forward, Vector3.up
                 ).normalized;
 
+            CancelCombat();
             dodge.BeginDodge(rollDirection);
         }
 
@@ -168,6 +217,7 @@ public class PlayerMotor : MonoBehaviour
 
         if (IsDodging)
         {
+            ClearCombatInputRequests();
             jumpRequested = false;
             jump.Cancel();
 
@@ -182,6 +232,28 @@ public class PlayerMotor : MonoBehaviour
             }
 
             dodge.Tick(Time.fixedDeltaTime);
+            return;
+        }
+
+        HandleCombatRequests(direction);
+
+        if (IsAttacking)
+        {
+            jumpRequested = false;
+            ApplyAttackMovement(direction);
+            melee.Tick(Time.fixedDeltaTime);
+
+            if (jump.enabled)
+                jump.Tick(jumpHeld);
+
+            return;
+        }
+
+        if (IsCharging)
+        {
+            jumpRequested = false;
+            jump.Cancel();
+            MoveNormally(direction, moveSpeed * chargingMovementMultiplier, true);
             return;
         }
 
@@ -201,6 +273,7 @@ public class PlayerMotor : MonoBehaviour
 
         if (jumpRequested && CanJump)
         {
+            melee.Cancel();
             jump.ExecuteJump();
             IsGrounded = false;
             IsSprinting = false;
@@ -212,6 +285,191 @@ public class PlayerMotor : MonoBehaviour
 
         if (jump.enabled)
             jump.Tick(jumpHeld);
+    }
+
+    private void HandleCombatRequests(Vector3 direction)
+    {
+        // Soltar cancela apenas o carregamento ainda incompleto.
+        // Um golpe ja confirmado continua aguardando o fim da animacao atual.
+        if (attackReleased || !IsGrounded)
+            CancelCharge();
+
+        ConsumeQueuedAttacks(direction);
+
+        if (attackPressed)
+        {
+            if (IsAttacking)
+            {
+                if (melee.CurrentAttack == PlayerMelee.AttackType.ChargedUp)
+                {
+                    // Exige uma nova pressao: manter o primeiro hold nao encadeia.
+                    ArmCharge(ChargeIntent.Down);
+                }
+                else if (melee.IsLightAttack && melee.CanQueueNext)
+                {
+                    if (melee.CurrentAttack != PlayerMelee.AttackType.Light3)
+                        queuedLightAttack = true;
+
+                    ArmCharge(ChargeIntent.Up);
+                }
+            }
+            else if (CanStartAttack)
+            {
+                if (IsGrounded)
+                {
+                    // O golpe leve sai imediatamente, antes de sabermos se sera um hold.
+                    if (TryStartAttack(melee.NextLightAttack, direction))
+                        ArmCharge(ChargeIntent.Up);
+                }
+                else if (!airAttackUsed)
+                {
+                    TryStartAttack(PlayerMelee.AttackType.AirSpin, direction);
+                }
+            }
+        }
+
+        UpdateChargeIntent();
+        ClearCombatInputRequests();
+        ConsumeQueuedAttacks(direction);
+    }
+
+    private void ArmCharge(ChargeIntent intent)
+    {
+        PlayerMelee.AttackType type = intent == ChargeIntent.Down
+            ? PlayerMelee.AttackType.ChargedDown : PlayerMelee.AttackType.ChargedUp;
+
+        if (!IsGrounded || resources.CurrentStamina < melee.GetStaminaCost(type))
+            return;
+
+        chargeIntent = intent;
+        chargeTimer = 0f;
+        IsCharging = true;
+    }
+
+    private void UpdateChargeIntent()
+    {
+        if (!IsCharging)
+            return;
+
+        if (!attackHeld || !IsGrounded || !melee.enabled)
+        {
+            CancelCharge();
+            return;
+        }
+
+        bool validSequence = chargeIntent == ChargeIntent.Up
+            ? !IsAttacking || melee.IsLightAttack
+            : melee.CurrentAttack == PlayerMelee.AttackType.ChargedUp ||
+                melee.CanChainChargedDown;
+
+        if (!validSequence)
+        {
+            CancelCharge();
+            return;
+        }
+
+        chargeTimer += Time.fixedDeltaTime;
+        float requiredTime = chargeIntent == ChargeIntent.Down
+            ? followupChargeDuration : chargeDuration;
+
+        if (chargeTimer >= requiredTime)
+        {
+            queuedChargedAttack = chargeIntent == ChargeIntent.Down
+                ? PlayerMelee.AttackType.ChargedDown : PlayerMelee.AttackType.ChargedUp;
+
+            queuedLightAttack = false;
+            CancelCharge();
+        }
+    }
+
+    private void ConsumeQueuedAttacks(Vector3 direction)
+    {
+        if (!CanStartAttack)
+            return;
+
+        if (queuedChargedAttack != PlayerMelee.AttackType.None)
+        {
+            PlayerMelee.AttackType type = queuedChargedAttack;
+            queuedChargedAttack = PlayerMelee.AttackType.None;
+            queuedLightAttack = false;
+            CancelCharge();
+
+            if (IsGrounded && (type == PlayerMelee.AttackType.ChargedUp ||
+                melee.CanChainChargedDown))
+                TryStartAttack(type, direction);
+        }
+        else if (queuedLightAttack)
+        {
+            queuedLightAttack = false;
+
+            if (IsGrounded)
+                TryStartAttack(melee.NextLightAttack, direction);
+        }
+    }
+
+    private bool TryStartAttack(PlayerMelee.AttackType type, Vector3 direction)
+    {
+        if (!CanStartAttack ||
+            !resources.TrySpendStamina(melee.GetStaminaCost(type)))
+            return false;
+
+        Vector3 attackDirection = direction.sqrMagnitude > 0.001f
+            ? direction.normalized : body.rotation * Vector3.forward;
+
+        queuedLightAttack = false;
+        queuedChargedAttack = PlayerMelee.AttackType.None;
+        melee.BeginAttack(type, attackDirection);
+        IsSprinting = false;
+
+        if (type == PlayerMelee.AttackType.AirSpin)
+            airAttackUsed = true;
+
+        return true;
+    }
+
+    private void ApplyAttackMovement(Vector3 direction)
+    {
+        if (IsGrounded)
+        {
+            Vector3 inputVelocity = direction * moveSpeed * melee.MovementMultiplier;
+            SetHorizontalVelocity(
+                inputVelocity + melee.GetAdvanceVelocity(Time.fixedDeltaTime)
+            );
+        }
+        else if (useAirControlRestriction)
+        {
+            MoveInAir(direction);
+        }
+        else
+        {
+            MoveNormally(direction, moveSpeed, false, false);
+        }
+
+        body.MoveRotation(melee.AttackRotation);
+    }
+
+    private void ClearCombatInputRequests()
+    {
+        attackPressed = false;
+        attackReleased = false;
+    }
+
+    private void CancelCharge()
+    {
+        IsCharging = false;
+        chargeIntent = ChargeIntent.None;
+        chargeTimer = 0f;
+    }
+
+    private void CancelCombat()
+    {
+        CancelCharge();
+        queuedLightAttack = false;
+        queuedChargedAttack = PlayerMelee.AttackType.None;
+        ClearCombatInputRequests();
+
+        if (melee != null)
+            melee.Cancel();
     }
 
     private void RefreshGroundedState()
@@ -254,6 +512,8 @@ public class PlayerMotor : MonoBehaviour
             !IsDead &&
             IsGrounded &&
             !IsDodging &&
+            !IsAttacking &&
+            !IsCharging &&
             !sprintExhausted &&
             !sprintNeedsRelease;
 
@@ -291,6 +551,9 @@ public class PlayerMotor : MonoBehaviour
         wasAirborne = false;
         airborneReferenceSpeed = 0f;
         IsSprinting = false;
+        airAttackUsed = false;
+        attackHeld = false;
+        CancelCombat();
 
         if (jump != null)
             jump.Cancel();
@@ -320,7 +583,8 @@ public class PlayerMotor : MonoBehaviour
     private void MoveNormally(
         Vector3 direction,
         float speed,
-        bool limitSpeedImmediately = false)
+        bool limitSpeedImmediately = false,
+        bool rotateBody = true)
     {
         // Separa a rapidez da direcao para manter a velocidade nas curvas.
         Vector3 currentVelocity = Vector3.ProjectOnPlane(
@@ -374,7 +638,7 @@ public class PlayerMotor : MonoBehaviour
 
         SetHorizontalVelocity(movementDirection * nextSpeed);
 
-        if (!hasInput)
+        if (!hasInput || !rotateBody)
             return;
 
         Quaternion targetRotation =

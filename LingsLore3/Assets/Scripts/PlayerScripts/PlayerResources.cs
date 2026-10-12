@@ -47,8 +47,8 @@ public class PlayerResources : MonoBehaviour
         if (IsDead)
             return;
 
-        // Nao regenera durante o dodge, sua recuperacao ou a corrida.
-        if (motor != null && (motor.IsDodging || motor.IsSprinting))
+        // O motor informa se alguma acao esta bloqueando a regeneracao.
+        if (motor != null && motor.BlocksStaminaRegeneration)
             return;
 
         if (Time.time - lastStaminaUseTime < staminaRegenDelay)

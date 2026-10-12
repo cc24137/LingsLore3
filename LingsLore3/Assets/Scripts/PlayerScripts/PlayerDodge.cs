@@ -6,6 +6,7 @@ public class PlayerDodge : MonoBehaviour
 {
     [Header("Visual")]
     [SerializeField] private Transform rollPivot;
+    [SerializeField] private bool animateRollPivot = true;
 
     [Header("Rolamento")]
     [SerializeField, Min(0.01f)] private float rollDuration = 0.45f;
@@ -28,6 +29,25 @@ public class PlayerDodge : MonoBehaviour
     private Vector3 dodgeDirection;
     private float dodgeTimer;
     private Quaternion initialPivotRotation = Quaternion.identity;
+
+    public float TotalDuration => Mathf.Max(0.01f, rollDuration + recoveryDuration);
+    public float NormalizedTime => IsActive ? Mathf.Clamp01(dodgeTimer / TotalDuration) : 0f;
+
+    public bool UseProceduralRollAnimation
+    {
+        get => animateRollPivot;
+        set
+        {
+            if (animateRollPivot == value)
+                return;
+
+            // Remove uma rotacao antiga antes de entregar o visual ao Animator.
+            if (!value && rollPivot != null)
+                rollPivot.localRotation = initialPivotRotation;
+
+            animateRollPivot = value;
+        }
+    }
 
     public bool IsActive { get; private set; }
     public bool IsRolling => IsActive && dodgeTimer < rollDuration;
@@ -94,7 +114,7 @@ public class PlayerDodge : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (rollPivot == null)
+        if (!animateRollPivot || rollPivot == null)
             return;
 
         if (IsRolling)
@@ -115,7 +135,7 @@ public class PlayerDodge : MonoBehaviour
         IsActive = false;
         dodgeTimer = 0f;
 
-        if (rollPivot != null)
+        if (animateRollPivot && rollPivot != null)
             rollPivot.localRotation = initialPivotRotation;
     }
 
