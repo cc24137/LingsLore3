@@ -2,7 +2,7 @@ using UnityEngine;
 
 // Apenas envia parametros. Os estados, transicoes e clips ficam no Animator Controller.
 [RequireComponent(typeof(PlayerMotor), typeof(PlayerMelee), typeof(PlayerDodge))]
-public class ForkAttackAnimator : MonoBehaviour
+public class LingAnimator : MonoBehaviour
 {
     [SerializeField] private Animator animator;
     [SerializeField] private bool useAnimatorForDodge;
