@@ -1,17 +1,16 @@
 using UnityEngine;
 
-// Apenas envia parametros. Os estados, transicoes e clips ficam no Animator Controller.
-[RequireComponent(typeof(PlayerMotor), typeof(PlayerMelee), typeof(PlayerDodge))]
+// Apenas envia parametros ao Animator, incluindo o dodge.
+// Nao controla tempo, velocidade, root motion ou transforms visuais.
+// Estados, transicoes e clips sao configurados no Animator Controller.
+[RequireComponent(typeof(PlayerMotor), typeof(PlayerMelee))]
 public class LingAnimator : MonoBehaviour
 {
     [SerializeField] private Animator animator;
-    [SerializeField] private bool useAnimatorForDodge;
 
     private PlayerMotor motor;
     private PlayerMelee melee;
-    private PlayerDodge dodge;
     private bool configured;
-    private bool originalProceduralDodge;
 
     private static readonly int Moving = Animator.StringToHash("Moving");
     private static readonly int Sprinting = Animator.StringToHash("Sprinting");
@@ -29,19 +28,6 @@ public class LingAnimator : MonoBehaviour
     {
         motor = GetComponent<PlayerMotor>();
         melee = GetComponent<PlayerMelee>();
-        dodge = GetComponent<PlayerDodge>();
-    }
-
-    private void OnEnable()
-    {
-        originalProceduralDodge = dodge.UseProceduralRollAnimation;
-
-        if (animator != null)
-        {
-            // Agora o Animator reproduz os clips normalmente.
-            animator.speed = 1f;
-            animator.applyRootMotion = false;
-        }
     }
 
     private void Start()
@@ -88,14 +74,8 @@ public class LingAnimator : MonoBehaviour
 
     private void Update()
     {
-        if (!configured || !animator.isActiveAndEnabled)
-        {
-            dodge.UseProceduralRollAnimation = originalProceduralDodge;
+        if (!configured || animator == null || !animator.isActiveAndEnabled)
             return;
-        }
-
-        dodge.UseProceduralRollAnimation = useAnimatorForDodge
-            ? false : originalProceduralDodge;
 
         bool dead = motor.IsDead;
         bool dodging = motor.IsDodging;
@@ -108,17 +88,11 @@ public class LingAnimator : MonoBehaviour
         animator.SetBool(Grounded, motor.IsGrounded);
         animator.SetBool(Rising, motor.IsRising);
         animator.SetBool(Dead, dead);
-        animator.SetBool(Dodging, useAnimatorForDodge && dodging && !dead);
+        animator.SetBool(Dodging, dodging && !dead);
         animator.SetBool(Attacking, attacking);
         animator.SetInteger(AttackId, attacking ? (int)melee.CurrentAttack : 0);
         animator.SetBool(Charging, charging);
         animator.SetBool(ChargeDown, motor.IsChargingDown);
         animator.SetBool(Free, free);
-    }
-
-    private void OnDisable()
-    {
-        if (dodge != null)
-            dodge.UseProceduralRollAnimation = originalProceduralDodge;
     }
 }

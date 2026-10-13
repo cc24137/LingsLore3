@@ -49,7 +49,7 @@ AnimatorStateTransition:
   m_HasExitTime: 0
   m_HasFixedDuration: 1
   m_InterruptionSource: 3
-  m_OrderedInterruption: 0
+  m_OrderedInterruption: 1
   m_CanTransitionToSelf: 0
 --- !u!1101 &-7669858653279618648
 AnimatorStateTransition:
@@ -80,7 +80,7 @@ AnimatorStateTransition:
   m_HasExitTime: 0
   m_HasFixedDuration: 1
   m_InterruptionSource: 3
-  m_OrderedInterruption: 0
+  m_OrderedInterruption: 1
   m_CanTransitionToSelf: 0
 --- !u!1101 &-7427318108332267491
 AnimatorStateTransition:
@@ -111,7 +111,7 @@ AnimatorStateTransition:
   m_HasExitTime: 0
   m_HasFixedDuration: 1
   m_InterruptionSource: 3
-  m_OrderedInterruption: 0
+  m_OrderedInterruption: 1
   m_CanTransitionToSelf: 0
 --- !u!1102 &-7384303279879852068
 AnimatorState:
@@ -171,7 +171,7 @@ AnimatorStateTransition:
   m_HasExitTime: 0
   m_HasFixedDuration: 1
   m_InterruptionSource: 3
-  m_OrderedInterruption: 0
+  m_OrderedInterruption: 1
   m_CanTransitionToSelf: 0
 --- !u!1102 &-7164049913230809394
 AnimatorState:
@@ -231,7 +231,7 @@ AnimatorStateTransition:
   m_HasExitTime: 0
   m_HasFixedDuration: 1
   m_InterruptionSource: 3
-  m_OrderedInterruption: 0
+  m_OrderedInterruption: 1
   m_CanTransitionToSelf: 0
 --- !u!1102 &-6303824012254805398
 AnimatorState:
@@ -294,7 +294,7 @@ AnimatorStateTransition:
   m_HasExitTime: 0
   m_HasFixedDuration: 1
   m_InterruptionSource: 3
-  m_OrderedInterruption: 0
+  m_OrderedInterruption: 1
   m_CanTransitionToSelf: 0
 --- !u!1101 &-4262459350203152952
 AnimatorStateTransition:
@@ -322,7 +322,7 @@ AnimatorStateTransition:
   m_HasExitTime: 0
   m_HasFixedDuration: 1
   m_InterruptionSource: 3
-  m_OrderedInterruption: 0
+  m_OrderedInterruption: 1
   m_CanTransitionToSelf: 0
 --- !u!1102 &-1806311815199540679
 AnimatorState:
@@ -437,7 +437,7 @@ AnimatorStateTransition:
   m_HasExitTime: 0
   m_HasFixedDuration: 1
   m_InterruptionSource: 3
-  m_OrderedInterruption: 0
+  m_OrderedInterruption: 1
   m_CanTransitionToSelf: 0
 --- !u!1102 &-505060669828923400
 AnimatorState:
@@ -585,7 +585,7 @@ AnimatorStateTransition:
   m_HasExitTime: 0
   m_HasFixedDuration: 1
   m_InterruptionSource: 3
-  m_OrderedInterruption: 0
+  m_OrderedInterruption: 1
   m_CanTransitionToSelf: 0
 --- !u!1101 &214563084685898203
 AnimatorStateTransition:
@@ -619,7 +619,7 @@ AnimatorStateTransition:
   m_HasExitTime: 0
   m_HasFixedDuration: 1
   m_InterruptionSource: 3
-  m_OrderedInterruption: 0
+  m_OrderedInterruption: 1
   m_CanTransitionToSelf: 0
 --- !u!1107 &693795204783847862
 AnimatorStateMachine:
@@ -677,21 +677,21 @@ AnimatorStateMachine:
     m_Position: {x: 210, y: 900, z: 0}
   m_ChildStateMachines: []
   m_AnyStateTransitions:
-  - {fileID: -7427318108332267491}
-  - {fileID: 174705562240724528}
-  - {fileID: 6036709324837717570}
-  - {fileID: -7669858653279618648}
-  - {fileID: 4857414570290210771}
   - {fileID: -8243867725190172995}
   - {fileID: -4262459350203152952}
-  - {fileID: -860984806464558308}
-  - {fileID: -4649118898166638443}
   - {fileID: -6381467710482159952}
   - {fileID: -7353990240148445788}
   - {fileID: 214563084685898203}
   - {fileID: 3260591655535817719}
   - {fileID: 8348235089696851533}
   - {fileID: 1757119868101522880}
+  - {fileID: -860984806464558308}
+  - {fileID: -4649118898166638443}
+  - {fileID: -7427318108332267491}
+  - {fileID: 174705562240724528}
+  - {fileID: 6036709324837717570}
+  - {fileID: -7669858653279618648}
+  - {fileID: 4857414570290210771}
   m_EntryTransitions: []
   m_StateMachineTransitions: {}
   m_StateMachineBehaviours: []
@@ -758,7 +758,7 @@ AnimatorStateTransition:
   m_HasExitTime: 0
   m_HasFixedDuration: 1
   m_InterruptionSource: 3
-  m_OrderedInterruption: 0
+  m_OrderedInterruption: 1
   m_CanTransitionToSelf: 0
 --- !u!1102 &2477204317832130295
 AnimatorState:
@@ -844,7 +844,7 @@ AnimatorStateTransition:
   m_HasExitTime: 0
   m_HasFixedDuration: 1
   m_InterruptionSource: 3
-  m_OrderedInterruption: 0
+  m_OrderedInterruption: 1
   m_CanTransitionToSelf: 0
 --- !u!1101 &4857414570290210771
 AnimatorStateTransition:
@@ -875,7 +875,7 @@ AnimatorStateTransition:
   m_HasExitTime: 0
   m_HasFixedDuration: 1
   m_InterruptionSource: 3
-  m_OrderedInterruption: 0
+  m_OrderedInterruption: 1
   m_CanTransitionToSelf: 0
 --- !u!1102 &5555100325363135546
 AnimatorState:
@@ -935,7 +935,7 @@ AnimatorStateTransition:
   m_HasExitTime: 0
   m_HasFixedDuration: 1
   m_InterruptionSource: 3
-  m_OrderedInterruption: 0
+  m_OrderedInterruption: 1
   m_CanTransitionToSelf: 0
 --- !u!1102 &6248190111841673802
 AnimatorState:
@@ -1047,5 +1047,5 @@ AnimatorStateTransition:
   m_HasExitTime: 0
   m_HasFixedDuration: 1
   m_InterruptionSource: 3
-  m_OrderedInterruption: 0
+  m_OrderedInterruption: 1
   m_CanTransitionToSelf: 0

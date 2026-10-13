@@ -1,0 +1,6 @@
+{
+    "name": "LingsLore.Animation.Editor.Tests",
+    "references": [],
+    "includePlatforms": ["Editor"],
+    "optionalUnityReferences": ["TestAssemblies"]
+}

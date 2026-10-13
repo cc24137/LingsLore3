@@ -1,13 +1,11 @@
 using UnityEngine;
 
-// Executa o dodge. Vida, chao e custo de stamina sao verificados no motor.
+// Executa apenas o movimento fisico e os tempos do dodge.
+// A animacao visual pertence ao Animator; este script nao altera pivots.
+// Vida, chao e custo de stamina sao verificados no PlayerMotor.
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerDodge : MonoBehaviour
 {
-    [Header("Visual")]
-    [SerializeField] private Transform rollPivot;
-    [SerializeField] private bool animateRollPivot = true;
-
     [Header("Rolamento")]
     [SerializeField, Min(0.01f)] private float rollDuration = 0.45f;
     [SerializeField, Min(0f)] private float rollStartSpeed = 14f;
@@ -28,26 +26,9 @@ public class PlayerDodge : MonoBehaviour
     private Rigidbody body;
     private Vector3 dodgeDirection;
     private float dodgeTimer;
-    private Quaternion initialPivotRotation = Quaternion.identity;
 
     public float TotalDuration => Mathf.Max(0.01f, rollDuration + recoveryDuration);
     public float NormalizedTime => IsActive ? Mathf.Clamp01(dodgeTimer / TotalDuration) : 0f;
-
-    public bool UseProceduralRollAnimation
-    {
-        get => animateRollPivot;
-        set
-        {
-            if (animateRollPivot == value)
-                return;
-
-            // Remove uma rotacao antiga antes de entregar o visual ao Animator.
-            if (!value && rollPivot != null)
-                rollPivot.localRotation = initialPivotRotation;
-
-            animateRollPivot = value;
-        }
-    }
 
     public bool IsActive { get; private set; }
     public bool IsRolling => IsActive && dodgeTimer < rollDuration;
@@ -62,9 +43,6 @@ public class PlayerDodge : MonoBehaviour
     private void Awake()
     {
         body = GetComponent<Rigidbody>();
-
-        if (rollPivot != null)
-            initialPivotRotation = rollPivot.localRotation;
     }
 
     public void BeginDodge(Vector3 direction)
@@ -112,31 +90,10 @@ public class PlayerDodge : MonoBehaviour
             Cancel();
     }
 
-    private void LateUpdate()
-    {
-        if (!animateRollPivot || rollPivot == null)
-            return;
-
-        if (IsRolling)
-        {
-            float progress = Mathf.Clamp01(dodgeTimer / rollDuration);
-            rollPivot.localRotation =
-                initialPivotRotation *
-                Quaternion.AngleAxis(360f * progress, Vector3.right);
-        }
-        else
-        {
-            rollPivot.localRotation = initialPivotRotation;
-        }
-    }
-
     public void Cancel()
     {
         IsActive = false;
         dodgeTimer = 0f;
-
-        if (animateRollPivot && rollPivot != null)
-            rollPivot.localRotation = initialPivotRotation;
     }
 
     private void OnDisable()
