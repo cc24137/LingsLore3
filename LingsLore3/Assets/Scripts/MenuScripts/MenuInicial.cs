@@ -5,7 +5,7 @@ public class MenuInicial : MonoBehaviour
 {
     public void Jogar()
     {
-        SceneManager.LoadScene("ArenaPrototype");
+        SceneManager.LoadScene("Contextualizacao");
     }
 
     public void Sair()
