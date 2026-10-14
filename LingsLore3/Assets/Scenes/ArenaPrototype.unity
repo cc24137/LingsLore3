@@ -344,6 +344,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 520
   lineOfSightOrigin: {x: 0, y: 1, z: 0}
+  showHitboxGizmos: 1
+  previewAttack: 6
   comboWindow: 0.4
   bufferOpensAt: 0.55
   light1:
@@ -404,8 +406,8 @@ MonoBehaviour:
     staminaCost: 0
     movementMultiplier: 0.3
     stepDistance: 0
-    hitboxCenter: {x: 0, y: 0, z: 0}
-    hitboxSize: {x: 1, y: 3, z: 3}
+    hitboxCenter: {x: 0, y: 0.5, z: 0}
+    hitboxSize: {x: 1, y: 4, z: 4}
 --- !u!114 &28656689
 MonoBehaviour:
   m_ObjectHideFlags: 0

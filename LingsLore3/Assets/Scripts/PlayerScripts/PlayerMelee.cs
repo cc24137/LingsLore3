@@ -26,6 +26,10 @@ public class PlayerMelee : MonoBehaviour
     [SerializeField] private LayerMask obstacleMask;
     [SerializeField] private Vector3 lineOfSightOrigin = new Vector3(0f, 1f, 0f);
 
+    [Header("Gizmos da hitbox")]
+    [SerializeField] private bool showHitboxGizmos = true;
+    [SerializeField] private AttackType previewAttack = AttackType.Light1;
+
     [Header("Janelas de continuacao")]
     [SerializeField, Min(0f)] private float comboWindow = 0.4f;
     [SerializeField, Range(0f, 1f)] private float bufferOpensAt = 0.55f;
@@ -282,6 +286,46 @@ public class PlayerMelee : MonoBehaviour
     private void OnDisable()
     {
         Cancel();
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (!showHitboxGizmos || !enabled)
+            return;
+
+        // Em Play, mostra apenas o golpe em andamento. Fora de Play, permite
+        // conferir cada hitbox escolhendo Preview Attack no Inspector.
+        if (Application.isPlaying && !IsActive)
+            return;
+
+        AttackSettings selected = Application.isPlaying ? settings : GetSettings(previewAttack);
+        if (selected == null)
+            return;
+
+        Rigidbody owner = body != null ? body : GetComponent<Rigidbody>();
+        Vector3 position = owner != null ? owner.position : transform.position;
+        Quaternion rotation = Application.isPlaying ? AttackRotation :
+            owner != null ? owner.rotation : transform.rotation;
+        Vector3 size = GetSafeSize(selected.hitboxSize);
+        bool damageWindow = Application.isPlaying &&
+            attackTimer >= HitStart && attackTimer < HitEnd;
+
+        Matrix4x4 previousMatrix = Gizmos.matrix;
+        Color previousColor = Gizmos.color;
+        // A consulta de dano usa a pose do Rigidbody e dimensoes em unidades
+        // de mundo; a escala do Transform nao deve alterar o desenho.
+        Gizmos.matrix = Matrix4x4.TRS(position, rotation, Vector3.one);
+        Gizmos.color = damageWindow ? Color.red : Color.yellow;
+        Gizmos.DrawWireCube(selected.hitboxCenter, size);
+
+        if (damageWindow)
+        {
+            Gizmos.color = new Color(1f, 0f, 0f, 0.15f);
+            Gizmos.DrawCube(selected.hitboxCenter, size);
+        }
+
+        Gizmos.matrix = previousMatrix;
+        Gizmos.color = previousColor;
     }
 
 }
