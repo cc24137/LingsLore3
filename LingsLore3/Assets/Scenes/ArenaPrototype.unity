@@ -345,11 +345,11 @@ MonoBehaviour:
     m_Bits: 520
   lineOfSightOrigin: {x: 0, y: 1, z: 0}
   showHitboxGizmos: 1
-  previewAttack: 6
+  previewAttack: 3
   comboWindow: 0.4
   bufferOpensAt: 0.55
   light1:
-    duration: 0.45
+    duration: 0.36
     hitStart: 0.12
     hitEnd: 0.26
     damage: 12
@@ -359,7 +359,7 @@ MonoBehaviour:
     hitboxCenter: {x: 0, y: 1, z: 1.25}
     hitboxSize: {x: 1.8, y: 1.6, z: 1.8}
   light2:
-    duration: 0.45
+    duration: 0.36
     hitStart: 0.12
     hitEnd: 0.26
     damage: 14
@@ -369,15 +369,15 @@ MonoBehaviour:
     hitboxCenter: {x: 0, y: 1, z: 1.25}
     hitboxSize: {x: 1.8, y: 1.6, z: 1.8}
   light3:
-    duration: 0.55
+    duration: 0.45
     hitStart: 0.18
     hitEnd: 0.34
     damage: 18
     staminaCost: 0
     movementMultiplier: 0.3
     stepDistance: 0.4
-    hitboxCenter: {x: 0, y: 1, z: 1.4}
-    hitboxSize: {x: 2, y: 1.8, z: 2.2}
+    hitboxCenter: {x: 0, y: 1, z: 2.5}
+    hitboxSize: {x: 2, y: 1, z: 2}
   chargedUp:
     duration: 0.65
     hitStart: 0.22
