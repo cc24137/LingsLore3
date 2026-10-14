@@ -345,7 +345,7 @@ MonoBehaviour:
     m_Bits: 520
   lineOfSightOrigin: {x: 0, y: 1, z: 0}
   showHitboxGizmos: 1
-  previewAttack: 3
+  previewAttack: 6
   comboWindow: 0.4
   bufferOpensAt: 0.55
   light1:
@@ -376,7 +376,7 @@ MonoBehaviour:
     staminaCost: 0
     movementMultiplier: 0.3
     stepDistance: 0.4
-    hitboxCenter: {x: 0, y: 1, z: 2.5}
+    hitboxCenter: {x: 0, y: 1, z: 2.7}
     hitboxSize: {x: 2, y: 1, z: 2}
   chargedUp:
     duration: 0.65
