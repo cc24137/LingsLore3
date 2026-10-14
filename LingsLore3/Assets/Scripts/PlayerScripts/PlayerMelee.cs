@@ -10,7 +10,7 @@ public class PlayerMelee : MonoBehaviour
     [Serializable]
     public class AttackSettings
     {
-        [Min(0.05f)] public float duration = 0.45f;
+        [Min(0.05f)] public float duration = 0.36f;
         [Min(0f)] public float hitStart = 0.12f;
         [Min(0f)] public float hitEnd = 0.26f;
         [Min(0f)] public float damage = 12f;
@@ -38,11 +38,11 @@ public class PlayerMelee : MonoBehaviour
     [SerializeField] private AttackSettings light1 = new AttackSettings();
     [SerializeField] private AttackSettings light2 = new AttackSettings
     {
-        duration = 0.45f, damage = 14f, stepDistance = 0.3f
+        duration = 0.36f, damage = 14f, stepDistance = 0.3f
     };
     [SerializeField] private AttackSettings light3 = new AttackSettings
     {
-        duration = 0.55f, hitStart = 0.18f, hitEnd = 0.34f,
+        duration = 0.45f, hitStart = 0.18f, hitEnd = 0.34f,
         damage = 18f, stepDistance = 0.4f,
         hitboxCenter = new Vector3(0f, 1f, 1.4f),
         hitboxSize = new Vector3(2f, 1.8f, 2.2f)
