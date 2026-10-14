@@ -17,6 +17,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Contextualizacao.unity
     guid: ea246970b1ad44c4097a3fa9ffca9194
+  - enabled: 1
+    path: Assets/Scenes/SelecaoPersonagem.unity
+    guid: ef202e568341f41cdadb2bb00c3e6b51
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
