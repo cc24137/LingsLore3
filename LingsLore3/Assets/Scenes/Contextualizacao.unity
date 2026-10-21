@@ -779,7 +779,7 @@ MonoBehaviour:
   velocidade: 70
   posicaoInicial: -200
   posicaoFinal: 6000
-  cenaJogo: ArenaPrototype
+  cenaJogo: Tutorial
 --- !u!4 &1260252911
 Transform:
   m_ObjectHideFlags: 0
