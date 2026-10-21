@@ -51,7 +51,7 @@ public class PlayerMelee : MonoBehaviour
     [Header("Carregado ascendente")]
     [SerializeField] private AttackSettings chargedUp = new AttackSettings
     {
-        duration = 0.65f, hitStart = 0.22f, hitEnd = 0.38f,
+        duration = 0.5f, hitStart = 0.1f, hitEnd = 0.3f,
         damage = 32f, staminaCost = 20f, movementMultiplier = 0.15f,
         stepDistance = 0.3f,
         hitboxCenter = new Vector3(0f, 1.3f, 1.25f),
@@ -61,7 +61,7 @@ public class PlayerMelee : MonoBehaviour
     [Header("Continuacao descendente")]
     [SerializeField] private AttackSettings chargedDown = new AttackSettings
     {
-        duration = 0.7f, hitStart = 0.2f, hitEnd = 0.4f,
+        duration = 0.6f, hitStart = 0.1f, hitEnd = 0.3f,
         damage = 42f, staminaCost = 25f, movementMultiplier = 0.1f,
         stepDistance = 0.35f,
         hitboxCenter = new Vector3(0f, 1.1f, 1.35f),
