@@ -647,7 +647,7 @@ MonoBehaviour:
   dodgeSprintAction: {fileID: 0}
   attackAction: {fileID: 0}
   throwHashiAction: {fileID: 0}
-  movementCamera: {fileID: 0}
+  movementCamera: {fileID: 3282035870114400524, guid: 72dc671a2adcd4623bf7bedb836dffc2, type: 3}
   groundCheck: {fileID: 1673793658632429951}
   groundMask:
     serializedVersion: 2
@@ -746,7 +746,7 @@ MonoBehaviour:
   onDeath:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 4310892910318517748, guid: b59f6d507dd55466ea3cd431e8655eb4, type: 3}
         m_TargetAssemblyTypeName: FimDeJogo, Assembly-CSharp
         m_MethodName: ExibirDerrota
         m_Mode: 1
@@ -868,7 +868,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHashi
   projectilePrefab: {fileID: -4649547100616442519, guid: f18aeb9330b104037ac5fd00cf21c5b0, type: 3}
   firePoint: {fileID: 5104285036496242309}
-  aimCamera: {fileID: 0}
+  aimCamera: {fileID: 5527378779101294287, guid: 72dc671a2adcd4623bf7bedb836dffc2, type: 3}
   backHashis:
   - {fileID: 6297692683521953340}
   - {fileID: 4553885336819184030}
