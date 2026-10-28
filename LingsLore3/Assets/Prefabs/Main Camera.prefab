@@ -150,7 +150,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d9d5506fe9c6c742b26b9a22c9e4cbc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ThirdPersonCamera
-  target: {fileID: 0}
+  target: {fileID: 4179926326753591687, guid: f5b4fbbddb5db4d51850ceb84c463869, type: 3}
   lookAction: {fileID: 0}
   targetHeight: 1.8
   distance: 7
