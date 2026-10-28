@@ -1340,6 +1340,10 @@ PrefabInstance:
       propertyPath: groundMask.m_Bits
       value: 128
       objectReference: {fileID: 0}
+    - target: {fileID: 2815968617334740565, guid: f5b4fbbddb5db4d51850ceb84c463869, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2999062693324019157, guid: f5b4fbbddb5db4d51850ceb84c463869, type: 3}
       propertyPath: previewAttack
       value: 0
