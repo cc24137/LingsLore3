@@ -145,6 +145,7 @@ Transform:
   m_Children:
   - {fileID: 3075266797777085612}
   - {fileID: 8801109326435163005}
+  - {fileID: 5104285036496242309}
   m_Father: {fileID: 4179926326753591687}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &8082381591605667135
@@ -384,6 +385,37 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &5427494111280436155
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5104285036496242309}
+  m_Layer: 6
+  m_Name: PivotHashi
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5104285036496242309
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5427494111280436155}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.138, z: 0.477}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7187820936272000593}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6297692683521953340
 GameObject:
   m_ObjectHideFlags: 0
@@ -523,6 +555,7 @@ GameObject:
   - component: {fileID: 6547861235598511370}
   - component: {fileID: 2999062693324019157}
   - component: {fileID: 1273842927237044294}
+  - component: {fileID: 5565780530721533133}
   m_Layer: 6
   m_Name: Ling
   m_TagString: Untagged
@@ -613,6 +646,7 @@ MonoBehaviour:
   jumpAction: {fileID: 0}
   dodgeSprintAction: {fileID: 0}
   attackAction: {fileID: 0}
+  throwHashiAction: {fileID: 0}
   movementCamera: {fileID: 0}
   groundCheck: {fileID: 1673793658632429951}
   groundMask:
@@ -689,8 +723,8 @@ MonoBehaviour:
     m_RotationOrder: 4
   recoveryDuration: 0.2
   recoverySpeedMultiplier: 0.35
-  invulnerabilityStart: 0.06
-  invulnerabilityEnd: 0.28
+  invulnerabilityStart: 0
+  invulnerabilityEnd: 0.4
 --- !u!114 &6547861235598511370
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -820,6 +854,31 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ForkAttackAnimator
   animator: {fileID: 8082381591605667135}
+--- !u!114 &5565780530721533133
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8005583530017208899}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63f13535d884c4fb4b330820d933e2e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerHashi
+  projectilePrefab: {fileID: -4649547100616442519, guid: f18aeb9330b104037ac5fd00cf21c5b0, type: 3}
+  firePoint: {fileID: 5104285036496242309}
+  aimCamera: {fileID: 0}
+  backHashis:
+  - {fileID: 6297692683521953340}
+  - {fileID: 4553885336819184030}
+  damage: 20
+  shotInterval: 0.25
+  reloadTime: 10
+  aimDistance: 80
+  hitMask:
+    serializedVersion: 2
+    m_Bits: 904
 --- !u!1 &8513959521425641727
 GameObject:
   m_ObjectHideFlags: 0

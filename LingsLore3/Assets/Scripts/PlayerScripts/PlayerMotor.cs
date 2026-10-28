@@ -5,6 +5,7 @@ using UnityEngine.InputSystem.Interactions;
 [DefaultExecutionOrder(-100)]
 [RequireComponent(typeof(Rigidbody), typeof(PlayerJump), typeof(PlayerDodge))]
 [RequireComponent(typeof(PlayerResources), typeof(PlayerMelee))]
+[RequireComponent(typeof(PlayerHashi))]
 public class PlayerMotor : MonoBehaviour
 {
     [Header("Inputs")]
@@ -12,6 +13,7 @@ public class PlayerMotor : MonoBehaviour
     [SerializeField] private InputActionReference jumpAction;
     [SerializeField] private InputActionReference dodgeSprintAction;
     [SerializeField] private InputActionReference attackAction;
+    [SerializeField] private InputActionReference throwHashiAction;
 
     [Header("Referencias")]
     [SerializeField] private Transform movementCamera;
@@ -44,6 +46,8 @@ public class PlayerMotor : MonoBehaviour
     [SerializeField, Min(0.05f)] private float followupChargeDuration = 0.25f;
     [SerializeField, Range(0f, 1f)] private float chargingMovementMultiplier = 0.2f;
 
+    private PlayerHashi hashi;
+    private bool throwHashiRequested;
     private PlayerMelee melee;
     private enum ChargeIntent { None, Up, Down }
     private ChargeIntent chargeIntent;
@@ -89,6 +93,11 @@ public class PlayerMotor : MonoBehaviour
         IsDodging || IsSprinting || IsAttacking || IsCharging ||
         queuedLightAttack || queuedChargedAttack != PlayerMelee.AttackType.None;
 
+    public bool CanThrowHashi =>
+        !IsDead && !IsDodging && !IsAttacking && !IsCharging &&
+        queuedChargedAttack == PlayerMelee.AttackType.None && !queuedLightAttack &&
+        hashi != null && hashi.isActiveAndEnabled && hashi.CanFire;
+
     public bool CanStartAttack =>
         !IsDead && !IsDodging && !IsAttacking &&
         melee != null && melee.enabled;
@@ -113,6 +122,7 @@ public class PlayerMotor : MonoBehaviour
         jump = GetComponent<PlayerJump>();
         dodge = GetComponent<PlayerDodge>();
         melee = GetComponent<PlayerMelee>();
+        hashi = GetComponent<PlayerHashi>();
     }
 
     private void OnEnable()
@@ -124,6 +134,8 @@ public class PlayerMotor : MonoBehaviour
         jumpAction.action.Enable();
         dodgeSprintAction.action.Enable();
         attackAction.action.Enable();
+        if (throwHashiAction != null)
+            throwHashiAction.action.Enable();
     }
 
     private void OnDisable()
@@ -135,6 +147,8 @@ public class PlayerMotor : MonoBehaviour
         jumpAction.action.Disable();
         dodgeSprintAction.action.Disable();
         attackAction.action.Disable();
+        if (throwHashiAction != null)
+            throwHashiAction.action.Disable();
 
         StopActions();
         IsGrounded = false;
@@ -172,6 +186,9 @@ public class PlayerMotor : MonoBehaviour
             attackReleased = true;
 
         attackHeld = attackAction.action.IsPressed();
+
+        if (throwHashiAction != null && throwHashiAction.action.WasPressedThisFrame())
+            throwHashiRequested = true;
     }
 
     private void FixedUpdate()
@@ -217,6 +234,7 @@ public class PlayerMotor : MonoBehaviour
 
         if (IsDodging)
         {
+            throwHashiRequested = false;
             ClearCombatInputRequests();
             jumpRequested = false;
             jump.Cancel();
@@ -236,6 +254,11 @@ public class PlayerMotor : MonoBehaviour
         }
 
         HandleCombatRequests(direction);
+
+        // Garfo e dodge tem prioridade sobre pedidos simultaneos de disparo.
+        if (throwHashiRequested && CanThrowHashi)
+            hashi.Fire(transform);
+        throwHashiRequested = false;
 
         if (IsAttacking)
         {
@@ -541,6 +564,7 @@ public class PlayerMotor : MonoBehaviour
 
     private void StopActions()
     {
+        throwHashiRequested = false;
         moveInput = Vector2.zero;
         jumpRequested = false;
         jumpHeld = false;
