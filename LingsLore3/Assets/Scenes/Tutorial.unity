@@ -131,8 +131,7 @@ GameObject:
   - component: {fileID: 12571197}
   - component: {fileID: 12571196}
   - component: {fileID: 12571195}
-  - component: {fileID: 12571194}
-  - component: {fileID: 12571193}
+  - component: {fileID: 12571198}
   m_Layer: 3
   m_Name: CreditoSocial (6)
   m_TagString: Untagged
@@ -155,39 +154,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 362483029}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &12571193
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 12571191}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a9eeb2a71e4b47c0a855d140b8b4044, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
-  velocidadeGiro: 90
-  aoColetar:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &12571194
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 12571191}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7cb0b3f1d4d1b4107a6bde154a085d47, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
-  velocidadeGiro: 90
-  aoColetar:
-    m_PersistentCalls:
-      m_Calls:
-      - {m_Target: {fileID: 0}, m_TargetAssemblyTypeName: ContadorCreditos, Assembly-CSharp, m_MethodName: RegistrarColeta, m_Mode: 1, m_Arguments: {m_ObjectArgument: {fileID: 0}, m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine, m_IntArgument: 0, m_FloatArgument: 0, m_StringArgument: , m_BoolArgument: 0}, m_CallState: 2}
 --- !u!65 &12571195
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -266,6 +232,22 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 12571191}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &12571198
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 12571191}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53b2900f2736941b0a70e353ffb2928d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
+  velocidadeGiro: 90
+  aoColetar:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &13129129
 GameObject:
   m_ObjectHideFlags: 0
@@ -467,6 +449,37 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.InputActionReference
   m_Asset: {fileID: -944628639613478452, guid: 3101f40c679c0a041a80cc6bf0cc1edf, type: 3}
   m_ActionId: d7f7ffc5-b5db-4046-9213-71e883cd1071
+--- !u!1 &64577039
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 64577040}
+  m_Layer: 3
+  m_Name: InicioCorrida
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &64577040
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 64577039}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -4.32, y: 0, z: -11.58}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1385803612}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &65767877
 GameObject:
   m_ObjectHideFlags: 0
@@ -678,8 +691,7 @@ GameObject:
   - component: {fileID: 121582600}
   - component: {fileID: 121582599}
   - component: {fileID: 121582598}
-  - component: {fileID: 121582597}
-  - component: {fileID: 121582596}
+  - component: {fileID: 121582601}
   m_Layer: 3
   m_Name: CreditoSocial (7)
   m_TagString: Untagged
@@ -702,39 +714,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 362483029}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &121582596
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 121582594}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a9eeb2a71e4b47c0a855d140b8b4044, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
-  velocidadeGiro: 90
-  aoColetar:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &121582597
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 121582594}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7cb0b3f1d4d1b4107a6bde154a085d47, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
-  velocidadeGiro: 90
-  aoColetar:
-    m_PersistentCalls:
-      m_Calls:
-      - {m_Target: {fileID: 0}, m_TargetAssemblyTypeName: ContadorCreditos, Assembly-CSharp, m_MethodName: RegistrarColeta, m_Mode: 1, m_Arguments: {m_ObjectArgument: {fileID: 0}, m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine, m_IntArgument: 0, m_FloatArgument: 0, m_StringArgument: , m_BoolArgument: 0}, m_CallState: 2}
 --- !u!65 &121582598
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -813,6 +792,22 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 121582594}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &121582601
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 121582594}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53b2900f2736941b0a70e353ffb2928d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
+  velocidadeGiro: 90
+  aoColetar:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &156488846
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -876,6 +871,7 @@ GameObject:
   - component: {fileID: 219774423}
   - component: {fileID: 219774422}
   - component: {fileID: 219774421}
+  - component: {fileID: 219774425}
   m_Layer: 3
   m_Name: CreditoSocial (2)
   m_TagString: Untagged
@@ -992,6 +988,22 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 219774419}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &219774425
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 219774419}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53b2900f2736941b0a70e353ffb2928d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
+  velocidadeGiro: 90
+  aoColetar:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &337561534
 GameObject:
   m_ObjectHideFlags: 0
@@ -1492,6 +1504,7 @@ RectTransform:
   - {fileID: 1241110928}
   - {fileID: 727478678}
   - {fileID: 1397881946}
+  - {fileID: 2025003694}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -1508,15 +1521,23 @@ MonoBehaviour:
   m_GameObject: {fileID: 478753746}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c1380b5d19cd4399a35d6c135cda1b1, type: 3}
+  m_Script: {fileID: 11500000, guid: 955e024f929de4f04ba31e425ec43617, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ContadorCreditos
   textoContador: {fileID: 1397881947}
   totalCreditos: 5
   rodadas:
   - grupoCreditos: {fileID: 1413387574}
+    tempoLimite: 0
+    pontoInicial: {fileID: 0}
   - grupoCreditos: {fileID: 75796922}
+    tempoLimite: 0
+    pontoInicial: {fileID: 0}
   - grupoCreditos: {fileID: 362483028}
+    tempoLimite: 30
+    pontoInicial: {fileID: 64577040}
+  textoTempo: {fileID: 2025003692}
+  jogador: {fileID: 1139482912}
 --- !u!1 &490724743
 GameObject:
   m_ObjectHideFlags: 0
@@ -1964,7 +1985,6 @@ GameObject:
   - component: {fileID: 540638947}
   - component: {fileID: 540638946}
   - component: {fileID: 540638945}
-  - component: {fileID: 540638944}
   - component: {fileID: 540638948}
   m_Layer: 3
   m_Name: CreditoSocial (3)
@@ -1988,23 +2008,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 75796923}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &540638944
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 540638942}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7cb0b3f1d4d1b4107a6bde154a085d47, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
-  velocidadeGiro: 90
-  aoColetar:
-    m_PersistentCalls:
-      m_Calls:
-      - {m_Target: {fileID: 0}, m_TargetAssemblyTypeName: ContadorCreditos, Assembly-CSharp, m_MethodName: RegistrarColeta, m_Mode: 1, m_Arguments: {m_ObjectArgument: {fileID: 0}, m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine, m_IntArgument: 0, m_FloatArgument: 0, m_StringArgument: , m_BoolArgument: 0}, m_CallState: 2}
 --- !u!65 &540638945
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2092,7 +2095,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 540638942}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a9eeb2a71e4b47c0a855d140b8b4044, type: 3}
+  m_Script: {fileID: 11500000, guid: 53b2900f2736941b0a70e353ffb2928d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
   velocidadeGiro: 90
@@ -2232,6 +2235,7 @@ GameObject:
   - component: {fileID: 774744416}
   - component: {fileID: 774744415}
   - component: {fileID: 774744414}
+  - component: {fileID: 774744418}
   m_Layer: 3
   m_Name: CreditoSocial (3)
   m_TagString: Untagged
@@ -2348,6 +2352,22 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 774744412}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &774744418
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 774744412}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53b2900f2736941b0a70e353ffb2928d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
+  velocidadeGiro: 90
+  aoColetar:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &863917022
 GameObject:
   m_ObjectHideFlags: 0
@@ -2461,8 +2481,7 @@ GameObject:
   - component: {fileID: 1054965915}
   - component: {fileID: 1054965914}
   - component: {fileID: 1054965913}
-  - component: {fileID: 1054965912}
-  - component: {fileID: 1054965911}
+  - component: {fileID: 1054965916}
   m_Layer: 3
   m_Name: CreditoSocial (3)
   m_TagString: Untagged
@@ -2485,39 +2504,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 362483029}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1054965911
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1054965909}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a9eeb2a71e4b47c0a855d140b8b4044, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
-  velocidadeGiro: 90
-  aoColetar:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &1054965912
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1054965909}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7cb0b3f1d4d1b4107a6bde154a085d47, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
-  velocidadeGiro: 90
-  aoColetar:
-    m_PersistentCalls:
-      m_Calls:
-      - {m_Target: {fileID: 0}, m_TargetAssemblyTypeName: ContadorCreditos, Assembly-CSharp, m_MethodName: RegistrarColeta, m_Mode: 1, m_Arguments: {m_ObjectArgument: {fileID: 0}, m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine, m_IntArgument: 0, m_FloatArgument: 0, m_StringArgument: , m_BoolArgument: 0}, m_CallState: 2}
 --- !u!65 &1054965913
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2596,6 +2582,22 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1054965909}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1054965916
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1054965909}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53b2900f2736941b0a70e353ffb2928d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
+  velocidadeGiro: 90
+  aoColetar:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1073755059
 GameObject:
   m_ObjectHideFlags: 0
@@ -2608,8 +2610,7 @@ GameObject:
   - component: {fileID: 1073755065}
   - component: {fileID: 1073755064}
   - component: {fileID: 1073755063}
-  - component: {fileID: 1073755062}
-  - component: {fileID: 1073755061}
+  - component: {fileID: 1073755066}
   m_Layer: 3
   m_Name: CreditoSocial (4)
   m_TagString: Untagged
@@ -2632,39 +2633,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 362483029}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1073755061
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1073755059}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a9eeb2a71e4b47c0a855d140b8b4044, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
-  velocidadeGiro: 90
-  aoColetar:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &1073755062
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1073755059}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7cb0b3f1d4d1b4107a6bde154a085d47, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
-  velocidadeGiro: 90
-  aoColetar:
-    m_PersistentCalls:
-      m_Calls:
-      - {m_Target: {fileID: 0}, m_TargetAssemblyTypeName: ContadorCreditos, Assembly-CSharp, m_MethodName: RegistrarColeta, m_Mode: 1, m_Arguments: {m_ObjectArgument: {fileID: 0}, m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine, m_IntArgument: 0, m_FloatArgument: 0, m_StringArgument: , m_BoolArgument: 0}, m_CallState: 2}
 --- !u!65 &1073755063
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2743,6 +2711,22 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1073755059}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1073755066
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1073755059}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53b2900f2736941b0a70e353ffb2928d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
+  velocidadeGiro: 90
+  aoColetar:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1077003028
 GameObject:
   m_ObjectHideFlags: 0
@@ -2755,8 +2739,7 @@ GameObject:
   - component: {fileID: 1077003034}
   - component: {fileID: 1077003033}
   - component: {fileID: 1077003032}
-  - component: {fileID: 1077003031}
-  - component: {fileID: 1077003030}
+  - component: {fileID: 1077003035}
   m_Layer: 3
   m_Name: CreditoSocial (2)
   m_TagString: Untagged
@@ -2779,39 +2762,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 362483029}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1077003030
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1077003028}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a9eeb2a71e4b47c0a855d140b8b4044, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
-  velocidadeGiro: 90
-  aoColetar:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &1077003031
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1077003028}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7cb0b3f1d4d1b4107a6bde154a085d47, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
-  velocidadeGiro: 90
-  aoColetar:
-    m_PersistentCalls:
-      m_Calls:
-      - {m_Target: {fileID: 0}, m_TargetAssemblyTypeName: ContadorCreditos, Assembly-CSharp, m_MethodName: RegistrarColeta, m_Mode: 1, m_Arguments: {m_ObjectArgument: {fileID: 0}, m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine, m_IntArgument: 0, m_FloatArgument: 0, m_StringArgument: , m_BoolArgument: 0}, m_CallState: 2}
 --- !u!65 &1077003032
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2890,6 +2840,22 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1077003028}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1077003035
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1077003028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53b2900f2736941b0a70e353ffb2928d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
+  velocidadeGiro: 90
+  aoColetar:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &1139482912 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6547861235598511370, guid: f5b4fbbddb5db4d51850ceb84c463869, type: 3}
@@ -3032,8 +2998,7 @@ GameObject:
   - component: {fileID: 1292078815}
   - component: {fileID: 1292078814}
   - component: {fileID: 1292078813}
-  - component: {fileID: 1292078812}
-  - component: {fileID: 1292078811}
+  - component: {fileID: 1292078816}
   m_Layer: 3
   m_Name: CreditoSocial (5)
   m_TagString: Untagged
@@ -3056,39 +3021,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 362483029}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1292078811
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1292078809}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a9eeb2a71e4b47c0a855d140b8b4044, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
-  velocidadeGiro: 90
-  aoColetar:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &1292078812
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1292078809}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7cb0b3f1d4d1b4107a6bde154a085d47, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
-  velocidadeGiro: 90
-  aoColetar:
-    m_PersistentCalls:
-      m_Calls:
-      - {m_Target: {fileID: 0}, m_TargetAssemblyTypeName: ContadorCreditos, Assembly-CSharp, m_MethodName: RegistrarColeta, m_Mode: 1, m_Arguments: {m_ObjectArgument: {fileID: 0}, m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine, m_IntArgument: 0, m_FloatArgument: 0, m_StringArgument: , m_BoolArgument: 0}, m_CallState: 2}
 --- !u!65 &1292078813
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3167,6 +3099,22 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1292078809}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1292078816
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1292078809}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53b2900f2736941b0a70e353ffb2928d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
+  velocidadeGiro: 90
+  aoColetar:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1361583356
 GameObject:
   m_ObjectHideFlags: 0
@@ -3280,6 +3228,7 @@ Transform:
   - {fileID: 1413387575}
   - {fileID: 75796923}
   - {fileID: 362483029}
+  - {fileID: 64577040}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1397881945
@@ -3482,6 +3431,7 @@ GameObject:
   - component: {fileID: 1536955482}
   - component: {fileID: 1536955481}
   - component: {fileID: 1536955480}
+  - component: {fileID: 1536955484}
   m_Layer: 3
   m_Name: CreditoSocial (5)
   m_TagString: Untagged
@@ -3598,6 +3548,22 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1536955478}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1536955484
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1536955478}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53b2900f2736941b0a70e353ffb2928d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
+  velocidadeGiro: 90
+  aoColetar:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1547382354
 GameObject:
   m_ObjectHideFlags: 0
@@ -3723,6 +3689,7 @@ GameObject:
   - component: {fileID: 1565274575}
   - component: {fileID: 1565274574}
   - component: {fileID: 1565274573}
+  - component: {fileID: 1565274577}
   m_Layer: 3
   m_Name: CreditoSocial (4)
   m_TagString: Untagged
@@ -3839,6 +3806,22 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1565274571}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1565274577
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1565274571}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53b2900f2736941b0a70e353ffb2928d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
+  velocidadeGiro: 90
+  aoColetar:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &1639412666
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3865,7 +3848,6 @@ GameObject:
   - component: {fileID: 1646133874}
   - component: {fileID: 1646133873}
   - component: {fileID: 1646133872}
-  - component: {fileID: 1646133871}
   - component: {fileID: 1646133875}
   m_Layer: 3
   m_Name: CreditoSocial (2)
@@ -3889,23 +3871,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 75796923}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1646133871
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1646133869}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7cb0b3f1d4d1b4107a6bde154a085d47, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
-  velocidadeGiro: 90
-  aoColetar:
-    m_PersistentCalls:
-      m_Calls:
-      - {m_Target: {fileID: 0}, m_TargetAssemblyTypeName: ContadorCreditos, Assembly-CSharp, m_MethodName: RegistrarColeta, m_Mode: 1, m_Arguments: {m_ObjectArgument: {fileID: 0}, m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine, m_IntArgument: 0, m_FloatArgument: 0, m_StringArgument: , m_BoolArgument: 0}, m_CallState: 2}
 --- !u!65 &1646133872
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3993,7 +3958,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1646133869}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a9eeb2a71e4b47c0a855d140b8b4044, type: 3}
+  m_Script: {fileID: 11500000, guid: 53b2900f2736941b0a70e353ffb2928d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
   velocidadeGiro: 90
@@ -4139,8 +4104,7 @@ GameObject:
   - component: {fileID: 1692220022}
   - component: {fileID: 1692220021}
   - component: {fileID: 1692220020}
-  - component: {fileID: 1692220019}
-  - component: {fileID: 1692220018}
+  - component: {fileID: 1692220023}
   m_Layer: 3
   m_Name: CreditoSocial (8)
   m_TagString: Untagged
@@ -4163,39 +4127,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 362483029}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1692220018
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1692220016}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a9eeb2a71e4b47c0a855d140b8b4044, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
-  velocidadeGiro: 90
-  aoColetar:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &1692220019
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1692220016}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7cb0b3f1d4d1b4107a6bde154a085d47, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
-  velocidadeGiro: 90
-  aoColetar:
-    m_PersistentCalls:
-      m_Calls:
-      - {m_Target: {fileID: 0}, m_TargetAssemblyTypeName: ContadorCreditos, Assembly-CSharp, m_MethodName: RegistrarColeta, m_Mode: 1, m_Arguments: {m_ObjectArgument: {fileID: 0}, m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine, m_IntArgument: 0, m_FloatArgument: 0, m_StringArgument: , m_BoolArgument: 0}, m_CallState: 2}
 --- !u!65 &1692220020
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4274,6 +4205,22 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1692220016}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1692220023
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1692220016}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53b2900f2736941b0a70e353ffb2928d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
+  velocidadeGiro: 90
+  aoColetar:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1703523016
 GameObject:
   m_ObjectHideFlags: 0
@@ -4361,8 +4308,8 @@ GameObject:
   - component: {fileID: 1733491143}
   - component: {fileID: 1733491142}
   - component: {fileID: 1733491141}
-  - component: {fileID: 1733491140}
   - component: {fileID: 1733491144}
+  - component: {fileID: 1733491145}
   m_Layer: 3
   m_Name: CreditoSocial (1)
   m_TagString: Untagged
@@ -4385,23 +4332,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 75796923}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1733491140
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1733491138}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7cb0b3f1d4d1b4107a6bde154a085d47, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
-  velocidadeGiro: 90
-  aoColetar:
-    m_PersistentCalls:
-      m_Calls:
-      - {m_Target: {fileID: 0}, m_TargetAssemblyTypeName: ContadorCreditos, Assembly-CSharp, m_MethodName: RegistrarColeta, m_Mode: 1, m_Arguments: {m_ObjectArgument: {fileID: 0}, m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine, m_IntArgument: 0, m_FloatArgument: 0, m_StringArgument: , m_BoolArgument: 0}, m_CallState: 2}
 --- !u!65 &1733491141
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4490,6 +4420,22 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9a9eeb2a71e4b47c0a855d140b8b4044, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
+  velocidadeGiro: 90
+  aoColetar:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &1733491145
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1733491138}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53b2900f2736941b0a70e353ffb2928d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
   velocidadeGiro: 90
@@ -4761,6 +4707,7 @@ GameObject:
   - component: {fileID: 1916617264}
   - component: {fileID: 1916617263}
   - component: {fileID: 1916617266}
+  - component: {fileID: 1916617267}
   m_Layer: 3
   m_Name: CreditoSocial (1)
   m_TagString: Untagged
@@ -4871,6 +4818,22 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9a9eeb2a71e4b47c0a855d140b8b4044, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
+  velocidadeGiro: 90
+  aoColetar:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &1916617267
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1916617260}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53b2900f2736941b0a70e353ffb2928d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
   velocidadeGiro: 90
@@ -5014,6 +4977,143 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1988385466}
   m_CullTransparentMesh: 1
+--- !u!1 &2025003691
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2025003694}
+  - component: {fileID: 2025003693}
+  - component: {fileID: 2025003692}
+  m_Layer: 5
+  m_Name: TextoTempo
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2025003692
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2025003691}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_text: "Cr\xE9ditos sociais: 0/5"
+  m_isRightToLeft: 0
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontSharedMaterials: []
+  m_fontMaterial: {fileID: 0}
+  m_fontMaterials: []
+  m_fontColor32:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+  m_enableVertexGradient: 0
+  m_colorMode: 3
+  m_fontColorGradient:
+    topLeft: {r: 1, g: 1, b: 1, a: 1}
+    topRight: {r: 1, g: 1, b: 1, a: 1}
+    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
+    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColorGradientPreset: {fileID: 0}
+  m_spriteAsset: {fileID: 0}
+  m_tintAllSprites: 0
+  m_StyleSheet: {fileID: 0}
+  m_TextStyleHashCode: -1183493901
+  m_overrideHtmlColors: 0
+  m_faceColor:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontSize: 28
+  m_fontSizeBase: 28
+  m_fontWeight: 400
+  m_enableAutoSizing: 0
+  m_fontSizeMin: 18
+  m_fontSizeMax: 72
+  m_fontStyle: 0
+  m_HorizontalAlignment: 4
+  m_VerticalAlignment: 256
+  m_textAlignment: 65535
+  m_characterSpacing: 0
+  m_characterHorizontalScale: 1
+  m_wordSpacing: 0
+  m_lineSpacing: 0
+  m_lineSpacingMax: 0
+  m_paragraphSpacing: 0
+  m_charWidthMaxAdj: 0
+  m_TextWrappingMode: 1
+  m_wordWrappingRatios: 0.4
+  m_overflowMode: 0
+  m_linkedTextComponent: {fileID: 0}
+  parentLinkedComponent: {fileID: 0}
+  m_enableKerning: 0
+  m_ActiveFontFeatures: 6e72656b
+  m_enableExtraPadding: 0
+  checkPaddingRequired: 0
+  m_isRichText: 1
+  m_EmojiFallbackSupport: 1
+  m_parseCtrlCharacters: 1
+  m_isOrthographic: 1
+  m_isCullingEnabled: 0
+  m_horizontalMapping: 0
+  m_verticalMapping: 0
+  m_uvLineOffset: 0
+  m_geometrySortingOrder: 0
+  m_IsTextObjectScaleStatic: 0
+  m_VertexBufferAutoSizeReduction: 0
+  m_useMaxVisibleDescender: 1
+  m_pageToDisplay: 1
+  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_isUsingLegacyAnimationComponent: 0
+  m_isVolumetricText: 0
+  m_hasFontAssetChanged: 0
+  m_baseMaterial: {fileID: 0}
+  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!222 &2025003693
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2025003691}
+  m_CullTransparentMesh: 1
+--- !u!224 &2025003694
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2025003691}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 478753751}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 250, y: 50}
+  m_Pivot: {x: 1, y: 1}
 --- !u!1 &2081674271
 GameObject:
   m_ObjectHideFlags: 0

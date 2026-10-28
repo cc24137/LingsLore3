@@ -22,6 +22,13 @@ public class MoedaColetavel : MonoBehaviour
         transform.Rotate(Vector3.up, velocidadeGiro * Time.deltaTime, Space.World);
     }
 
+    public void ReiniciarColeta()
+    {
+        coletada = false;
+        GetComponent<BoxCollider>().enabled = true;
+        gameObject.SetActive(true);
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (coletada)
@@ -34,8 +41,10 @@ public class MoedaColetavel : MonoBehaviour
         // O Ling pode ter mais de um collider: conta a coleta uma unica vez.
         coletada = true;
         GetComponent<BoxCollider>().enabled = false;
+        // Oculta antes de avisar o contador: o evento pode trocar de rodada.
+        // Manter a nota permite repetir uma rodada sem recriar o cenario.
+        gameObject.SetActive(false);
         Coletada?.Invoke(this);
         aoColetar.Invoke();
-        Destroy(gameObject);
     }
 }

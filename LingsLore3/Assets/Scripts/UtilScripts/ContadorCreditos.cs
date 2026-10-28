@@ -8,6 +8,8 @@ public class ContadorCreditos : MonoBehaviour
     private class RodadaTutorial
     {
         public GameObject grupoCreditos;
+        [Min(0f)] public float tempoLimite;
+        public Transform pontoInicial;
     }
 
     [SerializeField] private TMP_Text textoContador;
@@ -16,9 +18,17 @@ public class ContadorCreditos : MonoBehaviour
     [Header("Rodadas opcionais - o total sera contado automaticamente")]
     [SerializeField] private RodadaTutorial[] rodadas = new RodadaTutorial[0];
 
+    [Header("Cronometro e ponto de inicio opcional")]
+    [SerializeField] private TMP_Text textoTempo;
+    [SerializeField] private PlayerResources jogador;
+
     private int creditosColetados;
     private int rodadaAtual = -1;
     private bool coletaAutomatica;
+    private bool tempoAtivo;
+    private bool tutorialConcluido;
+    private float tempoRestante;
+    private MoedaColetavel[][] notasPorRodada;
     private readonly Dictionary<MoedaColetavel, int> rodadaPorNota =
         new Dictionary<MoedaColetavel, int>();
     private readonly HashSet<MoedaColetavel> notasContadas =
@@ -34,6 +44,8 @@ public class ContadorCreditos : MonoBehaviour
         }
 
         AtualizarTexto();
+        if (textoTempo != null)
+            textoTempo.gameObject.SetActive(false);
     }
 
     private void Start()
@@ -42,6 +54,7 @@ public class ContadorCreditos : MonoBehaviour
             return;
 
         // Valida tudo antes de alterar a cena.
+        notasPorRodada = new MoedaColetavel[rodadas.Length][];
         for (int i = 0; i < rodadas.Length; i++)
         {
             GameObject grupo = rodadas[i].grupoCreditos;
@@ -49,6 +62,16 @@ public class ContadorCreditos : MonoBehaviour
                 grupo.GetComponentsInChildren<MoedaColetavel>(true).Length == 0)
             {
                 Debug.LogError($"Rodada {i + 1}: atribua um grupo com notas, separado do Canvas.", this);
+                enabled = false;
+                return;
+            }
+
+            notasPorRodada[i] = grupo.GetComponentsInChildren<MoedaColetavel>(true);
+
+            if (rodadas[i].pontoInicial != null &&
+                rodadas[i].pontoInicial.IsChildOf(grupo.transform))
+            {
+                Debug.LogError($"Rodada {i + 1}: coloque o ponto inicial fora do grupo de creditos.", this);
                 enabled = false;
                 return;
             }
@@ -71,15 +94,32 @@ public class ContadorCreditos : MonoBehaviour
             GameObject grupo = rodadas[i].grupoCreditos;
             grupo.SetActive(false);
 
-            foreach (MoedaColetavel nota in grupo.GetComponentsInChildren<MoedaColetavel>(true))
+            foreach (MoedaColetavel nota in notasPorRodada[i])
             {
                 rodadaPorNota.Add(nota, i);
                 nota.Coletada += RegistrarColetaAutomatica;
             }
         }
 
+        if (jogador == null)
+            jogador = FindFirstObjectByType<PlayerResources>();
+
         coletaAutomatica = true;
         IniciarRodada(0);
+    }
+
+    private void Update()
+    {
+        if (!tempoAtivo || tutorialConcluido ||
+            (jogador != null && jogador.IsDead))
+            return;
+
+        // O cronometro tambem pausa quando a tela de fim de jogo pausa o jogo.
+        tempoRestante = Mathf.Max(0f, tempoRestante - Time.deltaTime);
+        AtualizarTempo();
+
+        if (tempoRestante <= 0f)
+            IniciarRodada(rodadaAtual);
     }
 
     // Compatibilidade com o contador antigo, sem rodadas configuradas.
@@ -112,10 +152,17 @@ public class ContadorCreditos : MonoBehaviour
 
         if (creditosColetados == totalCreditos && rodadaAtual >= 0)
         {
+            tempoAtivo = false;
             rodadas[rodadaAtual].grupoCreditos.SetActive(false);
 
             if (rodadaAtual + 1 < rodadas.Length)
                 IniciarRodada(rodadaAtual + 1);
+            else
+            {
+                tutorialConcluido = true;
+                if (textoTempo != null)
+                    textoTempo.gameObject.SetActive(false);
+            }
         }
     }
 
@@ -123,12 +170,49 @@ public class ContadorCreditos : MonoBehaviour
     {
         rodadaAtual = indice;
         RodadaTutorial rodada = rodadas[indice];
-        totalCreditos = rodada.grupoCreditos
-            .GetComponentsInChildren<MoedaColetavel>(true).Length;
+        tempoAtivo = false;
+        rodada.grupoCreditos.SetActive(false);
+        notasContadas.Clear();
+        totalCreditos = notasPorRodada[indice].Length;
         creditosColetados = 0;
 
+        foreach (MoedaColetavel nota in notasPorRodada[indice])
+            nota.ReiniciarColeta();
+
+        ReposicionarJogador(rodada.pontoInicial);
         AtualizarTexto();
         rodada.grupoCreditos.SetActive(true);
+
+        tempoRestante = Mathf.Max(0f, rodada.tempoLimite);
+        tempoAtivo = tempoRestante > 0f;
+        if (textoTempo != null)
+        {
+            textoTempo.gameObject.SetActive(tempoAtivo);
+            AtualizarTempo();
+        }
+    }
+
+    private void ReposicionarJogador(Transform ponto)
+    {
+        if (ponto == null || jogador == null)
+            return;
+
+        Rigidbody corpo = jogador.GetComponent<Rigidbody>();
+        if (corpo != null)
+        {
+            corpo.position = ponto.position;
+            corpo.rotation = ponto.rotation;
+            corpo.linearVelocity = Vector3.zero;
+            corpo.angularVelocity = Vector3.zero;
+        }
+        else
+            jogador.transform.SetPositionAndRotation(ponto.position, ponto.rotation);
+    }
+
+    private void AtualizarTempo()
+    {
+        if (textoTempo != null)
+            textoTempo.text = $"Tempo: {Mathf.CeilToInt(tempoRestante)}s";
     }
 
     private void AtualizarTexto()
