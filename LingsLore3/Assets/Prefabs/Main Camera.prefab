@@ -162,6 +162,6 @@ MonoBehaviour:
     m_Bits: 136
   collisionRadius: 0.25
   collisionPadding: 0.1
-  playerMotor: {fileID: 0}
+  playerMotor: {fileID: 2414548747392225552, guid: f5b4fbbddb5db4d51850ceb84c463869, type: 3}
   sprintFieldOfView: 75
   fovChangeSpeed: 60
