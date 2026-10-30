@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -18,17 +19,24 @@ public class ContadorCreditos : MonoBehaviour
     [Header("Rodadas opcionais - o total sera contado automaticamente")]
     [SerializeField] private RodadaTutorial[] rodadas = new RodadaTutorial[0];
 
-    [Header("Cronometro e ponto de inicio opcional")]
+    [Header("Cronometro e jogador")]
     [SerializeField] private TMP_Text textoTempo;
     [SerializeField] private PlayerResources jogador;
+
+    [Header("Reinicio apos morte")]
+    [SerializeField, Min(0f)] private float atrasoRespawn = 0.35f;
+    [SerializeField, Min(0f)] private float tempoInvulnerabilidade = 2.5f;
 
     private int creditosColetados;
     private int rodadaAtual = -1;
     private bool coletaAutomatica;
     private bool tempoAtivo;
     private bool tutorialConcluido;
+    private bool reiniciandoPorMorte;
     private float tempoRestante;
     private MoedaColetavel[][] notasPorRodada;
+    private Coroutine coroutineReinicio;
+
     private readonly Dictionary<MoedaColetavel, int> rodadaPorNota =
         new Dictionary<MoedaColetavel, int>();
     private readonly HashSet<MoedaColetavel> notasContadas =
@@ -50,7 +58,7 @@ public class ContadorCreditos : MonoBehaviour
 
     private void Start()
     {
-        if (rodadas.Length == 0)
+        if (rodadas == null || rodadas.Length == 0)
             return;
 
         // Valida tudo antes de alterar a cena.
@@ -89,6 +97,18 @@ public class ContadorCreditos : MonoBehaviour
             }
         }
 
+        if (jogador == null)
+            jogador = FindFirstObjectByType<PlayerResources>();
+
+        if (jogador == null)
+        {
+            Debug.LogError("ContadorCreditos: nao foi encontrado um PlayerResources para controlar a morte e o respawn.", this);
+            enabled = false;
+            return;
+        }
+
+        jogador.Died += AoJogadorMorrer;
+
         for (int i = 0; i < rodadas.Length; i++)
         {
             GameObject grupo = rodadas[i].grupoCreditos;
@@ -101,25 +121,62 @@ public class ContadorCreditos : MonoBehaviour
             }
         }
 
-        if (jogador == null)
-            jogador = FindFirstObjectByType<PlayerResources>();
-
         coletaAutomatica = true;
         IniciarRodada(0);
     }
 
     private void Update()
     {
-        if (!tempoAtivo || tutorialConcluido ||
+        if (!tempoAtivo || tutorialConcluido || reiniciandoPorMorte ||
             (jogador != null && jogador.IsDead))
             return;
 
-        // O cronometro tambem pausa quando a tela de fim de jogo pausa o jogo.
         tempoRestante = Mathf.Max(0f, tempoRestante - Time.deltaTime);
         AtualizarTempo();
 
+        // Ao acabar o tempo, a propria rodada reinicia com todos os creditos.
         if (tempoRestante <= 0f)
             IniciarRodada(rodadaAtual);
+    }
+
+    private void AoJogadorMorrer()
+    {
+        if (!coletaAutomatica || tutorialConcluido || rodadaAtual < 0 ||
+            reiniciandoPorMorte)
+            return;
+
+        // Congela o cronometro durante a pequena espera do respawn.
+        tempoAtivo = false;
+        reiniciandoPorMorte = true;
+
+        if (coroutineReinicio != null)
+            StopCoroutine(coroutineReinicio);
+
+        coroutineReinicio = StartCoroutine(ReiniciarRodadaAposMorte());
+    }
+
+    private IEnumerator ReiniciarRodadaAposMorte()
+    {
+        if (atrasoRespawn > 0f)
+            yield return new WaitForSecondsRealtime(atrasoRespawn);
+
+        if (this == null || !isActiveAndEnabled || jogador == null ||
+            rodadaAtual < 0 || tutorialConcluido)
+        {
+            reiniciandoPorMorte = false;
+            coroutineReinicio = null;
+            yield break;
+        }
+
+        // IniciarRodada restaura notas, contador, cronometro e ponto inicial.
+        IniciarRodada(rodadaAtual);
+
+        // Reanima o jogador e protege contra dano imediato ao reaparecer.
+        jogador.SetRespawnInvulnerability(tempoInvulnerabilidade);
+        jogador.RestoreFullResources();
+
+        reiniciandoPorMorte = false;
+        coroutineReinicio = null;
     }
 
     // Compatibilidade com o contador antigo, sem rodadas configuradas.
@@ -168,6 +225,9 @@ public class ContadorCreditos : MonoBehaviour
 
     private void IniciarRodada(int indice)
     {
+        if (indice < 0 || indice >= rodadas.Length)
+            return;
+
         rodadaAtual = indice;
         RodadaTutorial rodada = rodadas[indice];
         tempoAtivo = false;
@@ -204,9 +264,13 @@ public class ContadorCreditos : MonoBehaviour
             corpo.rotation = ponto.rotation;
             corpo.linearVelocity = Vector3.zero;
             corpo.angularVelocity = Vector3.zero;
+            corpo.WakeUp();
+            Physics.SyncTransforms();
         }
         else
+        {
             jogador.transform.SetPositionAndRotation(ponto.position, ponto.rotation);
+        }
     }
 
     private void AtualizarTempo()
@@ -217,11 +281,14 @@ public class ContadorCreditos : MonoBehaviour
 
     private void AtualizarTexto()
     {
-        textoContador.text = $"Créditos sociais: {creditosColetados}/{totalCreditos}";
+        textoContador.text = $"Creditos sociais: {creditosColetados}/{totalCreditos}";
     }
 
     private void OnDestroy()
     {
+        if (jogador != null)
+            jogador.Died -= AoJogadorMorrer;
+
         foreach (MoedaColetavel nota in rodadaPorNota.Keys)
         {
             if (nota != null)

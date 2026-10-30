@@ -9,7 +9,7 @@ public class MoedaColetavel : MonoBehaviour
 
     private bool coletada;
 
-    // O contador se conecta a este evento pelo grupo da rodada.
+    // O ContadorCreditos se conecta a este evento pelo grupo da rodada.
     public event System.Action<MoedaColetavel> Coletada;
 
     private void Reset()

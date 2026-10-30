@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -20,8 +21,16 @@ public class PlayerResources : MonoBehaviour
     [Header("Eventos")]
     [SerializeField] private UnityEvent onDeath = new UnityEvent();
 
+    [Header("Comportamento de morte")]
+    [Tooltip("Desmarque no Tutorial para impedir a chamada do evento antigo, como FimDeJogo.ExibirDerrota.")]
+    [SerializeField] private bool invokeUnityEventOnDeath = true;
+
     private PlayerMotor motor;
     private float lastStaminaUseTime = float.NegativeInfinity;
+    private float respawnInvulnerableUntil = float.NegativeInfinity;
+
+    // Evento C# usado pelo ContadorCreditos para reiniciar a rodada atual.
+    public event Action Died;
 
     public float MaxHealth => maxHealth;
     public float MaxStamina => maxStamina;
@@ -47,7 +56,6 @@ public class PlayerResources : MonoBehaviour
         if (IsDead)
             return;
 
-        // O motor informa se alguma acao esta bloqueando a regeneracao.
         if (motor != null && motor.BlocksStaminaRegeneration)
             return;
 
@@ -60,7 +68,6 @@ public class PlayerResources : MonoBehaviour
         );
     }
 
-    // Para acoes com custo fixo: ou paga tudo, ou a acao nao comeca.
     public bool TrySpendStamina(float amount)
     {
         if (IsDead || amount < 0f || float.IsNaN(amount) ||
@@ -78,7 +85,6 @@ public class PlayerResources : MonoBehaviour
         return true;
     }
 
-    // Para consumo continuo: usa o restante e para em zero.
     public void DrainStamina(float amount)
     {
         if (IsDead || amount <= 0f || float.IsNaN(amount) ||
@@ -89,11 +95,14 @@ public class PlayerResources : MonoBehaviour
         lastStaminaUseTime = Time.time;
     }
 
-    // Retorna true somente quando o dano foi aplicado.
     public bool TakeDamage(float amount)
     {
         if (IsDead || amount <= 0f || float.IsNaN(amount) ||
             float.IsInfinity(amount))
+            return false;
+
+        // A protecao vale para qualquer origem de dano, inclusive OnTriggerStay.
+        if (Time.time < respawnInvulnerableUntil)
             return false;
 
         if (motor != null && motor.IsInvulnerable)
@@ -104,13 +113,16 @@ public class PlayerResources : MonoBehaviour
         if (IsDead)
         {
             Debug.Log("Ling morreu.", this);
-            onDeath.Invoke();
+            Died?.Invoke();
+
+            // Mantem a tela de derrota na arena normal; no Tutorial, desmarcar no Inspector.
+            if (invokeUnityEventOnDeath)
+                onDeath.Invoke();
         }
 
         return true;
     }
 
-    // Cura nao revive. Para reiniciar o personagem, use RestoreFullResources.
     public void Heal(float amount)
     {
         if (IsDead || amount <= 0f || float.IsNaN(amount) ||
@@ -125,6 +137,12 @@ public class PlayerResources : MonoBehaviour
         currentHealth = maxHealth;
         currentStamina = maxStamina;
         lastStaminaUseTime = float.NegativeInfinity;
+    }
+
+    // Chamado pelo ContadorCreditos depois de reposicionar o jogador.
+    public void SetRespawnInvulnerability(float duration)
+    {
+        respawnInvulnerableUntil = Time.time + Mathf.Max(0f, duration);
     }
 
     private void OnValidate()
