@@ -13,6 +13,7 @@ public class ContadorCreditos : MonoBehaviour
         [Min(0f)] public float tempoLimite;
         public Transform pontoInicial;
         public EnemyHealth alvoParaDerrotar;
+        public bool exigeComboLeve;
     }
 
     [SerializeField] private TMP_Text textoContador;
@@ -25,6 +26,7 @@ public class ContadorCreditos : MonoBehaviour
     [SerializeField] private TMP_Text textoTempo;
     [SerializeField] private PlayerResources jogador;
     private PlayerMotor motorJogador;
+    private PlayerMelee meleeJogador;
 
     [Header("Reinicio apos morte")]
     [SerializeField, Min(0f)] private float atrasoRespawn = 0.35f;
@@ -40,6 +42,8 @@ public class ContadorCreditos : MonoBehaviour
     private MoedaColetavel[][] notasPorRodada;
     private Coroutine coroutineReinicio;
     private EnemyHealth alvoDaRodada;
+    private int progressoComboLeve;
+    private bool comboLeveCompleto;
 
     private readonly HashSet<MoedaColetavel> notasRegistradas =
         new HashSet<MoedaColetavel>();
@@ -128,6 +132,18 @@ public class ContadorCreditos : MonoBehaviour
 
         jogador.Died += AoJogadorMorrer;
         motorJogador = jogador.GetComponent<PlayerMotor>();
+        meleeJogador = jogador.GetComponent<PlayerMelee>();
+        bool acompanhaCombo = Array.Exists(rodadas,
+            rodada => rodada != null && rodada.exigeComboLeve);
+        if (acompanhaCombo && meleeJogador == null)
+        {
+            Debug.LogError("ContadorCreditos: o jogador precisa de PlayerMelee para validar o combo.", this);
+            enabled = false;
+            return;
+        }
+
+        if (meleeJogador != null)
+            meleeJogador.HitLanded += AoJogadorAtingirAlvo;
 
         for (int i = 0; i < rodadas.Length; i++)
         {
@@ -231,30 +247,33 @@ public class ContadorCreditos : MonoBehaviour
         if (rodadas == null || rodadas.Length == 0)
             return;
 
+        EnemyHealth manequim = null;
         foreach (RodadaTutorial rodada in rodadas)
         {
             if (rodada != null && rodada.alvoParaDerrotar != null)
             {
-                alvoDaRodada = rodada.alvoParaDerrotar;
-                return;
+                manequim = rodada.alvoParaDerrotar;
+                break;
             }
         }
 
-#if UNITY_2023_1_OR_NEWER
-        EnemyHealth[] alvos = FindObjectsByType<EnemyHealth>(
-            FindObjectsInactive.Include, FindObjectsSortMode.None);
-#else
-        EnemyHealth[] alvos = FindObjectsOfType<EnemyHealth>(true);
-#endif
-        EnemyHealth manequim = null;
-        foreach (EnemyHealth alvo in alvos)
+        if (manequim == null)
         {
-            if (alvo != null &&
-                (alvo.name.IndexOf("dummy", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                 alvo.name.IndexOf("manequim", StringComparison.OrdinalIgnoreCase) >= 0))
+#if UNITY_2023_1_OR_NEWER
+            EnemyHealth[] alvos = FindObjectsByType<EnemyHealth>(
+                FindObjectsInactive.Include, FindObjectsSortMode.None);
+#else
+            EnemyHealth[] alvos = FindObjectsOfType<EnemyHealth>(true);
+#endif
+            foreach (EnemyHealth alvo in alvos)
             {
-                manequim = alvo;
-                break;
+                if (alvo != null &&
+                    (alvo.name.IndexOf("dummy", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                     alvo.name.IndexOf("manequim", StringComparison.OrdinalIgnoreCase) >= 0))
+                {
+                    manequim = alvo;
+                    break;
+                }
             }
         }
 
@@ -263,17 +282,23 @@ public class ContadorCreditos : MonoBehaviour
 
         alvoDaRodada = manequim;
         GameObject grupoRodada5 = GameObject.Find("CreditosRodada5");
-        if (grupoRodada5 != null)
+        GameObject grupoRodada6 = GameObject.Find("CreditosRodada6");
+        bool rodadaDoDummyConfigurada = false;
+        foreach (RodadaTutorial rodada in rodadas)
         {
-            foreach (RodadaTutorial rodada in rodadas)
+            if (rodada == null)
+                continue;
+
+            if ((grupoRodada5 != null && rodada.grupoCreditos == grupoRodada5) ||
+                (grupoRodada6 != null && rodada.grupoCreditos == grupoRodada6))
             {
-                if (rodada != null && rodada.grupoCreditos == grupoRodada5)
-                {
-                    rodada.alvoParaDerrotar = manequim;
-                    return;
-                }
+                rodada.alvoParaDerrotar = manequim;
+                rodadaDoDummyConfigurada = true;
             }
         }
+
+        if (rodadaDoDummyConfigurada)
+            return;
 
         if (grupoRodada5 == null ||
             grupoRodada5.GetComponentsInChildren<MoedaColetavel>(true).Length == 0)
@@ -293,6 +318,37 @@ public class ContadorCreditos : MonoBehaviour
         rodadas = comRodadaDoManequim;
     }
 
+    private void AoJogadorAtingirAlvo(EnemyHealth alvo, PlayerMelee.AttackType ataque)
+    {
+        if (!isActiveAndEnabled || tutorialConcluido || rodadaAtual < 0 ||
+            rodadaAtual >= rodadas.Length)
+            return;
+
+        RodadaTutorial rodada = rodadas[rodadaAtual];
+        if (!rodada.exigeComboLeve || rodada.alvoParaDerrotar != alvo ||
+            creditosLiberadosPeloAlvo)
+            return;
+
+        if (ataque == PlayerMelee.AttackType.Light1)
+            progressoComboLeve = 1;
+        else if (ataque == PlayerMelee.AttackType.Light2 && progressoComboLeve == 1)
+            progressoComboLeve = 2;
+        else if (ataque == PlayerMelee.AttackType.Light3 && progressoComboLeve == 2)
+            progressoComboLeve = 3;
+        else
+            progressoComboLeve = 0;
+
+        if (progressoComboLeve == 3)
+        {
+            comboLeveCompleto = true;
+            LiberarCreditosPeloAlvo(alvo);
+        }
+        else
+        {
+            AtualizarTexto();
+        }
+    }
+
     private void AoAlvoDaRodadaDerrotado(EnemyHealth alvo)
     {
         if (!isActiveAndEnabled || tutorialConcluido || rodadaAtual < 0 ||
@@ -301,6 +357,28 @@ public class ContadorCreditos : MonoBehaviour
 
         RodadaTutorial rodada = rodadas[rodadaAtual];
         if (rodada.alvoParaDerrotar != alvo || creditosLiberadosPeloAlvo)
+            return;
+
+        if (rodada.exigeComboLeve && !comboLeveCompleto)
+        {
+            // O dummy pode receber varios golpes enquanto o jogador aprende a sequencia.
+            alvo.RestoreHealth();
+            alvo.gameObject.SetActive(true);
+            Physics.SyncTransforms();
+            return;
+        }
+
+        LiberarCreditosPeloAlvo(alvo);
+    }
+
+    private void LiberarCreditosPeloAlvo(EnemyHealth alvo)
+    {
+        if (!isActiveAndEnabled || tutorialConcluido || rodadaAtual < 0 ||
+            rodadaAtual >= rodadas.Length || creditosLiberadosPeloAlvo)
+            return;
+
+        RodadaTutorial rodada = rodadas[rodadaAtual];
+        if (rodada.alvoParaDerrotar != alvo)
             return;
 
         MoedaColetavel[] notas = notasPorRodada[rodadaAtual];
@@ -355,6 +433,8 @@ public class ContadorCreditos : MonoBehaviour
 
         rodadaAtual = indice;
         RodadaTutorial rodada = rodadas[indice];
+        progressoComboLeve = 0;
+        comboLeveCompleto = false;
         if (motorJogador != null)
             motorJogador.SetBasicAttackOnly(rodada.alvoParaDerrotar != null);
 
@@ -454,7 +534,10 @@ public class ContadorCreditos : MonoBehaviour
         if (rodadaAtual >= 0 && rodadaAtual < rodadas.Length &&
             rodadas[rodadaAtual].alvoParaDerrotar != null && !creditosLiberadosPeloAlvo)
         {
-            textoContador.text = "Golpeie o dummy com o ataque básico";
+            if (rodadas[rodadaAtual].exigeComboLeve)
+                textoContador.text = $"Combo no dummy: {progressoComboLeve}/3 (Light1 → Light2 → Light3)";
+            else
+                textoContador.text = "Golpeie o dummy com o ataque básico";
             return;
         }
 
@@ -468,6 +551,9 @@ public class ContadorCreditos : MonoBehaviour
 
         if (motorJogador != null)
             motorJogador.SetBasicAttackOnly(false);
+
+        if (meleeJogador != null)
+            meleeJogador.HitLanded -= AoJogadorAtingirAlvo;
 
         if (alvoDaRodada != null)
             alvoDaRodada.Died -= AoAlvoDaRodadaDerrotado;

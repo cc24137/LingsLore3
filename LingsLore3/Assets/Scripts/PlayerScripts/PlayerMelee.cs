@@ -86,6 +86,8 @@ public class PlayerMelee : MonoBehaviour
     private Collider[] overlaps = new Collider[16];
     private readonly HashSet<EnemyHealth> hitTargets = new HashSet<EnemyHealth>();
 
+    public event Action<EnemyHealth, AttackType> HitLanded;
+
     public AttackType CurrentAttack { get; private set; }
     public int AttackSerial { get; private set; }
     public bool IsActive => CurrentAttack != AttackType.None;
@@ -223,7 +225,9 @@ public class PlayerMelee : MonoBehaviour
 
             // Um inimigo recebe dano uma unica vez por golpe, mesmo com varios colliders.
             hitTargets.Add(target);
+            AttackType attackType = CurrentAttack;
             target.TakeDamage(settings.damage, IsLightAttack);
+            HitLanded?.Invoke(target, attackType);
         }
     }
 
