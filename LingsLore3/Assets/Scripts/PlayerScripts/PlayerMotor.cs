@@ -8,6 +8,8 @@ using UnityEngine.InputSystem.Interactions;
 [RequireComponent(typeof(PlayerHashi))]
 public class PlayerMotor : MonoBehaviour
 {
+    public enum AttackLessonMode { All, LightComboOnly, ChargedComboOnly }
+
     [Header("Inputs")]
     [SerializeField] private InputActionReference moveAction;
     [SerializeField] private InputActionReference jumpAction;
@@ -58,7 +60,7 @@ public class PlayerMotor : MonoBehaviour
     private PlayerMelee.AttackType queuedChargedAttack;
     private bool airAttackUsed;
     private float chargeTimer;
-    private bool somenteAtaqueBasico;
+    private AttackLessonMode attackLessonMode;
     private bool hashiAtivoAntesDaRestricao;
 
     private Rigidbody body;
@@ -96,7 +98,7 @@ public class PlayerMotor : MonoBehaviour
         queuedLightAttack || queuedChargedAttack != PlayerMelee.AttackType.None;
 
     public bool CanThrowHashi =>
-        !somenteAtaqueBasico && !IsDead && !IsDodging && !IsAttacking && !IsCharging &&
+        attackLessonMode == AttackLessonMode.All && !IsDead && !IsDodging && !IsAttacking && !IsCharging &&
         queuedChargedAttack == PlayerMelee.AttackType.None && !queuedLightAttack &&
         hashi != null && hashi.isActiveAndEnabled && hashi.CanFire;
 
@@ -106,25 +108,43 @@ public class PlayerMotor : MonoBehaviour
 
     public void SetBasicAttackOnly(bool active)
     {
-        if (somenteAtaqueBasico == active)
+        SetAttackLessonMode(active
+            ? AttackLessonMode.LightComboOnly
+            : AttackLessonMode.All);
+    }
+
+    public void SetAttackLessonMode(AttackLessonMode mode)
+    {
+        if (attackLessonMode == mode)
             return;
 
-        somenteAtaqueBasico = active;
+        bool wasRestricted = attackLessonMode != AttackLessonMode.All;
+        bool willBeRestricted = mode != AttackLessonMode.All;
+        attackLessonMode = mode;
         CancelCharge();
         queuedChargedAttack = PlayerMelee.AttackType.None;
+        queuedLightAttack = false;
 
-        if (active)
+        if (!wasRestricted && willBeRestricted)
         {
             hashiAtivoAntesDaRestricao = hashi != null && hashi.enabled;
             if (hashi != null)
                 hashi.enabled = false;
-
-            if (melee != null && melee.IsActive && !melee.IsLightAttack)
-                melee.Cancel();
         }
-        else if (hashi != null)
+        else if (wasRestricted && !willBeRestricted && hashi != null)
         {
             hashi.enabled = hashiAtivoAntesDaRestricao;
+        }
+
+        if (melee != null && melee.IsActive)
+        {
+            bool activeAttackAllowed = mode == AttackLessonMode.All ||
+                (mode == AttackLessonMode.LightComboOnly && melee.IsLightAttack) ||
+                (mode == AttackLessonMode.ChargedComboOnly &&
+                    (melee.CurrentAttack == PlayerMelee.AttackType.ChargedUp ||
+                     melee.CurrentAttack == PlayerMelee.AttackType.ChargedDown));
+            if (!activeAttackAllowed)
+                melee.Cancel();
         }
     }
     public bool IsDodging => dodge != null && dodge.IsActive;
@@ -349,18 +369,19 @@ public class PlayerMotor : MonoBehaviour
         {
             if (IsAttacking)
             {
-                if (!somenteAtaqueBasico &&
+                if (attackLessonMode != AttackLessonMode.LightComboOnly &&
                     melee.CurrentAttack == PlayerMelee.AttackType.ChargedUp)
                 {
                     // Exige uma nova pressao: manter o primeiro hold nao encadeia.
                     ArmCharge(ChargeIntent.Down);
                 }
-                else if (melee.IsLightAttack && melee.CanQueueNext)
+                else if (attackLessonMode != AttackLessonMode.ChargedComboOnly &&
+                    melee.IsLightAttack && melee.CanQueueNext)
                 {
                     if (melee.CurrentAttack != PlayerMelee.AttackType.Light3)
                         queuedLightAttack = true;
 
-                    if (!somenteAtaqueBasico)
+                    if (attackLessonMode == AttackLessonMode.All)
                         ArmCharge(ChargeIntent.Up);
                 }
             }
@@ -368,25 +389,33 @@ public class PlayerMotor : MonoBehaviour
             {
                 if (IsGrounded)
                 {
-                    // O golpe leve sai imediatamente, antes de sabermos se sera um hold.
-                    if (TryStartAttack(melee.NextLightAttack, direction) &&
-                        !somenteAtaqueBasico)
+                    if (attackLessonMode == AttackLessonMode.ChargedComboOnly)
+                    {
                         ArmCharge(ChargeIntent.Up);
+                    }
+                    else if (TryStartAttack(melee.NextLightAttack, direction) &&
+                        attackLessonMode == AttackLessonMode.All)
+                    {
+                        // No modo normal, o golpe leve sai antes de sabermos se sera um hold.
+                        ArmCharge(ChargeIntent.Up);
+                    }
                 }
-                else if (!somenteAtaqueBasico && !airAttackUsed)
+                else if (attackLessonMode == AttackLessonMode.All && !airAttackUsed)
                 {
                     TryStartAttack(PlayerMelee.AttackType.AirSpin, direction);
                 }
             }
         }
 
-        if (somenteAtaqueBasico)
+        if (attackLessonMode == AttackLessonMode.LightComboOnly)
         {
             CancelCharge();
             queuedChargedAttack = PlayerMelee.AttackType.None;
         }
         else
         {
+            if (attackLessonMode == AttackLessonMode.ChargedComboOnly)
+                queuedLightAttack = false;
             UpdateChargeIntent();
         }
         ClearCombatInputRequests();
@@ -469,10 +498,13 @@ public class PlayerMotor : MonoBehaviour
 
     private bool TryStartAttack(PlayerMelee.AttackType type, Vector3 direction)
     {
-        if (somenteAtaqueBasico &&
-            type != PlayerMelee.AttackType.Light1 &&
-            type != PlayerMelee.AttackType.Light2 &&
-            type != PlayerMelee.AttackType.Light3)
+        bool lightAttack = type == PlayerMelee.AttackType.Light1 ||
+            type == PlayerMelee.AttackType.Light2 ||
+            type == PlayerMelee.AttackType.Light3;
+        bool chargedAttack = type == PlayerMelee.AttackType.ChargedUp ||
+            type == PlayerMelee.AttackType.ChargedDown;
+        if ((attackLessonMode == AttackLessonMode.LightComboOnly && !lightAttack) ||
+            (attackLessonMode == AttackLessonMode.ChargedComboOnly && !chargedAttack))
             return false;
 
         if (!CanStartAttack ||

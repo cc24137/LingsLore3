@@ -14,6 +14,7 @@ public class ContadorCreditos : MonoBehaviour
         public Transform pontoInicial;
         public EnemyHealth alvoParaDerrotar;
         public bool exigeComboLeve;
+        public bool exigeComboCarregado;
     }
 
     [SerializeField] private TMP_Text textoContador;
@@ -44,6 +45,8 @@ public class ContadorCreditos : MonoBehaviour
     private EnemyHealth alvoDaRodada;
     private int progressoComboLeve;
     private bool comboLeveCompleto;
+    private int progressoComboCarregado;
+    private bool comboCarregadoCompleto;
 
     private readonly HashSet<MoedaColetavel> notasRegistradas =
         new HashSet<MoedaColetavel>();
@@ -134,7 +137,8 @@ public class ContadorCreditos : MonoBehaviour
         motorJogador = jogador.GetComponent<PlayerMotor>();
         meleeJogador = jogador.GetComponent<PlayerMelee>();
         bool acompanhaCombo = Array.Exists(rodadas,
-            rodada => rodada != null && rodada.exigeComboLeve);
+            rodada => rodada != null &&
+                (rodada.exigeComboLeve || rodada.exigeComboCarregado));
         if (acompanhaCombo && meleeJogador == null)
         {
             Debug.LogError("ContadorCreditos: o jogador precisa de PlayerMelee para validar o combo.", this);
@@ -283,6 +287,7 @@ public class ContadorCreditos : MonoBehaviour
         alvoDaRodada = manequim;
         GameObject grupoRodada5 = GameObject.Find("CreditosRodada5");
         GameObject grupoRodada6 = GameObject.Find("CreditosRodada6");
+        GameObject grupoRodada7 = GameObject.Find("CreditosRodada7");
         bool rodadaDoDummyConfigurada = false;
         foreach (RodadaTutorial rodada in rodadas)
         {
@@ -290,7 +295,8 @@ public class ContadorCreditos : MonoBehaviour
                 continue;
 
             if ((grupoRodada5 != null && rodada.grupoCreditos == grupoRodada5) ||
-                (grupoRodada6 != null && rodada.grupoCreditos == grupoRodada6))
+                (grupoRodada6 != null && rodada.grupoCreditos == grupoRodada6) ||
+                (grupoRodada7 != null && rodada.grupoCreditos == grupoRodada7))
             {
                 rodada.alvoParaDerrotar = manequim;
                 rodadaDoDummyConfigurada = true;
@@ -325,28 +331,46 @@ public class ContadorCreditos : MonoBehaviour
             return;
 
         RodadaTutorial rodada = rodadas[rodadaAtual];
-        if (!rodada.exigeComboLeve || rodada.alvoParaDerrotar != alvo ||
-            creditosLiberadosPeloAlvo)
+        if (rodada.alvoParaDerrotar != alvo || creditosLiberadosPeloAlvo)
             return;
 
-        if (ataque == PlayerMelee.AttackType.Light1)
-            progressoComboLeve = 1;
-        else if (ataque == PlayerMelee.AttackType.Light2 && progressoComboLeve == 1)
-            progressoComboLeve = 2;
-        else if (ataque == PlayerMelee.AttackType.Light3 && progressoComboLeve == 2)
-            progressoComboLeve = 3;
-        else
-            progressoComboLeve = 0;
+        if (rodada.exigeComboLeve)
+        {
+            if (ataque == PlayerMelee.AttackType.Light1)
+                progressoComboLeve = 1;
+            else if (ataque == PlayerMelee.AttackType.Light2 && progressoComboLeve == 1)
+                progressoComboLeve = 2;
+            else if (ataque == PlayerMelee.AttackType.Light3 && progressoComboLeve == 2)
+                progressoComboLeve = 3;
+            else
+                progressoComboLeve = 0;
 
-        if (progressoComboLeve == 3)
-        {
-            comboLeveCompleto = true;
-            LiberarCreditosPeloAlvo(alvo);
+            if (progressoComboLeve == 3)
+            {
+                comboLeveCompleto = true;
+                LiberarCreditosPeloAlvo(alvo);
+                return;
+            }
         }
-        else
+        else if (rodada.exigeComboCarregado)
         {
-            AtualizarTexto();
+            if (ataque == PlayerMelee.AttackType.ChargedUp)
+                progressoComboCarregado = 1;
+            else if (ataque == PlayerMelee.AttackType.ChargedDown &&
+                progressoComboCarregado == 1)
+                progressoComboCarregado = 2;
+            else
+                progressoComboCarregado = 0;
+
+            if (progressoComboCarregado == 2)
+            {
+                comboCarregadoCompleto = true;
+                LiberarCreditosPeloAlvo(alvo);
+                return;
+            }
         }
+
+        AtualizarTexto();
     }
 
     private void AoAlvoDaRodadaDerrotado(EnemyHealth alvo)
@@ -359,7 +383,8 @@ public class ContadorCreditos : MonoBehaviour
         if (rodada.alvoParaDerrotar != alvo || creditosLiberadosPeloAlvo)
             return;
 
-        if (rodada.exigeComboLeve && !comboLeveCompleto)
+        if ((rodada.exigeComboLeve && !comboLeveCompleto) ||
+            (rodada.exigeComboCarregado && !comboCarregadoCompleto))
         {
             // O dummy pode receber varios golpes enquanto o jogador aprende a sequencia.
             alvo.RestoreHealth();
@@ -418,7 +443,7 @@ public class ContadorCreditos : MonoBehaviour
             {
                 tutorialConcluido = true;
                 if (motorJogador != null)
-                    motorJogador.SetBasicAttackOnly(false);
+                    motorJogador.SetAttackLessonMode(PlayerMotor.AttackLessonMode.All);
 
                 if (textoTempo != null)
                     textoTempo.gameObject.SetActive(false);
@@ -435,8 +460,20 @@ public class ContadorCreditos : MonoBehaviour
         RodadaTutorial rodada = rodadas[indice];
         progressoComboLeve = 0;
         comboLeveCompleto = false;
+        progressoComboCarregado = 0;
+        comboCarregadoCompleto = false;
         if (motorJogador != null)
-            motorJogador.SetBasicAttackOnly(rodada.alvoParaDerrotar != null);
+        {
+            PlayerMotor.AttackLessonMode modo = rodada.alvoParaDerrotar == null
+                ? PlayerMotor.AttackLessonMode.All
+                : rodada.exigeComboCarregado
+                    ? PlayerMotor.AttackLessonMode.ChargedComboOnly
+                    : PlayerMotor.AttackLessonMode.LightComboOnly;
+            motorJogador.SetAttackLessonMode(modo);
+        }
+
+        if (rodada.alvoParaDerrotar != null)
+            rodada.alvoParaDerrotar.SetBasicAttackOnly(!rodada.exigeComboCarregado);
 
         tempoAtivo = false;
         rodada.grupoCreditos.SetActive(false);
@@ -536,6 +573,8 @@ public class ContadorCreditos : MonoBehaviour
         {
             if (rodadas[rodadaAtual].exigeComboLeve)
                 textoContador.text = $"Combo no dummy: {progressoComboLeve}/3 (Light1 → Light2 → Light3)";
+            else if (rodadas[rodadaAtual].exigeComboCarregado)
+                textoContador.text = $"Segure ataque; durante o ascendente, solte e segure de novo para o descendente: {progressoComboCarregado}/2";
             else
                 textoContador.text = "Golpeie o dummy com o ataque básico";
             return;
@@ -550,7 +589,7 @@ public class ContadorCreditos : MonoBehaviour
             jogador.Died -= AoJogadorMorrer;
 
         if (motorJogador != null)
-            motorJogador.SetBasicAttackOnly(false);
+            motorJogador.SetAttackLessonMode(PlayerMotor.AttackLessonMode.All);
 
         if (meleeJogador != null)
             meleeJogador.HitLanded -= AoJogadorAtingirAlvo;

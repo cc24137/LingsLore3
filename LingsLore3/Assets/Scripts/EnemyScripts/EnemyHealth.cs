@@ -14,6 +14,11 @@ public class EnemyHealth : MonoBehaviour
     public bool IsDead => currentHealth <= 0f;
     public float CurrentHealth => currentHealth;
 
+    public void SetBasicAttackOnly(bool active)
+    {
+        somenteAtaqueBasico = active;
+    }
+
     private void Awake()
     {
         currentHealth = maxHealth;
