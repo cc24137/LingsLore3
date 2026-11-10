@@ -258,7 +258,7 @@ MonoBehaviour:
   tempoSeguro: 0.3
   tempoAviso: 0.2
   tempoPerigo: 3
-  dano: 10
+  dano: 50
   intervaloEntreDanos: 1
   indicador: {fileID: 1642064252}
   corSegura: {r: 0, g: 1, b: 0, a: 0}
@@ -741,7 +741,7 @@ MonoBehaviour:
   tempoSeguro: 0.3
   tempoAviso: 0.2
   tempoPerigo: 3
-  dano: 10
+  dano: 50
   intervaloEntreDanos: 1
   indicador: {fileID: 1632820891}
   corSegura: {r: 0, g: 1, b: 0, a: 0}
@@ -808,7 +808,38 @@ Transform:
   m_GameObject: {fileID: 64577039}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.32, y: 0, z: -11.58}
+  m_LocalPosition: {x: -4.32, y: 3.22, z: -11.58}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1385803612}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &64731670
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 64731671}
+  m_Layer: 3
+  m_Name: InicioParte2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &64731671
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 64731670}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 12.9, y: 0, z: 4.23}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1123,6 +1154,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4179926326753591687, guid: f5b4fbbddb5db4d51850ceb84c463869, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6547861235598511370, guid: f5b4fbbddb5db4d51850ceb84c463869, type: 3}
+      propertyPath: invokeUnityEventOnDeath
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6547861235598511370, guid: f5b4fbbddb5db4d51850ceb84c463869, type: 3}
+      propertyPath: onDeath.m_PersistentCalls.m_Calls.Array.size
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6547861235598511370, guid: f5b4fbbddb5db4d51850ceb84c463869, type: 3}
@@ -1495,7 +1534,7 @@ MonoBehaviour:
   tempoSeguro: 0.3
   tempoAviso: 0.2
   tempoPerigo: 3
-  dano: 10
+  dano: 50
   intervaloEntreDanos: 1
   indicador: {fileID: 188042183}
   corSegura: {r: 0, g: 1, b: 0, a: 0}
@@ -1661,6 +1700,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a9eeb2a71e4b47c0a855d140b8b4044, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
+  velocidadeGiro: 90
+  aoColetar:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &219774422
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2294,7 +2337,7 @@ MonoBehaviour:
   tempoSeguro: 0.3
   tempoAviso: 0.2
   tempoPerigo: 3
-  dano: 10
+  dano: 50
   intervaloEntreDanos: 1
   indicador: {fileID: 1886937080}
   corSegura: {r: 0, g: 1, b: 0, a: 0}
@@ -2576,18 +2619,20 @@ MonoBehaviour:
   rodadas:
   - grupoCreditos: {fileID: 1413387574}
     tempoLimite: 0
-    pontoInicial: {fileID: 0}
+    pontoInicial: {fileID: 873968533}
   - grupoCreditos: {fileID: 75796922}
     tempoLimite: 0
-    pontoInicial: {fileID: 0}
+    pontoInicial: {fileID: 64731671}
   - grupoCreditos: {fileID: 362483028}
     tempoLimite: 30
     pontoInicial: {fileID: 64577040}
   - grupoCreditos: {fileID: 1504465854}
     tempoLimite: 0
-    pontoInicial: {fileID: 0}
+    pontoInicial: {fileID: 1363493122}
   textoTempo: {fileID: 2025003692}
   jogador: {fileID: 1139482912}
+  atrasoRespawn: 0.35
+  tempoInvulnerabilidade: 2.5
 --- !u!1 &479575318
 GameObject:
   m_ObjectHideFlags: 0
@@ -3330,7 +3375,7 @@ MonoBehaviour:
   tempoSeguro: 0.3
   tempoAviso: 0.2
   tempoPerigo: 3
-  dano: 10
+  dano: 50
   intervaloEntreDanos: 1
   indicador: {fileID: 324303885}
   corSegura: {r: 0, g: 1, b: 0, a: 0}
@@ -3438,7 +3483,7 @@ MonoBehaviour:
   tempoSeguro: 0.3
   tempoAviso: 0.2
   tempoPerigo: 3
-  dano: 10
+  dano: 50
   intervaloEntreDanos: 1
   indicador: {fileID: 1981008603}
   corSegura: {r: 0, g: 1, b: 0, a: 0}
@@ -3603,6 +3648,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a9eeb2a71e4b47c0a855d140b8b4044, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
+  velocidadeGiro: 90
+  aoColetar:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &774744415
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3854,6 +3903,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &873968532
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 873968533}
+  m_Layer: 3
+  m_Name: InicioParte1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &873968533
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 873968532}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 7.41, y: 0, z: -16.06}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1385803612}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &964381123
 GameObject:
   m_ObjectHideFlags: 0
@@ -3937,7 +4017,7 @@ MonoBehaviour:
   tempoSeguro: 0.3
   tempoAviso: 0.2
   tempoPerigo: 3
-  dano: 10
+  dano: 50
   intervaloEntreDanos: 1
   indicador: {fileID: 3596881}
   corSegura: {r: 0, g: 1, b: 0, a: 0}
@@ -4143,7 +4223,7 @@ MonoBehaviour:
   tempoSeguro: 0.3
   tempoAviso: 0.2
   tempoPerigo: 3
-  dano: 10
+  dano: 50
   intervaloEntreDanos: 1
   indicador: {fileID: 1556994057}
   corSegura: {r: 0, g: 1, b: 0, a: 0}
@@ -4478,7 +4558,7 @@ MonoBehaviour:
   tempoSeguro: 0.3
   tempoAviso: 0.2
   tempoPerigo: 3
-  dano: 10
+  dano: 50
   intervaloEntreDanos: 1
   indicador: {fileID: 25971746}
   corSegura: {r: 0, g: 1, b: 0, a: 0}
@@ -4725,7 +4805,7 @@ MonoBehaviour:
   tempoSeguro: 0.3
   tempoAviso: 0.2
   tempoPerigo: 3
-  dano: 10
+  dano: 50
   intervaloEntreDanos: 1
   indicador: {fileID: 1884106542}
   corSegura: {r: 0, g: 1, b: 0, a: 0}
@@ -5085,6 +5165,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1363493121
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1363493122}
+  m_Layer: 3
+  m_Name: InicioParte4
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1363493122
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1363493121}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -12.5, y: 0, z: -13.96}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1385803612}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1385803611
 GameObject:
   m_ObjectHideFlags: 0
@@ -5121,6 +5232,9 @@ Transform:
   - {fileID: 362483029}
   - {fileID: 1504465855}
   - {fileID: 64577040}
+  - {fileID: 64731671}
+  - {fileID: 873968533}
+  - {fileID: 1363493122}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1387714210
@@ -5172,7 +5286,7 @@ MonoBehaviour:
   tempoSeguro: 0.3
   tempoAviso: 0.2
   tempoPerigo: 3
-  dano: 10
+  dano: 50
   intervaloEntreDanos: 1
   indicador: {fileID: 102608731}
   corSegura: {r: 0, g: 1, b: 0, a: 0}
@@ -5249,7 +5363,7 @@ MonoBehaviour:
   tempoSeguro: 0.3
   tempoAviso: 0.2
   tempoPerigo: 3
-  dano: 10
+  dano: 50
   intervaloEntreDanos: 1
   indicador: {fileID: 1647888188}
   corSegura: {r: 0, g: 1, b: 0, a: 0}
@@ -5499,7 +5613,7 @@ MonoBehaviour:
   tempoSeguro: 0.3
   tempoAviso: 0.2
   tempoPerigo: 3
-  dano: 10
+  dano: 50
   intervaloEntreDanos: 1
   indicador: {fileID: 843662357}
   corSegura: {r: 0, g: 1, b: 0, a: 0}
@@ -5576,7 +5690,7 @@ MonoBehaviour:
   tempoSeguro: 0.3
   tempoAviso: 0.2
   tempoPerigo: 3
-  dano: 10
+  dano: 50
   intervaloEntreDanos: 1
   indicador: {fileID: 1939034072}
   corSegura: {r: 0, g: 1, b: 0, a: 0}
@@ -5705,6 +5819,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a9eeb2a71e4b47c0a855d140b8b4044, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
+  velocidadeGiro: 90
+  aoColetar:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &1536955481
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6049,6 +6167,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a9eeb2a71e4b47c0a855d140b8b4044, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
+  velocidadeGiro: 90
+  aoColetar:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &1565274574
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -7103,6 +7225,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a9eeb2a71e4b47c0a855d140b8b4044, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
+  velocidadeGiro: 90
+  aoColetar:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &1733491145
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7712,6 +7838,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a9eeb2a71e4b47c0a855d140b8b4044, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MoedaColetavel
+  velocidadeGiro: 90
+  aoColetar:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &1916617267
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7992,7 +8122,7 @@ MonoBehaviour:
   tempoSeguro: 0.3
   tempoAviso: 0.2
   tempoPerigo: 3
-  dano: 10
+  dano: 50
   intervaloEntreDanos: 1
   indicador: {fileID: 1943641881}
   corSegura: {r: 0, g: 1, b: 0, a: 0}
@@ -8433,7 +8563,7 @@ MonoBehaviour:
   tempoSeguro: 0.3
   tempoAviso: 0.2
   tempoPerigo: 3
-  dano: 10
+  dano: 50
   intervaloEntreDanos: 1
   indicador: {fileID: 1565431911}
   corSegura: {r: 0, g: 1, b: 0, a: 0}
