@@ -58,6 +58,8 @@ public class PlayerMotor : MonoBehaviour
     private PlayerMelee.AttackType queuedChargedAttack;
     private bool airAttackUsed;
     private float chargeTimer;
+    private bool somenteAtaqueBasico;
+    private bool hashiAtivoAntesDaRestricao;
 
     private Rigidbody body;
     private PlayerResources resources;
@@ -94,13 +96,37 @@ public class PlayerMotor : MonoBehaviour
         queuedLightAttack || queuedChargedAttack != PlayerMelee.AttackType.None;
 
     public bool CanThrowHashi =>
-        !IsDead && !IsDodging && !IsAttacking && !IsCharging &&
+        !somenteAtaqueBasico && !IsDead && !IsDodging && !IsAttacking && !IsCharging &&
         queuedChargedAttack == PlayerMelee.AttackType.None && !queuedLightAttack &&
         hashi != null && hashi.isActiveAndEnabled && hashi.CanFire;
 
     public bool CanStartAttack =>
         !IsDead && !IsDodging && !IsAttacking &&
         melee != null && melee.enabled;
+
+    public void SetBasicAttackOnly(bool active)
+    {
+        if (somenteAtaqueBasico == active)
+            return;
+
+        somenteAtaqueBasico = active;
+        CancelCharge();
+        queuedChargedAttack = PlayerMelee.AttackType.None;
+
+        if (active)
+        {
+            hashiAtivoAntesDaRestricao = hashi != null && hashi.enabled;
+            if (hashi != null)
+                hashi.enabled = false;
+
+            if (melee != null && melee.IsActive && !melee.IsLightAttack)
+                melee.Cancel();
+        }
+        else if (hashi != null)
+        {
+            hashi.enabled = hashiAtivoAntesDaRestricao;
+        }
+    }
     public bool IsDodging => dodge != null && dodge.IsActive;
     public bool IsInvulnerable =>
         !IsDead && IsDodging && dodge.IsInvulnerable;
@@ -323,7 +349,8 @@ public class PlayerMotor : MonoBehaviour
         {
             if (IsAttacking)
             {
-                if (melee.CurrentAttack == PlayerMelee.AttackType.ChargedUp)
+                if (!somenteAtaqueBasico &&
+                    melee.CurrentAttack == PlayerMelee.AttackType.ChargedUp)
                 {
                     // Exige uma nova pressao: manter o primeiro hold nao encadeia.
                     ArmCharge(ChargeIntent.Down);
@@ -333,7 +360,8 @@ public class PlayerMotor : MonoBehaviour
                     if (melee.CurrentAttack != PlayerMelee.AttackType.Light3)
                         queuedLightAttack = true;
 
-                    ArmCharge(ChargeIntent.Up);
+                    if (!somenteAtaqueBasico)
+                        ArmCharge(ChargeIntent.Up);
                 }
             }
             else if (CanStartAttack)
@@ -341,17 +369,26 @@ public class PlayerMotor : MonoBehaviour
                 if (IsGrounded)
                 {
                     // O golpe leve sai imediatamente, antes de sabermos se sera um hold.
-                    if (TryStartAttack(melee.NextLightAttack, direction))
+                    if (TryStartAttack(melee.NextLightAttack, direction) &&
+                        !somenteAtaqueBasico)
                         ArmCharge(ChargeIntent.Up);
                 }
-                else if (!airAttackUsed)
+                else if (!somenteAtaqueBasico && !airAttackUsed)
                 {
                     TryStartAttack(PlayerMelee.AttackType.AirSpin, direction);
                 }
             }
         }
 
-        UpdateChargeIntent();
+        if (somenteAtaqueBasico)
+        {
+            CancelCharge();
+            queuedChargedAttack = PlayerMelee.AttackType.None;
+        }
+        else
+        {
+            UpdateChargeIntent();
+        }
         ClearCombatInputRequests();
         ConsumeQueuedAttacks(direction);
     }
@@ -432,6 +469,12 @@ public class PlayerMotor : MonoBehaviour
 
     private bool TryStartAttack(PlayerMelee.AttackType type, Vector3 direction)
     {
+        if (somenteAtaqueBasico &&
+            type != PlayerMelee.AttackType.Light1 &&
+            type != PlayerMelee.AttackType.Light2 &&
+            type != PlayerMelee.AttackType.Light3)
+            return false;
+
         if (!CanStartAttack ||
             !resources.TrySpendStamina(melee.GetStaminaCost(type)))
             return false;

@@ -223,7 +223,7 @@ public class PlayerMelee : MonoBehaviour
 
             // Um inimigo recebe dano uma unica vez por golpe, mesmo com varios colliders.
             hitTargets.Add(target);
-            target.TakeDamage(settings.damage);
+            target.TakeDamage(settings.damage, IsLightAttack);
         }
     }
 
