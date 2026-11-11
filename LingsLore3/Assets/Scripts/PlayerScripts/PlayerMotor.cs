@@ -8,7 +8,7 @@ using UnityEngine.InputSystem.Interactions;
 [RequireComponent(typeof(PlayerHashi))]
 public class PlayerMotor : MonoBehaviour
 {
-    public enum AttackLessonMode { All, LightComboOnly, ChargedComboOnly }
+    public enum AttackLessonMode { All, LightComboOnly, ChargedComboOnly, AirSpinOnly, HashiOnly }
 
     [Header("Inputs")]
     [SerializeField] private InputActionReference moveAction;
@@ -98,7 +98,9 @@ public class PlayerMotor : MonoBehaviour
         queuedLightAttack || queuedChargedAttack != PlayerMelee.AttackType.None;
 
     public bool CanThrowHashi =>
-        attackLessonMode == AttackLessonMode.All && !IsDead && !IsDodging && !IsAttacking && !IsCharging &&
+        (attackLessonMode == AttackLessonMode.All ||
+            attackLessonMode == AttackLessonMode.HashiOnly) &&
+        !IsDead && !IsDodging && !IsAttacking && !IsCharging &&
         queuedChargedAttack == PlayerMelee.AttackType.None && !queuedLightAttack &&
         hashi != null && hashi.isActiveAndEnabled && hashi.CanFire;
 
@@ -118,20 +120,22 @@ public class PlayerMotor : MonoBehaviour
         if (attackLessonMode == mode)
             return;
 
-        bool wasRestricted = attackLessonMode != AttackLessonMode.All;
-        bool willBeRestricted = mode != AttackLessonMode.All;
+        bool wasHashiRestricted = attackLessonMode != AttackLessonMode.All &&
+            attackLessonMode != AttackLessonMode.HashiOnly;
+        bool willHashiBeRestricted = mode != AttackLessonMode.All &&
+            mode != AttackLessonMode.HashiOnly;
         attackLessonMode = mode;
         CancelCharge();
         queuedChargedAttack = PlayerMelee.AttackType.None;
         queuedLightAttack = false;
 
-        if (!wasRestricted && willBeRestricted)
+        if (!wasHashiRestricted && willHashiBeRestricted)
         {
             hashiAtivoAntesDaRestricao = hashi != null && hashi.enabled;
             if (hashi != null)
                 hashi.enabled = false;
         }
-        else if (wasRestricted && !willBeRestricted && hashi != null)
+        else if (wasHashiRestricted && !willHashiBeRestricted && hashi != null)
         {
             hashi.enabled = hashiAtivoAntesDaRestricao;
         }
@@ -142,7 +146,9 @@ public class PlayerMotor : MonoBehaviour
                 (mode == AttackLessonMode.LightComboOnly && melee.IsLightAttack) ||
                 (mode == AttackLessonMode.ChargedComboOnly &&
                     (melee.CurrentAttack == PlayerMelee.AttackType.ChargedUp ||
-                     melee.CurrentAttack == PlayerMelee.AttackType.ChargedDown));
+                     melee.CurrentAttack == PlayerMelee.AttackType.ChargedDown)) ||
+                (mode == AttackLessonMode.AirSpinOnly &&
+                    melee.CurrentAttack == PlayerMelee.AttackType.AirSpin);
             if (!activeAttackAllowed)
                 melee.Cancel();
         }
@@ -376,6 +382,7 @@ public class PlayerMotor : MonoBehaviour
                     ArmCharge(ChargeIntent.Down);
                 }
                 else if (attackLessonMode != AttackLessonMode.ChargedComboOnly &&
+                    attackLessonMode != AttackLessonMode.AirSpinOnly &&
                     melee.IsLightAttack && melee.CanQueueNext)
                 {
                     if (melee.CurrentAttack != PlayerMelee.AttackType.Light3)
@@ -393,14 +400,16 @@ public class PlayerMotor : MonoBehaviour
                     {
                         ArmCharge(ChargeIntent.Up);
                     }
-                    else if (TryStartAttack(melee.NextLightAttack, direction) &&
+                    else if (attackLessonMode != AttackLessonMode.AirSpinOnly &&
+                        TryStartAttack(melee.NextLightAttack, direction) &&
                         attackLessonMode == AttackLessonMode.All)
                     {
                         // No modo normal, o golpe leve sai antes de sabermos se sera um hold.
                         ArmCharge(ChargeIntent.Up);
                     }
                 }
-                else if (attackLessonMode == AttackLessonMode.All && !airAttackUsed)
+                else if ((attackLessonMode == AttackLessonMode.All ||
+                    attackLessonMode == AttackLessonMode.AirSpinOnly) && !airAttackUsed)
                 {
                     TryStartAttack(PlayerMelee.AttackType.AirSpin, direction);
                 }
@@ -503,8 +512,11 @@ public class PlayerMotor : MonoBehaviour
             type == PlayerMelee.AttackType.Light3;
         bool chargedAttack = type == PlayerMelee.AttackType.ChargedUp ||
             type == PlayerMelee.AttackType.ChargedDown;
+        bool aerialAttack = type == PlayerMelee.AttackType.AirSpin;
         if ((attackLessonMode == AttackLessonMode.LightComboOnly && !lightAttack) ||
-            (attackLessonMode == AttackLessonMode.ChargedComboOnly && !chargedAttack))
+            (attackLessonMode == AttackLessonMode.ChargedComboOnly && !chargedAttack) ||
+            (attackLessonMode == AttackLessonMode.AirSpinOnly && !aerialAttack) ||
+            attackLessonMode == AttackLessonMode.HashiOnly)
             return false;
 
         if (!CanStartAttack ||

@@ -15,6 +15,8 @@ public class ContadorCreditos : MonoBehaviour
         public EnemyHealth alvoParaDerrotar;
         public bool exigeComboLeve;
         public bool exigeComboCarregado;
+        public bool exigeAtaqueAereoGiratorio;
+        public bool exigeArremessoHashi;
     }
 
     [SerializeField] private TMP_Text textoContador;
@@ -28,6 +30,7 @@ public class ContadorCreditos : MonoBehaviour
     [SerializeField] private PlayerResources jogador;
     private PlayerMotor motorJogador;
     private PlayerMelee meleeJogador;
+    private PlayerHashi hashiJogador;
 
     [Header("Reinicio apos morte")]
     [SerializeField, Min(0f)] private float atrasoRespawn = 0.35f;
@@ -47,6 +50,8 @@ public class ContadorCreditos : MonoBehaviour
     private bool comboLeveCompleto;
     private int progressoComboCarregado;
     private bool comboCarregadoCompleto;
+    private bool ataqueAereoGiratorioCompleto;
+    private bool arremessoHashiCompleto;
 
     private readonly HashSet<MoedaColetavel> notasRegistradas =
         new HashSet<MoedaColetavel>();
@@ -136,18 +141,31 @@ public class ContadorCreditos : MonoBehaviour
         jogador.Died += AoJogadorMorrer;
         motorJogador = jogador.GetComponent<PlayerMotor>();
         meleeJogador = jogador.GetComponent<PlayerMelee>();
-        bool acompanhaCombo = Array.Exists(rodadas,
+        hashiJogador = jogador.GetComponent<PlayerHashi>();
+        bool acompanhaMelee = Array.Exists(rodadas,
             rodada => rodada != null &&
-                (rodada.exigeComboLeve || rodada.exigeComboCarregado));
-        if (acompanhaCombo && meleeJogador == null)
+                (rodada.exigeComboLeve || rodada.exigeComboCarregado ||
+                 rodada.exigeAtaqueAereoGiratorio));
+        if (acompanhaMelee && meleeJogador == null)
         {
             Debug.LogError("ContadorCreditos: o jogador precisa de PlayerMelee para validar o combo.", this);
             enabled = false;
             return;
         }
 
+        bool acompanhaHashi = Array.Exists(rodadas,
+            rodada => rodada != null && rodada.exigeArremessoHashi);
+        if (acompanhaHashi && hashiJogador == null)
+        {
+            Debug.LogError("ContadorCreditos: o jogador precisa de PlayerHashi para validar o arremesso.", this);
+            enabled = false;
+            return;
+        }
+
         if (meleeJogador != null)
             meleeJogador.HitLanded += AoJogadorAtingirAlvo;
+        if (hashiJogador != null)
+            hashiJogador.TargetHit += AoHashiAtingirAlvo;
 
         for (int i = 0; i < rodadas.Length; i++)
         {
@@ -288,6 +306,8 @@ public class ContadorCreditos : MonoBehaviour
         GameObject grupoRodada5 = GameObject.Find("CreditosRodada5");
         GameObject grupoRodada6 = GameObject.Find("CreditosRodada6");
         GameObject grupoRodada7 = GameObject.Find("CreditosRodada7");
+        GameObject grupoRodada8 = GameObject.Find("CreditosRodada8");
+        GameObject grupoRodada9 = GameObject.Find("CreditosRodada9");
         bool rodadaDoDummyConfigurada = false;
         foreach (RodadaTutorial rodada in rodadas)
         {
@@ -296,7 +316,9 @@ public class ContadorCreditos : MonoBehaviour
 
             if ((grupoRodada5 != null && rodada.grupoCreditos == grupoRodada5) ||
                 (grupoRodada6 != null && rodada.grupoCreditos == grupoRodada6) ||
-                (grupoRodada7 != null && rodada.grupoCreditos == grupoRodada7))
+                (grupoRodada7 != null && rodada.grupoCreditos == grupoRodada7) ||
+                (grupoRodada8 != null && rodada.grupoCreditos == grupoRodada8) ||
+                (grupoRodada9 != null && rodada.grupoCreditos == grupoRodada9))
             {
                 rodada.alvoParaDerrotar = manequim;
                 rodadaDoDummyConfigurada = true;
@@ -369,8 +391,32 @@ public class ContadorCreditos : MonoBehaviour
                 return;
             }
         }
+        else if (rodada.exigeAtaqueAereoGiratorio &&
+            ataque == PlayerMelee.AttackType.AirSpin)
+        {
+            ataqueAereoGiratorioCompleto = true;
+            LiberarCreditosPeloAlvo(alvo);
+            return;
+        }
 
         AtualizarTexto();
+    }
+
+    private void AoHashiAtingirAlvo(EnemyHealth alvo)
+    {
+        if (!isActiveAndEnabled || tutorialConcluido || rodadaAtual < 0 ||
+            rodadaAtual >= rodadas.Length)
+            return;
+
+        RodadaTutorial rodada = rodadas[rodadaAtual];
+        if (!rodada.exigeArremessoHashi || rodada.alvoParaDerrotar != alvo ||
+            creditosLiberadosPeloAlvo)
+            return;
+
+        arremessoHashiCompleto = true;
+        if (hashiJogador != null)
+            hashiJogador.SetAimIndicatorVisible(false);
+        LiberarCreditosPeloAlvo(alvo);
     }
 
     private void AoAlvoDaRodadaDerrotado(EnemyHealth alvo)
@@ -384,7 +430,9 @@ public class ContadorCreditos : MonoBehaviour
             return;
 
         if ((rodada.exigeComboLeve && !comboLeveCompleto) ||
-            (rodada.exigeComboCarregado && !comboCarregadoCompleto))
+            (rodada.exigeComboCarregado && !comboCarregadoCompleto) ||
+            (rodada.exigeAtaqueAereoGiratorio && !ataqueAereoGiratorioCompleto) ||
+            (rodada.exigeArremessoHashi && !arremessoHashiCompleto))
         {
             // O dummy pode receber varios golpes enquanto o jogador aprende a sequencia.
             alvo.RestoreHealth();
@@ -462,18 +510,28 @@ public class ContadorCreditos : MonoBehaviour
         comboLeveCompleto = false;
         progressoComboCarregado = 0;
         comboCarregadoCompleto = false;
+        ataqueAereoGiratorioCompleto = false;
+        arremessoHashiCompleto = false;
         if (motorJogador != null)
         {
             PlayerMotor.AttackLessonMode modo = rodada.alvoParaDerrotar == null
                 ? PlayerMotor.AttackLessonMode.All
                 : rodada.exigeComboCarregado
                     ? PlayerMotor.AttackLessonMode.ChargedComboOnly
-                    : PlayerMotor.AttackLessonMode.LightComboOnly;
+                    : rodada.exigeAtaqueAereoGiratorio
+                        ? PlayerMotor.AttackLessonMode.AirSpinOnly
+                        : rodada.exigeArremessoHashi
+                            ? PlayerMotor.AttackLessonMode.HashiOnly
+                            : PlayerMotor.AttackLessonMode.LightComboOnly;
             motorJogador.SetAttackLessonMode(modo);
         }
 
         if (rodada.alvoParaDerrotar != null)
-            rodada.alvoParaDerrotar.SetBasicAttackOnly(!rodada.exigeComboCarregado);
+            rodada.alvoParaDerrotar.SetBasicAttackOnly(
+                !rodada.exigeComboCarregado && !rodada.exigeAtaqueAereoGiratorio &&
+                !rodada.exigeArremessoHashi);
+        if (hashiJogador != null)
+            hashiJogador.SetAimIndicatorVisible(rodada.exigeArremessoHashi);
 
         tempoAtivo = false;
         rodada.grupoCreditos.SetActive(false);
@@ -575,6 +633,10 @@ public class ContadorCreditos : MonoBehaviour
                 textoContador.text = $"Combo no dummy: {progressoComboLeve}/3 (Light1 → Light2 → Light3)";
             else if (rodadas[rodadaAtual].exigeComboCarregado)
                 textoContador.text = $"Segure ataque; durante o ascendente, solte e segure de novo para o descendente: {progressoComboCarregado}/2";
+            else if (rodadas[rodadaAtual].exigeAtaqueAereoGiratorio)
+                textoContador.text = "Pule e acerte o dummy com o ataque aéreo giratório";
+            else if (rodadas[rodadaAtual].exigeArremessoHashi)
+                textoContador.text = "Mire no dummy pelo centro da tela e clique com o botão direito";
             else
                 textoContador.text = "Golpeie o dummy com o ataque básico";
             return;
@@ -593,6 +655,11 @@ public class ContadorCreditos : MonoBehaviour
 
         if (meleeJogador != null)
             meleeJogador.HitLanded -= AoJogadorAtingirAlvo;
+        if (hashiJogador != null)
+        {
+            hashiJogador.SetAimIndicatorVisible(false);
+            hashiJogador.TargetHit -= AoHashiAtingirAlvo;
+        }
 
         if (alvoDaRodada != null)
             alvoDaRodada.Died -= AoAlvoDaRodadaDerrotado;

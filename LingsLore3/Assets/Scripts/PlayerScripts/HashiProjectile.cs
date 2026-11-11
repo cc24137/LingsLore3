@@ -1,8 +1,11 @@
+using System;
 using UnityEngine;
 
 // Raiz do prefab: +Z aponta para a ponta. Sem Rigidbody ou Collider.
 public class HashiProjectile : MonoBehaviour
 {
+    public event Action<EnemyHealth> HitEnemy;
+
     [SerializeField, Min(0.1f)] private float speed = 30f;
     [SerializeField, Min(0.001f)] private float hitRadius = 0.06f;
     [SerializeField, Min(0.1f)] private float maxDistance = 80f;
@@ -33,8 +36,16 @@ public class HashiProjectile : MonoBehaviour
 
     private bool CanHit(Collider candidate)
     {
-        return candidate != null && !candidate.transform.IsChildOf(transform) &&
-            (owner == null || !candidate.transform.IsChildOf(owner));
+        if (candidate == null)
+            return false;
+
+        Transform candidateTransform = candidate.transform;
+        bool isProjectile = candidateTransform == transform ||
+            candidateTransform.IsChildOf(transform);
+        bool isShooter = owner != null &&
+            (candidateTransform == owner || candidateTransform.IsChildOf(owner));
+
+        return !isProjectile && !isShooter;
     }
 
     private bool CheckOverlap()
@@ -93,7 +104,11 @@ public class HashiProjectile : MonoBehaviour
         if (spent) return;
         spent = true;
         EnemyHealth enemy = target.GetComponentInParent<EnemyHealth>();
-        if (enemy != null && !enemy.IsDead) enemy.TakeDamage(damage);
+        if (enemy != null && !enemy.IsDead)
+        {
+            enemy.TakeDamage(damage);
+            HitEnemy?.Invoke(enemy);
+        }
         Destroy(gameObject);
     }
 }

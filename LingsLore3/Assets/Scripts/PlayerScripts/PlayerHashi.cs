@@ -1,8 +1,12 @@
 
+using System;
 using UnityEngine;
 
+[DefaultExecutionOrder(100)]
 public class PlayerHashi : MonoBehaviour
 {
+    public event Action<EnemyHealth> TargetHit;
+
     [Header("Referencias")]
     [SerializeField] private HashiProjectile projectilePrefab;
     [SerializeField] private Transform firePoint;
@@ -25,6 +29,15 @@ public class PlayerHashi : MonoBehaviour
     private bool ready;
     private float nextShotTime;
     private float nextReloadTime = -1f;
+    private bool aimIndicatorVisible;
+    private GameObject aimIndicatorRoot;
+    private LineRenderer aimLine;
+    private Transform aimMarker;
+    private Material aimIndicatorMaterial;
+    private readonly RaycastHit[] aimHits = new RaycastHit[32];
+
+    private const float AimPreviewDistance = 12f;
+    private static readonly Color AimIndicatorColor = new Color(0.1f, 0.95f, 1f, 0.9f);
 
     public int CurrentAmmo { get; private set; } = 2;
     public int MaxAmmo => 2;
@@ -82,36 +95,66 @@ public class PlayerHashi : MonoBehaviour
         }
     }
 
+    private void LateUpdate()
+    {
+        if (!aimIndicatorVisible || !ready || aimLine == null || aimMarker == null)
+            return;
+
+        CalculateAim(transform, out Vector3 target, out Vector3 direction, out _);
+        aimLine.SetPosition(0, firePoint.position);
+        aimLine.SetPosition(1, firePoint.position + direction *
+            Mathf.Min(aimDistance, AimPreviewDistance));
+        aimMarker.position = target;
+    }
+
+    private void OnGUI()
+    {
+        if (!aimIndicatorVisible || !ready || aimCamera == null)
+            return;
+
+        Rect viewport = aimCamera.pixelRect;
+        float centerX = viewport.x + viewport.width * 0.5f;
+        float centerY = Screen.height - (viewport.y + viewport.height * 0.5f);
+        Color previousColor = GUI.color;
+        DrawAimReticle(centerX, centerY, Color.black, 4f);
+        DrawAimReticle(centerX, centerY, AimIndicatorColor, 2f);
+        GUI.color = previousColor;
+    }
+
+    private static void DrawAimReticle(float centerX, float centerY, Color color, float thickness)
+    {
+        const float armLength = 7f;
+        const float gap = 4f;
+        GUI.color = color;
+        GUI.DrawTexture(new Rect(centerX - thickness * 0.5f, centerY - gap - armLength,
+            thickness, armLength), Texture2D.whiteTexture);
+        GUI.DrawTexture(new Rect(centerX - thickness * 0.5f, centerY + gap,
+            thickness, armLength), Texture2D.whiteTexture);
+        GUI.DrawTexture(new Rect(centerX - gap - armLength, centerY - thickness * 0.5f,
+            armLength, thickness), Texture2D.whiteTexture);
+        GUI.DrawTexture(new Rect(centerX + gap, centerY - thickness * 0.5f,
+            armLength, thickness), Texture2D.whiteTexture);
+    }
+
+    public void SetAimIndicatorVisible(bool visible)
+    {
+        aimIndicatorVisible = visible;
+        if (visible && ready)
+            CreateAimIndicator();
+
+        if (aimLine != null)
+            aimLine.enabled = visible;
+        if (aimMarker != null)
+            aimMarker.gameObject.SetActive(visible);
+    }
+
     public bool Fire(Transform owner)
     {
         if (!isActiveAndEnabled || !CanFire || owner == null ||
             projectilePrefab == null || firePoint == null || aimCamera == null)
             return false;
 
-        Ray ray = aimCamera.ViewportPointToRay(
-            new Vector3(0.5f, 0.5f, 0f));
-
-        Vector3 target = ray.GetPoint(aimDistance);
-        float closest = aimDistance;
-
-        foreach (RaycastHit hit in Physics.RaycastAll(
-            ray, aimDistance, hitMask, QueryTriggerInteraction.Collide))
-        {
-            if (hit.collider.transform.IsChildOf(owner) ||
-                hit.distance >= closest)
-                continue;
-
-            closest = hit.distance;
-            target = hit.point;
-        }
-
-        Vector3 direction = target - firePoint.position;
-
-        if (direction.sqrMagnitude < 0.0001f)
-            direction = ray.direction;
-
-        if (Vector3.Dot(direction, ray.direction) <= 0f)
-            direction = ray.direction;
+        CalculateAim(owner, out _, out Vector3 direction, out _);
 
         int usedSlot = System.Array.FindIndex(
             slotLoaded, loaded => loaded);
@@ -125,6 +168,7 @@ public class PlayerHashi : MonoBehaviour
             Quaternion.LookRotation(direction.normalized)
         );
 
+        projectile.HitEnemy += RelayEnemyHit;
         projectile.gameObject.SetActive(true);
 
         CurrentAmmo--;
@@ -141,6 +185,118 @@ public class PlayerHashi : MonoBehaviour
         projectile.Launch(owner, direction, damage, hitMask);
 
         return true;
+    }
+
+    private void CalculateAim(
+        Transform owner,
+        out Vector3 target,
+        out Vector3 direction,
+        out bool hitSomething)
+    {
+        Ray ray = aimCamera.ViewportPointToRay(
+            new Vector3(0.5f, 0.5f, 0f));
+
+        target = ray.GetPoint(aimDistance);
+        float closest = aimDistance;
+        hitSomething = false;
+
+        int hitCount = Physics.RaycastNonAlloc(
+            ray, aimHits, aimDistance, hitMask, QueryTriggerInteraction.Collide);
+        for (int i = 0; i < hitCount; i++)
+        {
+            RaycastHit hit = aimHits[i];
+            if (hit.collider.transform == owner ||
+                hit.collider.transform.IsChildOf(owner) ||
+                hit.distance >= closest)
+                continue;
+
+            closest = hit.distance;
+            target = hit.point;
+            hitSomething = true;
+        }
+
+        direction = target - firePoint.position;
+
+        if (direction.sqrMagnitude < 0.0001f ||
+            Vector3.Dot(direction, ray.direction) <= 0f)
+        {
+            direction = ray.direction;
+            target = firePoint.position + direction.normalized * aimDistance;
+        }
+
+        direction.Normalize();
+    }
+
+    private void CreateAimIndicator()
+    {
+        if (aimIndicatorRoot != null)
+            return;
+
+        aimIndicatorRoot = new GameObject("HashiAimIndicator");
+        aimIndicatorRoot.layer = 2;
+        aimIndicatorRoot.transform.SetParent(transform, false);
+
+        Shader shader = Shader.Find("Universal Render Pipeline/Unlit");
+        if (shader == null)
+            shader = Shader.Find("Unlit/Color");
+        if (shader == null)
+            shader = Shader.Find("Sprites/Default");
+
+        if (shader != null)
+        {
+            aimIndicatorMaterial = new Material(shader);
+            if (aimIndicatorMaterial.HasProperty("_BaseColor"))
+                aimIndicatorMaterial.SetColor("_BaseColor", AimIndicatorColor);
+            if (aimIndicatorMaterial.HasProperty("_Color"))
+                aimIndicatorMaterial.SetColor("_Color", AimIndicatorColor);
+        }
+        else
+        {
+            Renderer sourceRenderer = projectilePrefab.GetComponentInChildren<Renderer>();
+            if (sourceRenderer != null)
+                aimIndicatorMaterial = new Material(sourceRenderer.sharedMaterial);
+        }
+
+        aimLine = aimIndicatorRoot.AddComponent<LineRenderer>();
+        aimLine.useWorldSpace = true;
+        aimLine.positionCount = 2;
+        aimLine.startWidth = 0.025f;
+        aimLine.endWidth = 0.012f;
+        aimLine.startColor = AimIndicatorColor;
+        aimLine.endColor = AimIndicatorColor;
+        aimLine.numCapVertices = 4;
+        if (aimIndicatorMaterial != null)
+            aimLine.sharedMaterial = aimIndicatorMaterial;
+
+        GameObject marker = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        marker.name = "HashiAimPoint";
+        marker.layer = 2;
+        marker.transform.SetParent(aimIndicatorRoot.transform, false);
+        marker.transform.localScale = Vector3.one * 0.12f;
+        Collider markerCollider = marker.GetComponent<Collider>();
+        if (markerCollider != null)
+            markerCollider.enabled = false;
+
+        Renderer markerRenderer = marker.GetComponent<Renderer>();
+        if (markerRenderer != null && aimIndicatorMaterial != null)
+            markerRenderer.sharedMaterial = aimIndicatorMaterial;
+
+        aimMarker = marker.transform;
+        aimLine.enabled = aimIndicatorVisible;
+        marker.SetActive(aimIndicatorVisible);
+    }
+
+    private void RelayEnemyHit(EnemyHealth enemy)
+    {
+        TargetHit?.Invoke(enemy);
+    }
+
+    private void OnDestroy()
+    {
+        if (aimIndicatorRoot != null)
+            Destroy(aimIndicatorRoot);
+        if (aimIndicatorMaterial != null)
+            Destroy(aimIndicatorMaterial);
     }
 
     private void ReloadOneAmmo()
