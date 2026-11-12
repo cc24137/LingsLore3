@@ -17,6 +17,8 @@ public class ContadorCreditos : MonoBehaviour
         public bool exigeComboCarregado;
         public bool exigeAtaqueAereoGiratorio;
         public bool exigeArremessoHashi;
+        public bool ehRodadaRevisao;
+        [TextArea(2, 4)] public string instrucao;
     }
 
     [SerializeField] private TMP_Text textoContador;
@@ -60,6 +62,8 @@ public class ContadorCreditos : MonoBehaviour
     private readonly HashSet<MoedaColetavel> notasContadas =
         new HashSet<MoedaColetavel>();
     private bool creditosLiberadosPeloAlvo;
+
+    public bool TutorialConcluido => tutorialConcluido;
 
     private void Awake()
     {
@@ -311,7 +315,7 @@ public class ContadorCreditos : MonoBehaviour
         bool rodadaDoDummyConfigurada = false;
         foreach (RodadaTutorial rodada in rodadas)
         {
-            if (rodada == null)
+            if (rodada == null || rodada.ehRodadaRevisao)
                 continue;
 
             if ((grupoRodada5 != null && rodada.grupoCreditos == grupoRodada5) ||
@@ -495,6 +499,8 @@ public class ContadorCreditos : MonoBehaviour
 
                 if (textoTempo != null)
                     textoTempo.gameObject.SetActive(false);
+
+                AtualizarTexto();
             }
         }
     }
@@ -626,23 +632,46 @@ public class ContadorCreditos : MonoBehaviour
 
     private void AtualizarTexto()
     {
-        if (rodadaAtual >= 0 && rodadaAtual < rodadas.Length &&
-            rodadas[rodadaAtual].alvoParaDerrotar != null && !creditosLiberadosPeloAlvo)
+        if (tutorialConcluido)
         {
-            if (rodadas[rodadaAtual].exigeComboLeve)
-                textoContador.text = $"Combo no dummy: {progressoComboLeve}/3 (Light1 → Light2 → Light3)";
-            else if (rodadas[rodadaAtual].exigeComboCarregado)
-                textoContador.text = $"Segure ataque; durante o ascendente, solte e segure de novo para o descendente: {progressoComboCarregado}/2";
-            else if (rodadas[rodadaAtual].exigeAtaqueAereoGiratorio)
-                textoContador.text = "Pule e acerte o dummy com o ataque aéreo giratório";
-            else if (rodadas[rodadaAtual].exigeArremessoHashi)
-                textoContador.text = "Mire no dummy pelo centro da tela e clique com o botão direito";
-            else
-                textoContador.text = "Golpeie o dummy com o ataque básico";
+            textoContador.text = "Tutorial concluído! Clique em Ir ao jogo para continuar.";
             return;
         }
 
-        textoContador.text = $"Creditos sociais: {creditosColetados}/{totalCreditos}";
+        if (rodadaAtual < 0 || rodadaAtual >= rodadas.Length)
+        {
+            textoContador.text = $"Créditos sociais: {creditosColetados}/{totalCreditos}";
+            return;
+        }
+
+        RodadaTutorial rodada = rodadas[rodadaAtual];
+        string progresso;
+        if (rodada.alvoParaDerrotar != null && !creditosLiberadosPeloAlvo)
+        {
+            if (rodada.exigeComboLeve)
+                progresso = $"Combo leve no manequim: {progressoComboLeve}/3";
+            else if (rodada.exigeComboCarregado)
+                progresso = $"Combo carregado: {progressoComboCarregado}/2";
+            else if (rodada.exigeAtaqueAereoGiratorio)
+                progresso = ataqueAereoGiratorioCompleto
+                    ? "Ataque aéreo concluído"
+                    : "Acerte o manequim no ar: 0/1";
+            else if (rodada.exigeArremessoHashi)
+                progresso = arremessoHashiCompleto
+                    ? "Arremesso concluído"
+                    : "Acerte o manequim com o Hashi: 0/1";
+            else
+                progresso = "Manequim derrotado: 0/1";
+        }
+        else
+        {
+            progresso = $"Créditos sociais: {creditosColetados}/{totalCreditos}";
+        }
+
+        string instrucao = string.IsNullOrWhiteSpace(rodada.instrucao)
+            ? "Mova-se com W, A, S, D e colete os créditos da rodada."
+            : rodada.instrucao;
+        textoContador.text = $"{instrucao}\n{progresso}";
     }
 
     private void OnDestroy()

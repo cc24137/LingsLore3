@@ -1,6 +1,7 @@
 
 using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 [DefaultExecutionOrder(100)]
 public class PlayerHashi : MonoBehaviour
@@ -29,6 +30,7 @@ public class PlayerHashi : MonoBehaviour
     private bool ready;
     private float nextShotTime;
     private float nextReloadTime = -1f;
+    private bool tutorialAimIndicatorVisible;
     private bool aimIndicatorVisible;
     private GameObject aimIndicatorRoot;
     private LineRenderer aimLine;
@@ -80,6 +82,10 @@ public class PlayerHashi : MonoBehaviour
 
     private void Update()
     {
+        bool aimAssistHeld = Keyboard.current != null &&
+            Keyboard.current.qKey.isPressed;
+        SetAimIndicatorState(tutorialAimIndicatorVisible || aimAssistHeld);
+
         if (!ready || CurrentAmmo >= MaxAmmo || nextReloadTime < 0f)
             return;
 
@@ -138,6 +144,17 @@ public class PlayerHashi : MonoBehaviour
 
     public void SetAimIndicatorVisible(bool visible)
     {
+        tutorialAimIndicatorVisible = visible;
+        bool aimAssistHeld = Keyboard.current != null &&
+            Keyboard.current.qKey.isPressed;
+        SetAimIndicatorState(tutorialAimIndicatorVisible || aimAssistHeld);
+    }
+
+    private void SetAimIndicatorState(bool visible)
+    {
+        if (aimIndicatorVisible == visible)
+            return;
+
         aimIndicatorVisible = visible;
         if (visible && ready)
             CreateAimIndicator();

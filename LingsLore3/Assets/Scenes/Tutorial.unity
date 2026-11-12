@@ -2626,46 +2626,61 @@ MonoBehaviour:
     pontoInicial: {fileID: 873968533}
     alvoParaDerrotar: {fileID: 0}
     exigeComboLeve: 0
+    instrucao: "Use W, A, S, D para andar e passe sobre as notas para coletá-las."
   - grupoCreditos: {fileID: 75796922}
     tempoLimite: 0
     pontoInicial: {fileID: 64731671}
     alvoParaDerrotar: {fileID: 0}
     exigeComboLeve: 0
+    instrucao: "Aperte Espaço para pular as estruturas e alcançar as notas."
   - grupoCreditos: {fileID: 362483028}
     tempoLimite: 30
     pontoInicial: {fileID: 64577040}
     alvoParaDerrotar: {fileID: 0}
     exigeComboLeve: 0
+    instrucao: "Segure Shift enquanto anda para correr e colete as notas antes do tempo acabar."
   - grupoCreditos: {fileID: 1504465854}
     tempoLimite: 0
     pontoInicial: {fileID: 1363493122}
     alvoParaDerrotar: {fileID: 0}
     exigeComboLeve: 0
+    instrucao: "Toque Shift perto do laser para esquivar e atravessar sem ser atingido."
   - grupoCreditos: {fileID: 2115951146}
     tempoLimite: 0
     pontoInicial: {fileID: 0}
     alvoParaDerrotar: {fileID: 0}
     exigeComboLeve: 0
+    instrucao: "Use o botão esquerdo para atacar."
   - grupoCreditos: {fileID: 3115951146}
     tempoLimite: 0
     pontoInicial: {fileID: 0}
     alvoParaDerrotar: {fileID: 0}
     exigeComboCarregado: 1
+    instrucao: "Segure o botão esquerdo para o ataque ascendente; solte e segure de novo para o descendente."
   - grupoCreditos: {fileID: 4115951146}
     tempoLimite: 0
     pontoInicial: {fileID: 0}
     alvoParaDerrotar: {fileID: 0}
     exigeComboLeve: 1
+    instrucao: "Clique três vezes seguidas com o botão esquerdo para usar o combo."
   - grupoCreditos: {fileID: 5115951146}
     tempoLimite: 0
     pontoInicial: {fileID: 0}
     alvoParaDerrotar: {fileID: 0}
     exigeAtaqueAereoGiratorio: 1
+    instrucao: "Aperte Espaço para pular; no ar, clique com o botão esquerdo para atingir o manequim."
   - grupoCreditos: {fileID: 6115951146}
     tempoLimite: 0
     pontoInicial: {fileID: 0}
     alvoParaDerrotar: {fileID: 0}
     exigeArremessoHashi: 1
+    instrucao: "Segure Q para mirar; clique com o botão direito para arremessar o Hashi."
+  - grupoCreditos: {fileID: 6115951146}
+    tempoLimite: 0
+    pontoInicial: {fileID: 0}
+    alvoParaDerrotar: {fileID: 0}
+    ehRodadaRevisao: 1
+    instrucao: "Treino livre. Aperte F1 para ver os comandos detalhados."
   textoTempo: {fileID: 2025003692}
   jogador: {fileID: 1139482912}
   atrasoRespawn: 0.35
@@ -5534,11 +5549,11 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 478753751}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 30, y: -110}
-  m_SizeDelta: {x: 450, y: 50}
-  m_Pivot: {x: 0, y: 1}
+  m_AnchorMin: {x: 0.08, y: 1}
+  m_AnchorMax: {x: 0.92, y: 1}
+  m_AnchoredPosition: {x: 0, y: -28}
+  m_SizeDelta: {x: 0, y: 130}
+  m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &1397881947
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5593,7 +5608,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0

@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Interactions;
+using UnityEngine.SceneManagement;
 
 [DefaultExecutionOrder(-100)]
 [RequireComponent(typeof(Rigidbody), typeof(PlayerJump), typeof(PlayerDodge))]
@@ -49,6 +50,7 @@ public class PlayerMotor : MonoBehaviour
     [SerializeField, Range(0f, 1f)] private float chargingMovementMultiplier = 0.2f;
 
     private PlayerHashi hashi;
+    private ContadorCreditos contadorTutorial;
     private bool throwHashiRequested;
     private PlayerMelee melee;
     private enum ChargeIntent { None, Up, Down }
@@ -75,6 +77,7 @@ public class PlayerMotor : MonoBehaviour
     private bool sprintHeld;
     private bool sprintExhausted;
     private bool sprintNeedsRelease;
+    private bool controlsPanelVisible;
 
     private bool wasAirborne;
     private float airborneReferenceSpeed;
@@ -175,6 +178,7 @@ public class PlayerMotor : MonoBehaviour
         dodge = GetComponent<PlayerDodge>();
         melee = GetComponent<PlayerMelee>();
         hashi = GetComponent<PlayerHashi>();
+        contadorTutorial = FindFirstObjectByType<ContadorCreditos>();
     }
 
     private void OnEnable()
@@ -223,6 +227,25 @@ public class PlayerMotor : MonoBehaviour
 
     private void Update()
     {
+        if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
+        {
+            controlsPanelVisible = false;
+            bool liberarCursor = Cursor.lockState == CursorLockMode.Locked;
+            Cursor.lockState = liberarCursor
+                ? CursorLockMode.None
+                : CursorLockMode.Locked;
+            Cursor.visible = liberarCursor;
+        }
+
+        if (Keyboard.current != null && Keyboard.current.f1Key.wasPressedThisFrame)
+        {
+            controlsPanelVisible = !controlsPanelVisible;
+            Cursor.lockState = controlsPanelVisible
+                ? CursorLockMode.None
+                : CursorLockMode.Locked;
+            Cursor.visible = controlsPanelVisible;
+        }
+
         moveInput = Vector2.ClampMagnitude(
             moveAction.action.ReadValue<Vector2>(), 1f
         );
@@ -241,6 +264,63 @@ public class PlayerMotor : MonoBehaviour
 
         if (throwHashiAction != null && throwHashiAction.action.WasPressedThisFrame())
             throwHashiRequested = true;
+    }
+
+    private void OnGUI()
+    {
+        const float margin = 16f;
+        const float top = 12f;
+        const float hintWidth = 248f;
+        const float skipWidth = 148f;
+        bool isTutorial = SceneManager.GetActiveScene().name == "Tutorial";
+        float hintX = Screen.width - margin - hintWidth;
+        if (isTutorial)
+        {
+            float skipX = hintX - 8f - skipWidth;
+            bool tutorialFinalizado = contadorTutorial != null &&
+                contadorTutorial.TutorialConcluido;
+            string textoBotao = tutorialFinalizado
+                ? "Ir ao jogo  →"
+                : "Ir ao jogo";
+            if (GUI.Button(new Rect(skipX, top, skipWidth, 32f), textoBotao))
+            {
+                SceneManager.LoadScene("ArenaPrototype");
+                return;
+            }
+        }
+
+        GUI.Label(new Rect(hintX, top, hintWidth, 32f),
+            "F1  Comandos   |   Esc  Liberar mouse", GUI.skin.box);
+
+        if (!controlsPanelVisible)
+            return;
+
+        float panelWidth = Mathf.Min(520f, Screen.width - margin * 2f);
+        float panelHeight = Mathf.Min(380f, Screen.height - margin * 2f);
+        Rect panel = new Rect(
+            (Screen.width - panelWidth) * 0.5f,
+            (Screen.height - panelHeight) * 0.5f,
+            panelWidth,
+            panelHeight);
+
+        GUI.Box(panel, "CONTROLES");
+        Rect body = new Rect(panel.x + 24f, panel.y + 48f,
+            panel.width - 48f, panel.height - 84f);
+        GUIStyle bodyStyle = new GUIStyle(GUI.skin.label)
+        {
+            wordWrap = true
+        };
+        GUI.Label(body,
+            "W A S D        Mover\n" +
+            "Mouse           Olhar ao redor\n" +
+            "Espaço          Pular\n" +
+            "Shift (toque)   Esquivar\n" +
+            "Shift (segurar) Correr enquanto se move\n" +
+            "Q (segurar)     Mostrar a mira azul do Hashi\n" +
+            "Botão esquerdo  Ataque; segure para carregar\n" +
+            "Botão direito   Arremessar Hashi\n\n" +
+            "No combo carregado, solte e segure novamente durante o golpe ascendente para preparar o descendente.\n\n" +
+            "F1 fecha este resumo.", bodyStyle);
     }
 
     private void FixedUpdate()
