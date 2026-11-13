@@ -41,31 +41,35 @@ public class FimDeJogo : MonoBehaviour
     [ContextMenu("Teste/Exibir derrota")]
     public void ExibirDerrota()
     {
-        Encerrar("FIM DE JOGO", "Ling caiu. Sua jornada ainda não acabou.");
+        Encerrar("Fim de Jogo", "Ling caiu. Sua jornada ainda não acabou.", false);
     }
 
     [ContextMenu("Teste/Exibir vitoria")]
     public void ExibirVitoria()
     {
-        Encerrar("VITÓRIA!", "Ling venceu esta batalha.");
+        Encerrar("VITÓRIA!", "Ling venceu esta batalha.", true);
     }
 
-    private void Encerrar(string textoTitulo, string textoMensagem)
+    private void Encerrar(string textoTitulo, string textoMensagem, bool vitoria)
     {
         if (!Application.isPlaying || !isActiveAndEnabled || encerrando)
             return;
 
         encerrando = true;
-        StartCoroutine(ExibirPainel(textoTitulo, textoMensagem));
+        StartCoroutine(ExibirPainel(textoTitulo, textoMensagem, vitoria));
     }
 
-    private IEnumerator ExibirPainel(string textoTitulo, string textoMensagem)
+    private IEnumerator ExibirPainel(string textoTitulo, string textoMensagem, bool vitoria)
     {
         // Permite que a animacao de morte aconteca antes de pausar.
         yield return new WaitForSecondsRealtime(atrasoParaExibir);
 
         if (titulo != null)
+        {
             titulo.text = textoTitulo;
+            titulo.color = vitoria ? new Color32(244, 241, 234, 255) : new Color32(207, 203, 194, 255);
+        }
+        AplicarEstadoVisual(vitoria);
         if (mensagem != null)
             mensagem.text = textoMensagem;
 
@@ -84,6 +88,33 @@ public class FimDeJogo : MonoBehaviour
         }
     }
 
+    private void AplicarEstadoVisual(bool vitoria)
+    {
+        Transform painelCentral = painel.transform.Find("PainelCentral");
+        if (painelCentral == null)
+            return;
+
+        Color coral = new Color32(217, 67, 67, 255);
+        Color amber = new Color32(229, 169, 59, 255);
+        Color blue = new Color32(59, 116, 184, 255);
+        var outline = painelCentral.GetComponent<UnityEngine.UI.Outline>();
+        if (outline != null)
+            outline.effectColor = vitoria ? coral : blue;
+
+        Transform faixa = painelCentral.Find("FaixaResultado");
+        var imagemFaixa = faixa != null ? faixa.GetComponent<UnityEngine.UI.Image>() : null;
+        if (imagemFaixa != null)
+            imagemFaixa.color = vitoria ? coral : blue;
+
+        Transform filete = faixa != null ? faixa.Find("FileteVitoria") : null;
+        if (filete != null)
+        {
+            filete.gameObject.SetActive(vitoria);
+            var imagemFilete = filete.GetComponent<UnityEngine.UI.Image>();
+            if (imagemFilete != null)
+                imagemFilete.color = amber;
+        }
+    }
     public void TentarNovamente()
     {
         // Reabre a arena diretamente, mantendo as escolhas estaticas do projeto.
@@ -125,3 +156,6 @@ public class FimDeJogo : MonoBehaviour
         RetomarTempo();
     }
 }
+
+
+
