@@ -1,25 +1,13 @@
-using System.IO;
 using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-[InitializeOnLoad]
 public static class ConfigurarTelaDificuldade
 {
-    static ConfigurarTelaDificuldade()
-    {
-        EditorApplication.delayCall += VerificarEConfigurarAutomatico;
-    }
-
-    private static void VerificarEConfigurarAutomatico()
-    {
-        if (EditorApplication.isPlayingOrWillChangePlaymode) return;
-        AtualizarImporters();
-        AtualizarCena();
-    }
-
+    private const string MenuPath = "LingsLore/Configurar Tela Dificuldade Completa";
     private const string ScenePath = "Assets/Scenes/SelecaoDificuldade.unity";
     private const string SpritesDir = "Assets/Sprites/Dificuldade";
     private static readonly string[] NomesEmblemas = {
@@ -29,16 +17,17 @@ public static class ConfigurarTelaDificuldade
         "Dificuldade_Impossivel"
     };
 
-    [MenuItem("LingsLore/Configurar Tela Dificuldade Completa")]
+    [MenuItem(MenuPath, true)]
+    private static bool PodeConfigurar()
+    {
+        return !EditorApplication.isPlaying && !EditorApplication.isPlayingOrWillChangePlaymode;
+    }
+
+    [MenuItem(MenuPath)]
     public static void Executar()
     {
-        if (EditorApplication.isPlayingOrWillChangePlaymode)
-        {
-            Debug.LogWarning("Saia do modo Play antes de configurar a tela de dificuldade.");
-            return;
-        }
+        if (!PodeConfigurar()) return;
 
-        AtualizarImporters();
         AtualizarCena();
     }
 
@@ -48,7 +37,12 @@ public static class ConfigurarTelaDificuldade
         {
             string path = $"{SpritesDir}/{s}.png";
             TextureImporter importer = AssetImporter.GetAtPath(path) as TextureImporter;
-            if (importer != null)
+            if (importer != null &&
+                (importer.textureType != TextureImporterType.Sprite ||
+                 importer.spriteImportMode != SpriteImportMode.Single ||
+                 importer.filterMode != FilterMode.Point ||
+                 importer.textureCompression != TextureImporterCompression.Uncompressed ||
+                 importer.mipmapEnabled || !importer.alphaIsTransparency))
             {
                 importer.textureType = TextureImporterType.Sprite;
                 importer.spriteImportMode = SpriteImportMode.Single;
@@ -61,16 +55,36 @@ public static class ConfigurarTelaDificuldade
         }
     }
 
-    public static void AtualizarCena()
+    private static void AtualizarCena()
     {
-        var scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+        var scene = SceneManager.GetSceneByPath(ScenePath);
+        if (!scene.isLoaded)
+        {
+            if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo() || !PodeConfigurar()) return;
 
-        GameObject listaObj = GameObject.Find("ListaDificuldades");
-        if (listaObj == null)
+            scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+        }
+
+        Transform lista = null;
+        foreach (var root in scene.GetRootGameObjects())
+        {
+            foreach (var child in root.GetComponentsInChildren<Transform>(true))
+            {
+                if (child.name != "ListaDificuldades") continue;
+                lista = child;
+                break;
+            }
+
+            if (lista != null) break;
+        }
+
+        if (lista == null)
         {
             Debug.LogError("[ConfigurarTelaDificuldade] 'ListaDificuldades' não encontrado na cena!");
             return;
         }
+
+        AtualizarImporters();
 
         string[] titulosEsperados = { "Fácil", "Médio", "Difícil", "Impossível" };
         string[] descricoesAprovadas = {
@@ -79,9 +93,9 @@ public static class ConfigurarTelaDificuldade
             "Inimigos implacáveis e dano elevado: cada erro custa caro.",
             "Um único descuido é fatal. Boa sorte, você vai precisar."
         };
-        for (int i = 0; i < listaObj.transform.childCount && i < 4; i++)
+        for (int i = 0; i < lista.childCount && i < 4; i++)
         {
-            Transform botao = listaObj.transform.GetChild(i);
+            Transform botao = lista.GetChild(i);
 
             if (botao.GetComponent<MenuButtonHoverScale>() == null)
             {
