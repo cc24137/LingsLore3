@@ -8,8 +8,8 @@ $umChop = [System.Drawing.Bitmap]::FromFile("$dir\base_um_chopstick.png")
 
 # Função que gera uma composição limpa onde Ling fica na frente e os utensílios nas laterais
 function Create-CleanSprite($outPath, $damageLevel) {
-    $w = 112
-    $h = 88
+    $w = 160
+    $h = 128
     $bmp = New-Object System.Drawing.Bitmap($w, $h, [System.Drawing.Imaging.PixelFormat]::Format32bppArgb)
     $g = [System.Drawing.Graphics]::FromImage($bmp)
     $g.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::NearestNeighbor
@@ -18,8 +18,8 @@ function Create-CleanSprite($outPath, $damageLevel) {
 
     # Coordenadas:
     # Ling no centro, base na parte inferior
-    $lingX = [int](($w - $ling.Width) / 2) # (112 - 64) / 2 = 24
-    $lingY = 18
+    $lingX = 40
+    $lingY = 24
 
     # 1. GARFO NA ESQUERDA (desenhado atrás de Ling, deslocado para a esquerda)
     $forkBmp = New-Object System.Drawing.Bitmap($fork)
@@ -53,16 +53,16 @@ function Create-CleanSprite($outPath, $damageLevel) {
             }
         }
     }
-    # Desenhar o Garfo em x = 2, y = 30 (totalmente na lateral esquerda, sem cobrir o rosto!)
-    $forkX = 2
-    $forkY = 32
-    $g.DrawImage($forkBmp, $forkX, $forkY, 32, 32)
+    # Deixar o garfo visível na lateral sem competir com o rosto.
+    $forkX = 10
+    $forkY = 48
+    $g.DrawImage($forkBmp, $forkX, $forkY, 40, 40)
     $forkBmp.Dispose()
 
     # 2. HASHIS NA DIREITA (desenhados na lateral direita)
     # Pegamos o corte do hashi de base_dois_chopsticks ou desenhamos hashis limpos em ângulo
     # O chopstick original é 96x96, vamos usar uma sub-região ou desenhar os hashis apontando para cima na direita:
-    $chopBmp = New-Object System.Drawing.Bitmap(32, 54, [System.Drawing.Imaging.PixelFormat]::Format32bppArgb)
+    $chopBmp = New-Object System.Drawing.Bitmap(40, 70, [System.Drawing.Imaging.PixelFormat]::Format32bppArgb)
     $cg = [System.Drawing.Graphics]::FromImage($chopBmp)
     $cg.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::NearestNeighbor
     $cg.Clear([System.Drawing.Color]::Transparent)
@@ -75,9 +75,9 @@ function Create-CleanSprite($outPath, $damageLevel) {
     if ($damageLevel -eq "nenhum" -or $damageLevel -eq "medio" -or $damageLevel -eq "dificil" -or $damageLevel -eq "impossivel") {
         # Hashi 1 (Principal)
         # Traço diagonal de baixo-esquerda para cima-direita
-        for ($t = 0; $t -lt 48; $t++) {
-            $x = 4 + [int]($t * 0.45)
-            $y = 50 - $t
+        for ($t = 0; $t -lt 61; $t++) {
+            $x = 5 + [int]($t * 0.5)
+            $y = 65 - $t
 
             # No impossível, quebra na metade!
             if ($damageLevel -eq "impossivel" -and $t -gt 26) {
@@ -104,9 +104,9 @@ function Create-CleanSprite($outPath, $damageLevel) {
         # Hashi 2 (Segundo hashi)
         # No fácil e difícil tem 2 hashis. No médio o 2º tem ponta gasta. No impossível o 2º foi arremessado/ausente.
         if ($damageLevel -ne "impossivel") {
-            for ($t = 0; $t -lt 44; $t++) {
-                $x = 10 + [int]($t * 0.42)
-                $y = 50 - $t
+            for ($t = 0; $t -lt 56; $t++) {
+                $x = 10 + [int]($t * 0.46)
+                $y = 65 - $t
 
                 if ($damageLevel -eq "medio" -and $t -gt 38) {
                     # Ponta gasta
@@ -123,14 +123,14 @@ function Create-CleanSprite($outPath, $damageLevel) {
     }
     $cg.Dispose()
 
-    # Desenhar Hashis na lateral direita: x = 78, y = 16
-    $chopX = 78
-    $chopY = 18
-    $g.DrawImage($chopBmp, $chopX, $chopY, 32, 54)
+    # Manter os hashis altos e separados do rosto.
+    $chopX = 110
+    $chopY = 25
+    $g.DrawImage($chopBmp, $chopX, $chopY, 40, 70)
     $chopBmp.Dispose()
 
     # 3. LING NO CENTRO (EM CIMA, 100% VISÍVEL E LIMPA!)
-    $g.DrawImage($ling, $lingX, $lingY, $ling.Width, $ling.Height)
+    $g.DrawImage($ling, $lingX, $lingY, 80, 80)
 
     $g.Dispose()
     $bmp.Save($outPath, [System.Drawing.Imaging.ImageFormat]::Png)

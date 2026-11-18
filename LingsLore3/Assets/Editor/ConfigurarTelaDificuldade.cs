@@ -8,9 +8,6 @@ using UnityEngine.UI;
 [InitializeOnLoad]
 public static class ConfigurarTelaDificuldade
 {
-    private const string ScenePath = "Assets/Scenes/SelecaoDificuldade.unity";
-    private const string SpritesDir = "Assets/Sprites/Dificuldade";
-
     static ConfigurarTelaDificuldade()
     {
         EditorApplication.delayCall += VerificarEConfigurarAutomatico;
@@ -18,29 +15,36 @@ public static class ConfigurarTelaDificuldade
 
     private static void VerificarEConfigurarAutomatico()
     {
-        if (EditorApplication.isPlayingOrWillChangePlaymode)
-            return;
-
-        Executar();
+        if (EditorApplication.isPlayingOrWillChangePlaymode) return;
+        AtualizarImporters();
+        AtualizarCena();
     }
+
+    private const string ScenePath = "Assets/Scenes/SelecaoDificuldade.unity";
+    private const string SpritesDir = "Assets/Sprites/Dificuldade";
+    private static readonly string[] NomesEmblemas = {
+        "Dificuldade_Facil",
+        "Dificuldade_Medio",
+        "Dificuldade_Dificil",
+        "Dificuldade_Impossivel"
+    };
 
     [MenuItem("LingsLore/Configurar Tela Dificuldade Completa")]
     public static void Executar()
     {
+        if (EditorApplication.isPlayingOrWillChangePlaymode)
+        {
+            Debug.LogWarning("Saia do modo Play antes de configurar a tela de dificuldade.");
+            return;
+        }
+
         AtualizarImporters();
         AtualizarCena();
     }
 
     private static void AtualizarImporters()
     {
-        string[] sprites = {
-            "Dificuldade_Facil",
-            "Dificuldade_Medio",
-            "Dificuldade_Dificil",
-            "Dificuldade_Impossivel"
-        };
-
-        foreach (string s in sprites)
+        foreach (string s in NomesEmblemas)
         {
             string path = $"{SpritesDir}/{s}.png";
             TextureImporter importer = AssetImporter.GetAtPath(path) as TextureImporter;
@@ -75,13 +79,6 @@ public static class ConfigurarTelaDificuldade
             "Inimigos implacáveis e dano elevado: cada erro custa caro.",
             "Um único descuido é fatal. Boa sorte, você vai precisar."
         };
-        string[] nomesSprites = {
-            "Dificuldade_Facil",
-            "Dificuldade_Medio",
-            "Dificuldade_Dificil",
-            "Dificuldade_Impossivel"
-        };
-
         for (int i = 0; i < listaObj.transform.childCount && i < 4; i++)
         {
             Transform botao = listaObj.transform.GetChild(i);
@@ -108,7 +105,7 @@ public static class ConfigurarTelaDificuldade
                 tituloTMP.fontStyle = FontStyles.Bold;
             }
 
-            // 2. ÍCONE NO CENTRO (Mais espaçoso e com proporção adequada para Ling + armas nas laterais)
+            // 2. EMBLEMA NO CENTRO
             Transform iconeTransform = botao.Find("IconeDificuldade");
             GameObject iconeObj;
             if (iconeTransform == null)
@@ -122,14 +119,16 @@ public static class ConfigurarTelaDificuldade
             }
 
             RectTransform rectIcone = iconeObj.GetComponent<RectTransform>();
-            rectIcone.anchorMin = new Vector2(0.5f, 1f);
-            rectIcone.anchorMax = new Vector2(0.5f, 1f);
-            rectIcone.pivot = new Vector2(0.5f, 1f);
-            rectIcone.anchoredPosition = new Vector2(0f, -66f);
-            rectIcone.sizeDelta = new Vector2(210f, 165f);
+            // Âncoras: centro horizontal, ocupa a faixa central do card
+            rectIcone.anchorMin = new Vector2(0f, 0f);
+            rectIcone.anchorMax = new Vector2(1f, 1f);
+            rectIcone.pivot = new Vector2(0.5f, 0.5f);
+            // Margens: 20px topo (abaixo do título), 160px baixo (acima da descrição)
+            rectIcone.offsetMin = new Vector2(20f, 160f);
+            rectIcone.offsetMax = new Vector2(-20f, -72f);
 
             Image img = iconeObj.GetComponent<Image>();
-            string spritePath = $"{SpritesDir}/{nomesSprites[i]}.png";
+            string spritePath = $"{SpritesDir}/{NomesEmblemas[i]}.png";
             Sprite sp = AssetDatabase.LoadAssetAtPath<Sprite>(spritePath);
             if (sp == null)
             {
