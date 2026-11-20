@@ -197,7 +197,7 @@ public class ContadorCreditos : MonoBehaviour
 
     private void Update()
     {
-        if (!tempoAtivo || tutorialConcluido || reiniciandoPorMorte ||
+        if (MenuPausa.EstaPausado || !tempoAtivo || tutorialConcluido || reiniciandoPorMorte ||
             (jogador != null && jogador.IsDead))
             return;
 
@@ -228,7 +228,10 @@ public class ContadorCreditos : MonoBehaviour
     private IEnumerator ReiniciarRodadaAposMorte()
     {
         if (atrasoRespawn > 0f)
-            yield return new WaitForSecondsRealtime(atrasoRespawn);
+            yield return new WaitForSeconds(atrasoRespawn);
+
+        while (MenuPausa.EstaPausado)
+            yield return null;
 
         if (this == null || !isActiveAndEnabled || jogador == null ||
             rodadaAtual < 0 || tutorialConcluido)
@@ -634,7 +637,7 @@ public class ContadorCreditos : MonoBehaviour
     {
         if (tutorialConcluido)
         {
-            textoContador.text = "Tutorial concluído! Clique em Ir ao jogo para continuar.";
+            textoContador.text = "Tutorial concluído! Pressione Enter para ir ao jogo.";
             return;
         }
 

@@ -82,6 +82,9 @@ public class PlayerHashi : MonoBehaviour
 
     private void Update()
     {
+        if (MenuPausa.BloqueiaEntradaDeJogo)
+            return;
+
         bool aimAssistHeld = Keyboard.current != null &&
             Keyboard.current.qKey.isPressed;
         SetAimIndicatorState(tutorialAimIndicatorVisible || aimAssistHeld);

@@ -15,6 +15,52 @@ public class SelecaoDificuldade : MonoBehaviour
         = Dificuldade.Facil;
 
     private bool carregandoCena;
+    private DestaqueCardDificuldade cardComFoco;
+    private DestaqueCardDificuldade cardSobPonteiro;
+    private DestaqueCardDificuldade cardDestacado;
+
+    internal void PonteiroSobre(DestaqueCardDificuldade card)
+    {
+        cardSobPonteiro = card;
+        Destacar(card);
+    }
+
+    internal void PonteiroSaiu(DestaqueCardDificuldade card)
+    {
+        if (cardSobPonteiro != card)
+            return;
+
+        cardSobPonteiro = null;
+        Destacar(cardComFoco);
+    }
+
+    internal void Focar(DestaqueCardDificuldade card)
+    {
+        cardComFoco = card;
+        Destacar(card);
+    }
+
+    internal void Desfocar(DestaqueCardDificuldade card)
+    {
+        if (cardComFoco != card)
+            return;
+
+        cardComFoco = null;
+        Destacar(cardSobPonteiro);
+    }
+
+    private void Destacar(DestaqueCardDificuldade card)
+    {
+        if (cardDestacado == card)
+            return;
+
+        if (cardDestacado != null)
+            cardDestacado.DefinirDestaque(false);
+
+        cardDestacado = card;
+        if (cardDestacado != null)
+            cardDestacado.DefinirDestaque(true);
+    }
 
     public void SelecionarDificuldade(int indice)
     {

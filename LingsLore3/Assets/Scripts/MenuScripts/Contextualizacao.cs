@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
+[DefaultExecutionOrder(-100)]
 public class Contextualizacao : MonoBehaviour
 {
     [SerializeField] private RectTransform textoHistoria;
@@ -10,6 +12,14 @@ public class Contextualizacao : MonoBehaviour
     [SerializeField] private string cenaJogo = "ArenaPrototype";
 
     private bool carregandoJogo;
+
+    private void Awake()
+    {
+        LiberarCursor();
+
+        if (textoHistoria.TryGetComponent<Graphic>(out var texto))
+            texto.raycastTarget = false;
+    }
 
     private void Start()
     {
@@ -21,6 +31,7 @@ public class Contextualizacao : MonoBehaviour
         if (carregandoJogo)
             return;
 
+        LiberarCursor();
         textoHistoria.anchoredPosition +=
             Vector2.up * velocidade * Time.deltaTime;
 
@@ -28,6 +39,20 @@ public class Contextualizacao : MonoBehaviour
         {
             Pular();
         }
+    }
+
+    private void OnApplicationFocus(bool temFoco)
+    {
+        if (temFoco && !carregandoJogo)
+            LiberarCursor();
+    }
+
+    private static void LiberarCursor()
+    {
+        if (Cursor.lockState != CursorLockMode.None)
+            Cursor.lockState = CursorLockMode.None;
+        if (!Cursor.visible)
+            Cursor.visible = true;
     }
 
     public void Pular()

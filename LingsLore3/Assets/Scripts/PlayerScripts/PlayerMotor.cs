@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Interactions;
-using UnityEngine.SceneManagement;
 
 [DefaultExecutionOrder(-100)]
 [RequireComponent(typeof(Rigidbody), typeof(PlayerJump), typeof(PlayerDodge))]
@@ -50,7 +49,6 @@ public class PlayerMotor : MonoBehaviour
     [SerializeField, Range(0f, 1f)] private float chargingMovementMultiplier = 0.2f;
 
     private PlayerHashi hashi;
-    private ContadorCreditos contadorTutorial;
     private bool throwHashiRequested;
     private PlayerMelee melee;
     private enum ChargeIntent { None, Up, Down }
@@ -78,6 +76,7 @@ public class PlayerMotor : MonoBehaviour
     private bool sprintExhausted;
     private bool sprintNeedsRelease;
     private bool controlsPanelVisible;
+    private bool isTutorial;
 
     private bool wasAirborne;
     private float airborneReferenceSpeed;
@@ -178,7 +177,7 @@ public class PlayerMotor : MonoBehaviour
         dodge = GetComponent<PlayerDodge>();
         melee = GetComponent<PlayerMelee>();
         hashi = GetComponent<PlayerHashi>();
-        contadorTutorial = FindFirstObjectByType<ContadorCreditos>();
+        isTutorial = gameObject.scene.name == "Tutorial";
     }
 
     private void OnEnable()
@@ -212,6 +211,9 @@ public class PlayerMotor : MonoBehaviour
 
     private void OnDodgeSprintPerformed(InputAction.CallbackContext context)
     {
+        if (MenuPausa.BloqueiaEntradaDeJogo)
+            return;
+
         // Os callbacks registram pedidos; o FixedUpdate decide se pode executar.
         if (context.interaction is TapInteraction)
             dodgeRequested = true;
@@ -227,7 +229,24 @@ public class PlayerMotor : MonoBehaviour
 
     private void Update()
     {
-        if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
+        moveInput = Vector2.ClampMagnitude(moveAction.action.ReadValue<Vector2>(), 1f);
+        jumpHeld = jumpAction.action.IsPressed();
+
+        bool sobreBotao = MenuPausa.Ativo != null && MenuPausa.Ativo.PonteiroSobreBotao();
+        attackHeld = !sobreBotao && attackAction.action.IsPressed();
+
+        if (MenuPausa.BloqueiaEntradaDeJogo)
+        {
+            jumpRequested = false;
+            dodgeRequested = false;
+            throwHashiRequested = false;
+            attackPressed = false;
+            attackReleased |= attackAction.action.WasReleasedThisFrame();
+            return;
+        }
+
+        Keyboard teclado = Keyboard.current;
+        if (MenuPausa.Ativo == null && teclado != null && teclado.escapeKey.wasPressedThisFrame)
         {
             controlsPanelVisible = false;
             bool liberarCursor = Cursor.lockState == CursorLockMode.Locked;
@@ -237,7 +256,7 @@ public class PlayerMotor : MonoBehaviour
             Cursor.visible = liberarCursor;
         }
 
-        if (Keyboard.current != null && Keyboard.current.f1Key.wasPressedThisFrame)
+        if (!isTutorial && teclado != null && teclado.f1Key.wasPressedThisFrame)
         {
             controlsPanelVisible = !controlsPanelVisible;
             Cursor.lockState = controlsPanelVisible
@@ -246,51 +265,35 @@ public class PlayerMotor : MonoBehaviour
             Cursor.visible = controlsPanelVisible;
         }
 
-        moveInput = Vector2.ClampMagnitude(
-            moveAction.action.ReadValue<Vector2>(), 1f
-        );
-
         if (jumpAction.action.WasPressedThisFrame())
             jumpRequested = true;
 
-        jumpHeld = jumpAction.action.IsPressed();
-
-        if (attackAction.action.WasPressedThisFrame())
+        if (!sobreBotao && attackAction.action.WasPressedThisFrame())
             attackPressed = true;
         if (attackAction.action.WasReleasedThisFrame())
             attackReleased = true;
 
-        attackHeld = attackAction.action.IsPressed();
-
-        if (throwHashiAction != null && throwHashiAction.action.WasPressedThisFrame())
+        if (!sobreBotao && throwHashiAction != null && throwHashiAction.action.WasPressedThisFrame())
             throwHashiRequested = true;
     }
 
     private void OnGUI()
     {
-        const float margin = 16f;
-        const float top = 12f;
-        const float hintWidth = 248f;
-        const float skipWidth = 148f;
-        bool isTutorial = SceneManager.GetActiveScene().name == "Tutorial";
-        float hintX = Screen.width - margin - hintWidth;
-        if (isTutorial)
-        {
-            float skipX = hintX - 8f - skipWidth;
-            bool tutorialFinalizado = contadorTutorial != null &&
-                contadorTutorial.TutorialConcluido;
-            string textoBotao = tutorialFinalizado
-                ? "Ir ao jogo  →"
-                : "Ir ao jogo";
-            if (GUI.Button(new Rect(skipX, top, skipWidth, 32f), textoBotao))
-            {
-                SceneManager.LoadScene("ArenaPrototype");
-                return;
-            }
-        }
+        if (isTutorial || MenuPausa.BloqueiaEntradaDeJogo)
+            return;
 
-        GUI.Label(new Rect(hintX, top, hintWidth, 32f),
-            "F1  Comandos   |   Esc  Liberar mouse", GUI.skin.box);
+        const float margin = 16f;
+        var menuPausa = MenuPausa.Ativo;
+        Vector2 cantoPausa = menuPausa != null
+            ? menuPausa.CantoSuperiorEsquerdoNoOnGUI()
+            : new Vector2(Screen.width - margin, 12f);
+        float limiteDireito = menuPausa != null ? cantoPausa.x - 8f : cantoPausa.x;
+        float top = cantoPausa.y;
+        string atalhos = menuPausa != null
+            ? "F1  Comandos"
+            : "F1  Comandos   |   Esc  Liberar mouse";
+        float hintWidth = menuPausa != null ? 120f : 248f;
+        GUI.Label(new Rect(limiteDireito - hintWidth, top, hintWidth, 32f), atalhos, GUI.skin.box);
 
         if (!controlsPanelVisible)
             return;

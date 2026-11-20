@@ -62,7 +62,10 @@ public class FimDeJogo : MonoBehaviour
     private IEnumerator ExibirPainel(string textoTitulo, string textoMensagem, bool vitoria)
     {
         // Permite que a animacao de morte aconteca antes de pausar.
-        yield return new WaitForSecondsRealtime(atrasoParaExibir);
+        yield return new WaitForSeconds(atrasoParaExibir);
+
+        while (MenuPausa.EstaPausado)
+            yield return null;
 
         if (titulo != null)
         {

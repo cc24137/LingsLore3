@@ -58,7 +58,7 @@ public class ThirdPersonCamera : MonoBehaviour
 
     private void Update()
     {
-        if (Cursor.lockState != CursorLockMode.Locked)
+        if (MenuPausa.BloqueiaEntradaDeJogo || Cursor.lockState != CursorLockMode.Locked)
             return;
 
         Vector2 mouseDelta = lookAction.action.ReadValue<Vector2>();
@@ -84,6 +84,9 @@ public class ThirdPersonCamera : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (MenuPausa.BloqueiaEntradaDeJogo)
+            return;
+
         Vector3 focusPoint =
             target.position + Vector3.up * targetHeight;
 
