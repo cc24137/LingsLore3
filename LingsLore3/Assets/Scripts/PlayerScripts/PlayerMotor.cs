@@ -5,7 +5,7 @@ using UnityEngine.InputSystem.Interactions;
 [DefaultExecutionOrder(-100)]
 [RequireComponent(typeof(Rigidbody), typeof(PlayerJump), typeof(PlayerDodge))]
 [RequireComponent(typeof(PlayerResources), typeof(PlayerMelee))]
-[RequireComponent(typeof(PlayerHashi))]
+[RequireComponent(typeof(PlayerHashi), typeof(PlayerKnockback))]
 public class PlayerMotor : MonoBehaviour
 {
     public enum AttackLessonMode { All, LightComboOnly, ChargedComboOnly, AirSpinOnly, HashiOnly }
@@ -59,6 +59,8 @@ public class PlayerMotor : MonoBehaviour
     private bool queuedLightAttack;
     private PlayerMelee.AttackType queuedChargedAttack;
     private bool airAttackUsed;
+    private float pendingHitBounceHeight;
+    private int? lastBouncedAttackSerial;
     private float chargeTimer;
     private AttackLessonMode attackLessonMode;
     private bool hashiAtivoAntesDaRestricao;
@@ -67,6 +69,7 @@ public class PlayerMotor : MonoBehaviour
     private PlayerResources resources;
     private PlayerJump jump;
     private PlayerDodge dodge;
+    private PlayerKnockback knockback;
 
     private Vector2 moveInput;
     private bool jumpRequested;
@@ -101,12 +104,12 @@ public class PlayerMotor : MonoBehaviour
     public bool CanThrowHashi =>
         (attackLessonMode == AttackLessonMode.All ||
             attackLessonMode == AttackLessonMode.HashiOnly) &&
-        !IsDead && !IsDodging && !IsAttacking && !IsCharging &&
+        !IsDead && !IsKnockedBack && !IsDodging && !IsAttacking && !IsCharging &&
         queuedChargedAttack == PlayerMelee.AttackType.None && !queuedLightAttack &&
         hashi != null && hashi.isActiveAndEnabled && hashi.CanFire;
 
     public bool CanStartAttack =>
-        !IsDead && !IsDodging && !IsAttacking &&
+        !IsDead && !IsKnockedBack && !IsDodging && !IsAttacking &&
         melee != null && melee.enabled;
 
     public void SetBasicAttackOnly(bool active)
@@ -155,16 +158,18 @@ public class PlayerMotor : MonoBehaviour
         }
     }
     public bool IsDodging => dodge != null && dodge.IsActive;
+    public bool IsKnockedBack => knockback != null && knockback.IsActive;
     public bool IsInvulnerable =>
         !IsDead && IsDodging && dodge.IsInvulnerable;
 
     // As permissoes para as acoes ficam centralizadas aqui.
     public bool CanJump =>
-        !IsDead && IsGrounded && !IsDodging && !IsAttacking && !IsCharging &&
+        !IsDead && !IsKnockedBack && IsGrounded && !IsDodging &&
+        !IsAttacking && !IsCharging &&
         queuedChargedAttack == PlayerMelee.AttackType.None && jump != null && jump.enabled;
 
     public bool CanDodge =>
-        !IsDead && IsGrounded && !IsDodging && !IsAttacking &&
+        !IsDead && !IsKnockedBack && IsGrounded && !IsDodging && !IsAttacking &&
         dodge != null && dodge.enabled &&
         resources != null && resources.CurrentStamina >= dodgeStaminaCost;
 
@@ -176,11 +181,14 @@ public class PlayerMotor : MonoBehaviour
         dodge = GetComponent<PlayerDodge>();
         melee = GetComponent<PlayerMelee>();
         hashi = GetComponent<PlayerHashi>();
+        knockback = GetComponent<PlayerKnockback>();
         isTutorial = gameObject.scene.name == "Tutorial";
     }
 
     private void OnEnable()
     {
+        melee.HitLanded += OnMeleeHit;
+        hashi.TargetHit += OnHashiHit;
         dodgeSprintAction.action.performed += OnDodgeSprintPerformed;
         dodgeSprintAction.action.canceled += OnDodgeSprintCanceled;
 
@@ -194,6 +202,8 @@ public class PlayerMotor : MonoBehaviour
 
     private void OnDisable()
     {
+        melee.HitLanded -= OnMeleeHit;
+        hashi.TargetHit -= OnHashiHit;
         dodgeSprintAction.action.performed -= OnDodgeSprintPerformed;
         dodgeSprintAction.action.canceled -= OnDodgeSprintCanceled;
 
@@ -287,10 +297,31 @@ public class PlayerMotor : MonoBehaviour
             return;
         }
 
-        UpdateAirControlReference();
-
         if (IsGrounded)
+        {
             airAttackUsed = false;
+            wasAirborne = false;
+        }
+
+        if (IsKnockedBack)
+        {
+            IsSprinting = false;
+            dodgeRequested = false;
+            jumpRequested = false;
+            throwHashiRequested = false;
+            CancelCombat();
+            dodge.Cancel();
+            jump.Cancel();
+
+            knockback.Tick(Time.fixedDeltaTime);
+            if (body.linearVelocity.y > 0.1f)
+                IsGrounded = false;
+            UpdateAirControlReference();
+            return;
+        }
+
+        ApplyHitBounce();
+        UpdateAirControlReference();
 
         float resumeThreshold = Mathf.Min(
             minStaminaToResumeSprint, resources.MaxStamina
@@ -616,6 +647,59 @@ public class PlayerMotor : MonoBehaviour
             melee.Cancel();
     }
 
+    internal void RequestDamageKnockback(Vector3? sourcePosition)
+    {
+        if (!isActiveAndEnabled || knockback == null)
+            return;
+
+        knockback.QueueHit(sourcePosition);
+        if (IsKnockedBack)
+            pendingHitBounceHeight = 0f;
+    }
+
+    internal void ClearImpactMotion()
+    {
+        pendingHitBounceHeight = 0f;
+        if (knockback != null)
+            knockback.Cancel();
+    }
+
+    private void OnMeleeHit(EnemyHealth target, PlayerMelee.AttackType attack)
+    {
+        int attackSerial = melee.AttackSerial;
+        if (lastBouncedAttackSerial == attackSerial)
+            return;
+
+        lastBouncedAttackSerial = attackSerial;
+        QueueHitBounce(melee.GetHitBounceHeight(attack));
+    }
+
+    private void OnHashiHit(EnemyHealth target)
+    {
+        QueueHitBounce(hashi.HitBounceHeight);
+    }
+
+    private void QueueHitBounce(float height)
+    {
+        if (!IsDead && !IsKnockedBack && !IsDodging)
+            pendingHitBounceHeight = Mathf.Max(pendingHitBounceHeight, height);
+    }
+
+    private void ApplyHitBounce()
+    {
+        if (pendingHitBounceHeight <= 0f)
+            return;
+
+        float upwardSpeed = Mathf.Sqrt(2f * Mathf.Abs(Physics.gravity.y) * pendingHitBounceHeight);
+        pendingHitBounceHeight = 0f;
+
+        Vector3 velocity = body.linearVelocity;
+        velocity.y = Mathf.Max(velocity.y, upwardSpeed);
+        body.linearVelocity = velocity;
+        jump.Cancel();
+        IsGrounded = false;
+    }
+
     private void RefreshGroundedState()
     {
         IsGrounded =
@@ -685,6 +769,7 @@ public class PlayerMotor : MonoBehaviour
 
     private void StopActions()
     {
+        ClearImpactMotion();
         throwHashiRequested = false;
         moveInput = Vector2.zero;
         jumpRequested = false;

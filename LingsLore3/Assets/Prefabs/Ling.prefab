@@ -534,6 +534,7 @@ GameObject:
   - component: {fileID: 2999062693324019157}
   - component: {fileID: 1273842927237044294}
   - component: {fileID: 5565780530721533133}
+  - component: {fileID: 4594158712362881732}
   m_Layer: 6
   m_Name: Ling
   m_TagString: Untagged
@@ -814,6 +815,7 @@ MonoBehaviour:
     hitStart: 0.15
     hitEnd: 0.48
     damage: 22
+    hitBounceHeight: 0.8
     staminaCost: 0
     movementMultiplier: 0.3
     stepDistance: 0
@@ -851,12 +853,28 @@ MonoBehaviour:
   - {fileID: 6297692683521953340}
   - {fileID: 4553885336819184030}
   damage: 20
+  hitBounceHeight: 0
   shotInterval: 0.25
   reloadTime: 10
   aimDistance: 80
   hitMask:
     serializedVersion: 2
     m_Bits: 904
+--- !u!114 &4594158712362881732
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8005583530017208899}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ebad4f29bfc4fc79890c977780a46da, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerKnockback
+  horizontalSpeed: 6
+  upwardSpeed: 3
+  controlLockDuration: 0.18
 --- !u!1 &8513959521425641727
 GameObject:
   m_ObjectHideFlags: 0

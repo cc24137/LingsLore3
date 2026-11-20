@@ -584,6 +584,7 @@ public class ContadorCreditos : MonoBehaviour
         if (alvo == null || jogador == null)
             return;
 
+        motorJogador?.ClearImpactMotion();
         Vector3 direcao = Vector3.ProjectOnPlane(alvo.forward, Vector3.up).normalized;
         if (direcao.sqrMagnitude < 0.001f)
             direcao = Vector3.forward;
@@ -611,6 +612,7 @@ public class ContadorCreditos : MonoBehaviour
         if (ponto == null || jogador == null)
             return;
 
+        motorJogador?.ClearImpactMotion();
         Rigidbody corpo = jogador.GetComponent<Rigidbody>();
         if (corpo != null)
         {
