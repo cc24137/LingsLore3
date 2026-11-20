@@ -349,7 +349,7 @@ public class PlayerMotor : MonoBehaviour
 
         dodgeRequested = false;
 
-        if (IsDodging)
+        if (IsDodging || dodge.IsLaunchingToPillarTop)
         {
             throwHashiRequested = false;
             ClearCombatInputRequests();
@@ -366,10 +366,10 @@ public class PlayerMotor : MonoBehaviour
                 );
             }
 
-            bool launchedFromPillar = dodge.Tick(Time.fixedDeltaTime);
-            if (dodge.IsClimbing || launchedFromPillar)
+            bool terminouLancamento = dodge.Tick(Time.fixedDeltaTime);
+            if (dodge.IsClimbing || dodge.IsLaunchingToPillarTop || terminouLancamento)
                 IsGrounded = false;
-            if (launchedFromPillar)
+            if (terminouLancamento)
                 CaptureAirControlReference();
             return;
         }
@@ -708,6 +708,7 @@ public class PlayerMotor : MonoBehaviour
     {
         IsGrounded =
             groundCheck != null &&
+            !dodge.IsLaunchingToPillarTop &&
             body.linearVelocity.y <= 0.1f &&
             Physics.CheckSphere(
                 groundCheck.position,

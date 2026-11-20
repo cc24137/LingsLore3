@@ -38,6 +38,7 @@ public class PlayerDodge : MonoBehaviour
 
     public bool IsActive { get; private set; }
     public bool IsClimbing { get; private set; }
+    public bool IsLaunchingToPillarTop { get; private set; }
     public bool IsRolling => IsActive && (IsClimbing || dodgeTimer < rollDuration);
     public bool IsRecovering => IsActive && !IsRolling;
     public float RecoverySpeedMultiplier => recoverySpeedMultiplier;
@@ -80,16 +81,20 @@ public class PlayerDodge : MonoBehaviour
         IsClimbing = true;
     }
 
-    // Retorna true quando o motor pode devolver o controle no ar.
+    // Retorna true quando termina o lancamento assistido.
     public bool Tick(float deltaTime)
     {
+        if (IsLaunchingToPillarTop)
+            return TickPillarLaunch(deltaTime);
+
         if (!IsActive)
             return false;
 
         if (IsClimbing)
         {
             dodgeTimer += deltaTime;
-            return TickPillarClimb(deltaTime);
+            TickPillarClimb(deltaTime);
+            return false;
         }
 
         if (IsRolling)
@@ -123,20 +128,22 @@ public class PlayerDodge : MonoBehaviour
         return false;
     }
 
-    private bool TickPillarClimb(float deltaTime)
+    private void TickPillarClimb(float deltaTime)
     {
         if (climbSurface == null || !climbSurface.isActiveAndEnabled)
         {
             CancelClimb();
-            return false;
+            return;
         }
 
         if (body.position.y >= climbSurface.ReleaseY - 0.015f)
         {
-            body.linearVelocity = climbSurface.GetLaunchVelocity(climbOutward, body.position.y, deltaTime);
-            body.MoveRotation(Quaternion.LookRotation(climbOutward, Vector3.up));
-            Cancel();
-            return true;
+            body.linearVelocity = climbSurface.GetLaunchVelocity(playerCapsule.bounds.min.y, deltaTime);
+            body.MoveRotation(Quaternion.LookRotation(-climbOutward, Vector3.up));
+            IsActive = false;
+            IsClimbing = false;
+            IsLaunchingToPillarTop = true;
+            return;
         }
 
         climbTime += deltaTime;
@@ -147,12 +154,41 @@ public class PlayerDodge : MonoBehaviour
             body.SweepTest(step.normalized, out _, step.magnitude, QueryTriggerInteraction.Ignore))
         {
             CancelClimb();
-            return false;
+            return;
         }
 
         body.linearVelocity = step / deltaTime;
         if (body.useGravity)
             body.linearVelocity -= Physics.gravity * deltaTime;
+    }
+
+    private bool TickPillarLaunch(float deltaTime)
+    {
+        if (climbSurface == null || !climbSurface.isActiveAndEnabled)
+        {
+            Cancel();
+            return true;
+        }
+
+        Vector3 top = climbSurface.TopCenter;
+        Vector3 verticalVelocity = Vector3.up * body.linearVelocity.y;
+
+        // So cruza para o centro quando os pes estao acima da borda.
+        if (playerCapsule.bounds.min.y >= top.y + 0.06f)
+        {
+            Vector3 offset = Vector3.ProjectOnPlane(top - body.position, Vector3.up);
+            Vector3 horizontalVelocity = Vector3.ClampMagnitude(offset / deltaTime, climbSurface.LandingSpeed);
+            body.linearVelocity = horizontalVelocity + verticalVelocity;
+            return false;
+        }
+
+        if (verticalVelocity.y <= 0f)
+        {
+            body.linearVelocity = verticalVelocity;
+            Cancel();
+            return true;
+        }
+
         return false;
     }
 
@@ -166,6 +202,7 @@ public class PlayerDodge : MonoBehaviour
     {
         IsActive = false;
         IsClimbing = false;
+        IsLaunchingToPillarTop = false;
         climbSurface = null;
         dodgeTimer = 0f;
     }

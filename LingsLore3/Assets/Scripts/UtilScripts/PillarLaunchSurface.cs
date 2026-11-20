@@ -10,21 +10,23 @@ public class PillarLaunchSurface : MonoBehaviour
 
     [Header("Subida e lancamento")]
     [SerializeField, Min(0.1f)] private float climbSpeed = 10f;
-    [Tooltip("Altura do apice a partir da base. 0.8 equivale a 80% da altura do pilar.")]
-    [SerializeField, Min(0.8f)] private float launchApexFraction = 0.85f;
-    [SerializeField, Min(0f)] private float outwardSpeed = 3.5f;
+    [Tooltip("Altura do apice a partir da base. 1.2 equivale a 120% da altura do pilar.")]
+    [SerializeField, Min(MinimumApexFraction)] private float launchApexFraction = 1.2f;
+    [SerializeField, Min(0.1f)] private float landingSpeed = 3.5f;
 
     // Proporcoes da malha RampaPilar no prefab.
     private const float RampWidthRatio = 0.65f;
     private const float RampRiseFraction = 0.85f / 14f;
     private const float ReleaseFraction = 0.25f;
-    private const float MinimumApexFraction = 0.8f;
+    private const float MinimumApexFraction = 1.1f;
 
     private Vector3 baseCenter;
     private float shaftRadius;
     private float shaftHeight;
 
     public float ReleaseY => baseCenter.y + shaftHeight * ReleaseFraction;
+    internal Vector3 TopCenter => baseCenter + Vector3.up * shaftHeight;
+    internal float LandingSpeed => landingSpeed;
 
     private void Awake()
     {
@@ -82,13 +84,13 @@ public class PillarLaunchSurface : MonoBehaviour
         return position;
     }
 
-    internal Vector3 GetLaunchVelocity(Vector3 outward, float currentY, float deltaTime)
+    internal Vector3 GetLaunchVelocity(float feetY, float deltaTime)
     {
         float apexY = baseCenter.y + shaftHeight * Mathf.Max(MinimumApexFraction, launchApexFraction);
-        float remainingRise = Mathf.Max(0f, apexY - currentY);
+        float remainingRise = Mathf.Max(0f, apexY - feetY);
         float gravity = Mathf.Abs(Physics.gravity.y);
         // Compensa a gravidade aplicada no primeiro passo do lancamento.
         float liftSpeed = Mathf.Sqrt(2f * gravity * remainingRise) + gravity * deltaTime;
-        return outward * outwardSpeed + Vector3.up * liftSpeed;
+        return Vector3.up * liftSpeed;
     }
 }
