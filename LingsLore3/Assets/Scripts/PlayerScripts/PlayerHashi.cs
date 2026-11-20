@@ -16,6 +16,8 @@ public class PlayerHashi : MonoBehaviour
 
     [Header("Disparo")]
     [SerializeField, Min(0f)] private float damage = 20f;
+    [Tooltip("Altura do rebote do Ling ao acertar. Zero desativa.")]
+    [SerializeField, Min(0f)] private float hitBounceHeight;
     [SerializeField, Min(0.01f)] private float shotInterval = 0.25f;
     [SerializeField, Min(0.01f)] private float reloadTime = 10f;
     [SerializeField, Min(1f)] private float aimDistance = 80f;
@@ -43,6 +45,7 @@ public class PlayerHashi : MonoBehaviour
 
     public int CurrentAmmo { get; private set; } = 2;
     public int MaxAmmo => 2;
+    public float HitBounceHeight => hitBounceHeight;
 
     public bool CanFire =>
         ready && CurrentAmmo > 0 && Time.time >= nextShotTime;

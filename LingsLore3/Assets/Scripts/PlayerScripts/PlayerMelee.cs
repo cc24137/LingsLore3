@@ -14,6 +14,8 @@ public class PlayerMelee : MonoBehaviour
         [Min(0f)] public float hitStart = 0.12f;
         [Min(0f)] public float hitEnd = 0.26f;
         [Min(0f)] public float damage = 12f;
+        [Tooltip("Altura do rebote do Ling ao acertar. Zero desativa.")]
+        [Min(0f)] public float hitBounceHeight;
         [Min(0f)] public float staminaCost;
         [Range(0f, 1f)] public float movementMultiplier = 0.3f;
         [Min(0f)] public float stepDistance = 0.25f;
@@ -72,7 +74,7 @@ public class PlayerMelee : MonoBehaviour
     [SerializeField] private AttackSettings airSpin = new AttackSettings
     {
         duration = 0.65f, hitStart = 0.12f, hitEnd = 0.48f,
-        damage = 22f, movementMultiplier = 0.3f, stepDistance = 0f,
+        damage = 22f, hitBounceHeight = 0.8f, movementMultiplier = 0.3f, stepDistance = 0f,
         hitboxCenter = new Vector3(0f, 1f, 1.1f),
         hitboxSize = new Vector3(2f, 2f, 2.2f)
     };
@@ -133,6 +135,11 @@ public class PlayerMelee : MonoBehaviour
         return selected != null ? Mathf.Max(0f, selected.staminaCost) : 0f;
     }
 
+    public float GetHitBounceHeight(AttackType type)
+    {
+        return GetSettings(type)?.hitBounceHeight ?? 0f;
+    }
+
     // O motor ja verificou o estado e pagou o custo antes desta chamada.
     public void BeginAttack(AttackType type, Vector3 direction)
     {
@@ -176,8 +183,12 @@ public class PlayerMelee : MonoBehaviour
 
         // Testa a sobreposicao do intervalo, evitando pular uma janela curta.
         bool queriedHitbox = nextTime > HitStart && attackTimer < HitEnd;
+        int attackSerial = AttackSerial;
         if (queriedHitbox)
             ApplyHits();
+
+        if (!IsActive || AttackSerial != attackSerial)
+            return;
 
         attackTimer = nextTime;
 
@@ -187,6 +198,10 @@ public class PlayerMelee : MonoBehaviour
 
     private void ApplyHits()
     {
+        int attackSerial = AttackSerial;
+        AttackType attackType = CurrentAttack;
+        float damage = settings.damage;
+        bool isLightAttack = IsLightAttack;
         Quaternion rotation = AttackRotation;
         Vector3 center = body.position + rotation * settings.hitboxCenter;
         Vector3 halfSize = GetSafeSize(settings.hitboxSize) * 0.5f;
@@ -225,9 +240,11 @@ public class PlayerMelee : MonoBehaviour
 
             // Um inimigo recebe dano uma unica vez por golpe, mesmo com varios colliders.
             hitTargets.Add(target);
-            AttackType attackType = CurrentAttack;
-            target.TakeDamage(settings.damage, IsLightAttack);
-            HitLanded?.Invoke(target, attackType);
+            if (target.TryTakeDamage(damage, isLightAttack))
+                HitLanded?.Invoke(target, attackType);
+
+            if (!IsActive || AttackSerial != attackSerial)
+                return;
         }
     }
 

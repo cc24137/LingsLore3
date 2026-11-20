@@ -26,6 +26,7 @@ public class ZonaDanoTutorial : MonoBehaviour
     [SerializeField] private Estado estadoAtual;
 
     private float tempoRestante;
+    private BoxCollider zona;
     private MaterialPropertyBlock propriedades;
     private readonly Dictionary<PlayerResources, float> proximoDano =
         new Dictionary<PlayerResources, float>();
@@ -40,7 +41,8 @@ public class ZonaDanoTutorial : MonoBehaviour
 
     private void Awake()
     {
-        GetComponent<BoxCollider>().isTrigger = true;
+        zona = GetComponent<BoxCollider>();
+        zona.isTrigger = true;
         propriedades = new MaterialPropertyBlock();
 
         if (indicador == null)
@@ -130,7 +132,7 @@ public class ZonaDanoTutorial : MonoBehaviour
             return;
 
         // TakeDamage retorna false durante a invulnerabilidade da esquiva.
-        if (jogador.TakeDamage(dano))
+        if (jogador.TakeDamage(dano, zona.transform.TransformPoint(zona.center)))
             proximoDano[jogador] = Time.time + Mathf.Max(0.1f, intervaloEntreDanos);
     }
 }

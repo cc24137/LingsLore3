@@ -31,9 +31,14 @@ public class EnemyHealth : MonoBehaviour
 
     public void TakeDamage(float amount, bool ataqueBasico)
     {
+        TryTakeDamage(amount, ataqueBasico);
+    }
+
+    public bool TryTakeDamage(float amount, bool ataqueBasico = false)
+    {
         if (IsDead || (somenteAtaqueBasico && !ataqueBasico) || amount <= 0f ||
             float.IsNaN(amount) || float.IsInfinity(amount))
-            return;
+            return false;
 
         currentHealth = Mathf.Max(0f, currentHealth - amount);
         Debug.Log($"{name}: recebeu {amount} de dano. Vida: {currentHealth}/{maxHealth}", this);
@@ -43,6 +48,8 @@ public class EnemyHealth : MonoBehaviour
             onDeath.Invoke();
             Died?.Invoke(this);
         }
+
+        return true;
     }
 
     [ContextMenu("Teste/Restaurar vida")]

@@ -104,11 +104,8 @@ public class HashiProjectile : MonoBehaviour
         if (spent) return;
         spent = true;
         EnemyHealth enemy = target.GetComponentInParent<EnemyHealth>();
-        if (enemy != null && !enemy.IsDead)
-        {
-            enemy.TakeDamage(damage);
+        if (enemy != null && enemy.TryTakeDamage(damage))
             HitEnemy?.Invoke(enemy);
-        }
         Destroy(gameObject);
     }
 }

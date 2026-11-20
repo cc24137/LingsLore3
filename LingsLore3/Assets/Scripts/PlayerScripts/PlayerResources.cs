@@ -97,6 +97,11 @@ public class PlayerResources : MonoBehaviour
 
     public bool TakeDamage(float amount)
     {
+        return TakeDamage(amount, null);
+    }
+
+    public bool TakeDamage(float amount, Vector3? sourcePosition)
+    {
         if (IsDead || amount <= 0f || float.IsNaN(amount) ||
             float.IsInfinity(amount))
             return false;
@@ -112,12 +117,17 @@ public class PlayerResources : MonoBehaviour
 
         if (IsDead)
         {
+            motor?.ClearImpactMotion();
             Debug.Log("Ling morreu.", this);
             Died?.Invoke();
 
             // Mantem a tela de derrota na arena normal; no Tutorial, desmarcar no Inspector.
             if (invokeUnityEventOnDeath)
                 onDeath.Invoke();
+        }
+        else
+        {
+            motor?.RequestDamageKnockback(sourcePosition);
         }
 
         return true;
