@@ -12,11 +12,21 @@ public class MenuPausa : MonoBehaviour
     [SerializeField] private Button botaoPausar;
     [SerializeField] private Button botaoContinuar;
     [SerializeField] private Button botaoAvancar;
+    [SerializeField] private GameObject painelControles;
+    [SerializeField] private Button botaoControles;
+    [SerializeField] private Button botaoVoltarControles;
+    [SerializeField] private Slider volumeMusica;
+    [SerializeField] private Slider volumeEfeitos;
+    [SerializeField] private Image iconeMusica;
+    [SerializeField] private Image iconeEfeitos;
+    [SerializeField] private Sprite altoFalante;
+    [SerializeField] private Sprite altoFalanteSilenciado;
     [SerializeField] private string cenaMenu = "MenuInicial";
     [SerializeField] private string cenaAvanco;
 
     private bool pausado;
     private bool carregandoAvanco;
+    private bool volumesAlterados;
     private float escalaAnterior;
     private CursorLockMode bloqueioAnterior;
     private bool cursorVisivelAntes;
@@ -32,7 +42,10 @@ public class MenuPausa : MonoBehaviour
 
     private void Awake()
     {
-        if (painel == null || botaoPausar == null || botaoContinuar == null)
+        if (painel == null || botaoPausar == null || botaoContinuar == null ||
+            painelControles == null || botaoControles == null || botaoVoltarControles == null ||
+            volumeMusica == null || volumeEfeitos == null ||
+            iconeMusica == null || iconeEfeitos == null || altoFalante == null || altoFalanteSilenciado == null)
         {
             Debug.LogError("Configure o painel e os botões do menu de pausa.", this);
             enabled = false;
@@ -40,6 +53,11 @@ public class MenuPausa : MonoBehaviour
         }
 
         painel.SetActive(false);
+        painelControles.SetActive(false);
+        volumeMusica.SetValueWithoutNotify(VolumeDaFonte.ObterVolume(VolumeDaFonte.Canal.Musica));
+        volumeEfeitos.SetValueWithoutNotify(VolumeDaFonte.ObterVolume(VolumeDaFonte.Canal.Efeitos));
+        AtualizarIconeVolume(iconeMusica, volumeMusica.value);
+        AtualizarIconeVolume(iconeEfeitos, volumeEfeitos.value);
         AtualizarBotoes();
     }
 
@@ -56,7 +74,9 @@ public class MenuPausa : MonoBehaviour
 
         if (teclado.escapeKey.wasPressedThisFrame)
         {
-            if (pausado)
+            if (pausado && painelControles.activeSelf)
+                VoltarDosControles();
+            else if (pausado)
                 Continuar();
             else
                 Pausar();
@@ -92,15 +112,6 @@ public class MenuPausa : MonoBehaviour
             RectTransformUtility.RectangleContainsScreenPoint((RectTransform)botao.transform, posicao);
     }
 
-    public Vector2 CantoSuperiorEsquerdoNoOnGUI()
-    {
-        var botao = (RectTransform)botaoPausar.transform;
-        Rect area = botao.rect;
-        Vector3 canto = botao.TransformPoint(area.xMin, area.yMax, 0f);
-        Vector2 tela = RectTransformUtility.WorldToScreenPoint(null, canto);
-        return new Vector2(tela.x, Screen.height - tela.y);
-    }
-
     public void Pausar()
     {
         if (!isActiveAndEnabled || pausado || carregandoAvanco || BloqueiaEntradaDeJogo)
@@ -128,6 +139,59 @@ public class MenuPausa : MonoBehaviour
     {
         if (pausado)
             Fechar(restaurarCursor: true);
+    }
+
+    public void AbrirControles()
+    {
+        if (!pausado || painelControles.activeSelf)
+            return;
+
+        painel.SetActive(false);
+        painelControles.SetActive(true);
+        EventSystem.current?.SetSelectedGameObject(botaoVoltarControles.gameObject);
+    }
+
+    public void VoltarDosControles()
+    {
+        if (!pausado || !painelControles.activeSelf)
+            return;
+
+        painelControles.SetActive(false);
+        painel.SetActive(true);
+        EventSystem.current?.SetSelectedGameObject(botaoControles.gameObject);
+    }
+
+    public void AjustarMusica(float volume)
+    {
+        volumesAlterados = true;
+        VolumeDaFonte.DefinirVolume(VolumeDaFonte.Canal.Musica, volume);
+        AtualizarIconeVolume(iconeMusica, volume);
+    }
+
+    public void AjustarEfeitos(float volume)
+    {
+        volumesAlterados = true;
+        VolumeDaFonte.DefinirVolume(VolumeDaFonte.Canal.Efeitos, volume);
+        AtualizarIconeVolume(iconeEfeitos, volume);
+    }
+
+    public void AlternarMusica()
+    {
+        volumeMusica.value = volumeMusica.value > 0f
+            ? 0f
+            : VolumeDaFonte.ObterVolumeAnterior(VolumeDaFonte.Canal.Musica);
+    }
+
+    public void AlternarEfeitos()
+    {
+        volumeEfeitos.value = volumeEfeitos.value > 0f
+            ? 0f
+            : VolumeDaFonte.ObterVolumeAnterior(VolumeDaFonte.Canal.Efeitos);
+    }
+
+    private void AtualizarIconeVolume(Image icone, float volume)
+    {
+        icone.sprite = volume > 0f ? altoFalante : altoFalanteSilenciado;
     }
 
     public void Avancar()
@@ -178,6 +242,13 @@ public class MenuPausa : MonoBehaviour
 
         selecaoAnterior = null;
         painel.SetActive(false);
+        painelControles.SetActive(false);
+        if (volumesAlterados)
+        {
+            PlayerPrefs.Save();
+            volumesAlterados = false;
+        }
+
         if (restaurarCursor)
         {
             Cursor.lockState = bloqueioAnterior;

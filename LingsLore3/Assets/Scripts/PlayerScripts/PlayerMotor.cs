@@ -75,7 +75,6 @@ public class PlayerMotor : MonoBehaviour
     private bool sprintHeld;
     private bool sprintExhausted;
     private bool sprintNeedsRelease;
-    private bool controlsPanelVisible;
     private bool isTutorial;
 
     private bool wasAirborne;
@@ -248,21 +247,11 @@ public class PlayerMotor : MonoBehaviour
         Keyboard teclado = Keyboard.current;
         if (MenuPausa.Ativo == null && teclado != null && teclado.escapeKey.wasPressedThisFrame)
         {
-            controlsPanelVisible = false;
             bool liberarCursor = Cursor.lockState == CursorLockMode.Locked;
             Cursor.lockState = liberarCursor
                 ? CursorLockMode.None
                 : CursorLockMode.Locked;
             Cursor.visible = liberarCursor;
-        }
-
-        if (!isTutorial && teclado != null && teclado.f1Key.wasPressedThisFrame)
-        {
-            controlsPanelVisible = !controlsPanelVisible;
-            Cursor.lockState = controlsPanelVisible
-                ? CursorLockMode.None
-                : CursorLockMode.Locked;
-            Cursor.visible = controlsPanelVisible;
         }
 
         if (jumpAction.action.WasPressedThisFrame())
@@ -279,51 +268,13 @@ public class PlayerMotor : MonoBehaviour
 
     private void OnGUI()
     {
-        if (isTutorial || MenuPausa.BloqueiaEntradaDeJogo)
+        if (isTutorial || MenuPausa.Ativo != null || MenuPausa.BloqueiaEntradaDeJogo)
             return;
 
         const float margin = 16f;
-        var menuPausa = MenuPausa.Ativo;
-        Vector2 cantoPausa = menuPausa != null
-            ? menuPausa.CantoSuperiorEsquerdoNoOnGUI()
-            : new Vector2(Screen.width - margin, 12f);
-        float limiteDireito = menuPausa != null ? cantoPausa.x - 8f : cantoPausa.x;
-        float top = cantoPausa.y;
-        string atalhos = menuPausa != null
-            ? "F1  Comandos"
-            : "F1  Comandos   |   Esc  Liberar mouse";
-        float hintWidth = menuPausa != null ? 120f : 248f;
-        GUI.Label(new Rect(limiteDireito - hintWidth, top, hintWidth, 32f), atalhos, GUI.skin.box);
-
-        if (!controlsPanelVisible)
-            return;
-
-        float panelWidth = Mathf.Min(520f, Screen.width - margin * 2f);
-        float panelHeight = Mathf.Min(380f, Screen.height - margin * 2f);
-        Rect panel = new Rect(
-            (Screen.width - panelWidth) * 0.5f,
-            (Screen.height - panelHeight) * 0.5f,
-            panelWidth,
-            panelHeight);
-
-        GUI.Box(panel, "CONTROLES");
-        Rect body = new Rect(panel.x + 24f, panel.y + 48f,
-            panel.width - 48f, panel.height - 84f);
-        GUIStyle bodyStyle = new GUIStyle(GUI.skin.label)
-        {
-            wordWrap = true
-        };
-        GUI.Label(body,
-            "W A S D        Mover\n" +
-            "Mouse           Olhar ao redor\n" +
-            "Espaço          Pular\n" +
-            "Shift (toque)   Esquivar\n" +
-            "Shift (segurar) Correr enquanto se move\n" +
-            "Q (segurar)     Mostrar a mira azul do Hashi\n" +
-            "Botão esquerdo  Ataque; segure para carregar\n" +
-            "Botão direito   Arremessar Hashi\n\n" +
-            "No combo carregado, solte e segure novamente durante o golpe ascendente para preparar o descendente.\n\n" +
-            "F1 fecha este resumo.", bodyStyle);
+        const float largura = 148f;
+        GUI.Label(new Rect(Screen.width - margin - largura, 12f, largura, 32f),
+            "Esc  Liberar mouse", GUI.skin.box);
     }
 
     private void FixedUpdate()

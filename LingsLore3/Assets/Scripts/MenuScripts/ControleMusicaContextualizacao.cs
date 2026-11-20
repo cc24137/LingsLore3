@@ -13,6 +13,10 @@ public sealed class ControleMusicaContextualizacao : MonoBehaviour
 
     private void Awake()
     {
+        if (!musica.TryGetComponent<VolumeDaFonte>(out var volume))
+            volume = musica.gameObject.AddComponent<VolumeDaFonte>();
+        volume.DefinirCanal(VolumeDaFonte.Canal.Musica);
+
         atalho = new InputAction("Alternar música", InputActionType.Button, "<Keyboard>/m");
     }
 
