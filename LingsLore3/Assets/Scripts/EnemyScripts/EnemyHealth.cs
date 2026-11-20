@@ -19,7 +19,7 @@ public class EnemyHealth : MonoBehaviour
         somenteAtaqueBasico = active;
     }
 
-    private void Awake()
+    protected virtual void Awake()
     {
         currentHealth = maxHealth;
     }

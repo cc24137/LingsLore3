@@ -95,9 +95,10 @@ public class PlayerResources : MonoBehaviour
         lastStaminaUseTime = Time.time;
     }
 
-    public bool TakeDamage(float amount)
+    public void TakeDamage(float amount)
     {
-        return TakeDamage(amount, null);
+        TakeDamage(amount, null);
+        Debug.Log("Ling tem " + currentHealth +" de vida");
     }
 
     public bool TakeDamage(float amount, Vector3? sourcePosition)
