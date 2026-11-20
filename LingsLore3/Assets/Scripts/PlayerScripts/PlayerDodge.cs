@@ -26,23 +26,31 @@ public class PlayerDodge : MonoBehaviour
     private Rigidbody body;
     private Vector3 dodgeDirection;
     private float dodgeTimer;
+    private CapsuleCollider playerCapsule;
+    private PillarLaunchSurface climbSurface;
+    private Vector3 climbStart;
+    private Vector3 climbOutward;
+    private float climbRadius;
+    private float climbTime;
 
     public float TotalDuration => Mathf.Max(0.01f, rollDuration + recoveryDuration);
     public float NormalizedTime => IsActive ? Mathf.Clamp01(dodgeTimer / TotalDuration) : 0f;
 
     public bool IsActive { get; private set; }
-    public bool IsRolling => IsActive && dodgeTimer < rollDuration;
+    public bool IsClimbing { get; private set; }
+    public bool IsRolling => IsActive && (IsClimbing || dodgeTimer < rollDuration);
     public bool IsRecovering => IsActive && !IsRolling;
     public float RecoverySpeedMultiplier => recoverySpeedMultiplier;
 
     public bool IsInvulnerable =>
-        IsRolling &&
+        IsActive && dodgeTimer < rollDuration &&
         dodgeTimer >= invulnerabilityStart &&
         dodgeTimer < invulnerabilityEnd;
 
     private void Awake()
     {
         body = GetComponent<Rigidbody>();
+        playerCapsule = GetComponent<CapsuleCollider>();
     }
 
     public void BeginDodge(Vector3 direction)
@@ -55,11 +63,34 @@ public class PlayerDodge : MonoBehaviour
         IsActive = true;
     }
 
-    // Chamado pelo motor; este componente nao tem FixedUpdate proprio.
-    public void Tick(float deltaTime)
+    internal void TryBeginPillarClimb(PillarLaunchSurface surface)
+    {
+        if (!isActiveAndEnabled || !IsRolling || IsClimbing || playerCapsule == null)
+            return;
+
+        Vector3 extents = playerCapsule.bounds.extents;
+        float playerRadius = Mathf.Max(extents.x, extents.z);
+        if (!surface.TryGetEntry(body.position, dodgeDirection, playerRadius,
+            out climbOutward, out climbRadius))
+            return;
+
+        climbSurface = surface;
+        climbStart = body.position;
+        climbTime = 0f;
+        IsClimbing = true;
+    }
+
+    // Retorna true quando o motor pode devolver o controle no ar.
+    public bool Tick(float deltaTime)
     {
         if (!IsActive)
-            return;
+            return false;
+
+        if (IsClimbing)
+        {
+            dodgeTimer += deltaTime;
+            return TickPillarClimb(deltaTime);
+        }
 
         if (IsRolling)
         {
@@ -88,11 +119,54 @@ public class PlayerDodge : MonoBehaviour
 
         if (dodgeTimer >= rollDuration + recoveryDuration)
             Cancel();
+
+        return false;
+    }
+
+    private bool TickPillarClimb(float deltaTime)
+    {
+        if (climbSurface == null || !climbSurface.isActiveAndEnabled)
+        {
+            CancelClimb();
+            return false;
+        }
+
+        if (body.position.y >= climbSurface.ReleaseY - 0.015f)
+        {
+            body.linearVelocity = climbSurface.GetLaunchVelocity(climbOutward, body.position.y, deltaTime);
+            body.MoveRotation(Quaternion.LookRotation(climbOutward, Vector3.up));
+            Cancel();
+            return true;
+        }
+
+        climbTime += deltaTime;
+        Vector3 target = climbSurface.GetClimbPosition(
+            climbStart, climbOutward, climbRadius, climbTime);
+        Vector3 step = target - body.position;
+        if (step.sqrMagnitude < 0.000001f ||
+            body.SweepTest(step.normalized, out _, step.magnitude, QueryTriggerInteraction.Ignore))
+        {
+            CancelClimb();
+            return false;
+        }
+
+        body.linearVelocity = step / deltaTime;
+        if (body.useGravity)
+            body.linearVelocity -= Physics.gravity * deltaTime;
+        return false;
+    }
+
+    private void CancelClimb()
+    {
+        body.linearVelocity = Vector3.zero;
+        Cancel();
     }
 
     public void Cancel()
     {
         IsActive = false;
+        IsClimbing = false;
+        climbSurface = null;
         dodgeTimer = 0f;
     }
 

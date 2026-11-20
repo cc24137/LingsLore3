@@ -366,7 +366,11 @@ public class PlayerMotor : MonoBehaviour
                 );
             }
 
-            dodge.Tick(Time.fixedDeltaTime);
+            bool launchedFromPillar = dodge.Tick(Time.fixedDeltaTime);
+            if (dodge.IsClimbing || launchedFromPillar)
+                IsGrounded = false;
+            if (launchedFromPillar)
+                CaptureAirControlReference();
             return;
         }
 
