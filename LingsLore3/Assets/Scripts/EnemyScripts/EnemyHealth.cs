@@ -41,6 +41,7 @@ public class EnemyHealth : MonoBehaviour
             return false;
 
         currentHealth = Mathf.Max(0f, currentHealth - amount);
+        DamageFlash.PlayOn(this);
         Debug.Log($"{name}: recebeu {amount} de dano. Vida: {currentHealth}/{maxHealth}", this);
 
         if (IsDead)

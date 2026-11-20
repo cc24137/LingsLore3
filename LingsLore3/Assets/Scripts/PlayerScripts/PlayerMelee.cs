@@ -80,6 +80,7 @@ public class PlayerMelee : MonoBehaviour
     };
 
     private Rigidbody body;
+    private HitImpactVfx hitImpactVfx;
     private AttackSettings settings;
     private float attackTimer;
     private int lastLightIndex;
@@ -127,6 +128,7 @@ public class PlayerMelee : MonoBehaviour
     private void Awake()
     {
         body = GetComponent<Rigidbody>();
+        hitImpactVfx = GetComponent<HitImpactVfx>();
     }
 
     public float GetStaminaCost(AttackType type)
@@ -241,7 +243,12 @@ public class PlayerMelee : MonoBehaviour
             // Um inimigo recebe dano uma unica vez por golpe, mesmo com varios colliders.
             hitTargets.Add(target);
             if (target.TryTakeDamage(damage, isLightAttack))
+            {
+                if (hitImpactVfx != null)
+                    hitImpactVfx.Play(point + (sightOrigin - point).normalized * 0.05f);
+
                 HitLanded?.Invoke(target, attackType);
+            }
 
             if (!IsActive || AttackSerial != attackSerial)
                 return;

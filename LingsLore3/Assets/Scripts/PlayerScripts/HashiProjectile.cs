@@ -12,6 +12,7 @@ public class HashiProjectile : MonoBehaviour
     [SerializeField, Min(0.1f)] private float lifetime = 5f;
 
     private Transform owner;
+    private HitImpactVfx hitImpactVfx;
     private Vector3 direction;
     private LayerMask hitMask;
     private float damage;
@@ -23,6 +24,7 @@ public class HashiProjectile : MonoBehaviour
     public void Launch(Transform shooter, Vector3 forward, float hitDamage, LayerMask mask)
     {
         owner = shooter;
+        hitImpactVfx = shooter != null ? shooter.GetComponent<HitImpactVfx>() : null;
         direction = forward.normalized;
         damage = hitDamage;
         hitMask = mask;
@@ -51,16 +53,23 @@ public class HashiProjectile : MonoBehaviour
     private bool CheckOverlap()
     {
         Collider closest = null;
+        Vector3 closestPoint = default;
         float distance = float.PositiveInfinity;
         foreach (Collider candidate in Physics.OverlapSphere(
             transform.position, hitRadius, hitMask, QueryTriggerInteraction.Collide))
         {
             if (!CanHit(candidate)) continue;
-            float d = (candidate.ClosestPoint(transform.position) - transform.position).sqrMagnitude;
-            if (d < distance) { distance = d; closest = candidate; }
+            Vector3 point = candidate.ClosestPoint(transform.position);
+            float pointDistance = (point - transform.position).sqrMagnitude;
+            if (pointDistance < distance)
+            {
+                distance = pointDistance;
+                closest = candidate;
+                closestPoint = point;
+            }
         }
         if (closest == null) return false;
-        Impact(closest);
+        Impact(closest, closestPoint);
         return true;
     }
 
@@ -92,20 +101,28 @@ public class HashiProjectile : MonoBehaviour
         if (found)
         {
             transform.position += direction * nearest.distance;
-            Impact(nearest.collider);
+            Vector3 point = nearest.distance > 0f
+                ? nearest.point
+                : nearest.collider.ClosestPoint(transform.position);
+            Impact(nearest.collider, point);
             return;
         }
         transform.position += direction * step;
         traveled += step;
     }
 
-    private void Impact(Collider target)
+    private void Impact(Collider target, Vector3 point)
     {
         if (spent) return;
         spent = true;
         EnemyHealth enemy = target.GetComponentInParent<EnemyHealth>();
         if (enemy != null && enemy.TryTakeDamage(damage))
+        {
+            if (hitImpactVfx != null)
+                hitImpactVfx.Play(point - direction * 0.05f);
+
             HitEnemy?.Invoke(enemy);
+        }
         Destroy(gameObject);
     }
 }

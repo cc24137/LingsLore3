@@ -114,6 +114,7 @@ public class PlayerResources : MonoBehaviour
             return false;
 
         currentHealth = Mathf.Max(0f, currentHealth - amount);
+        DamageFlash.PlayOn(this);
 
         if (IsDead)
         {
@@ -144,6 +145,9 @@ public class PlayerResources : MonoBehaviour
 
     public void RestoreFullResources()
     {
+        if (TryGetComponent<DamageFlash>(out var flash))
+            flash.Clear();
+
         currentHealth = maxHealth;
         currentStamina = maxStamina;
         lastStaminaUseTime = float.NegativeInfinity;
