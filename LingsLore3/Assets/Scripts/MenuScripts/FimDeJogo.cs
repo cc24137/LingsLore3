@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -13,15 +14,19 @@ public class FimDeJogo : MonoBehaviour
     [SerializeField] private TMP_Text titulo;
     [SerializeField] private TMP_Text mensagem;
     [SerializeField] private Button botaoTentarNovamente;
+    [SerializeField] private Button botaoVoltarAoMenu;
 
     [Header("Configuracao")]
     [SerializeField, Min(0f)] private float atrasoParaExibir = 1.5f;
     [SerializeField] private string cenaMenu = "MenuInicial";
 
     private bool encerrando;
+    private bool foiVitoria;
     private bool carregandoCena;
     private bool pausou;
     private float escalaAnterior;
+
+    public event Action RepetindoAposDerrota;
 
     private void Awake()
     {
@@ -56,6 +61,7 @@ public class FimDeJogo : MonoBehaviour
             return;
 
         encerrando = true;
+        foiVitoria = vitoria;
         StartCoroutine(ExibirPainel(textoTitulo, textoMensagem, vitoria));
     }
 
@@ -82,12 +88,22 @@ public class FimDeJogo : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+
+        if (botaoTentarNovamente != null)
+            botaoTentarNovamente.gameObject.SetActive(!vitoria);
+        if (vitoria && botaoVoltarAoMenu != null)
+        {
+            var rectBotao = (RectTransform)botaoVoltarAoMenu.transform;
+            rectBotao.anchoredPosition = new Vector2(0f, rectBotao.anchoredPosition.y);
+        }
+
         painel.SetActive(true);
 
-        if (EventSystem.current != null && botaoTentarNovamente != null)
+        Button botaoSelecionado = vitoria ? botaoVoltarAoMenu : botaoTentarNovamente;
+        if (EventSystem.current != null && botaoSelecionado != null)
         {
             EventSystem.current.SetSelectedGameObject(null);
-            EventSystem.current.SetSelectedGameObject(botaoTentarNovamente.gameObject);
+            EventSystem.current.SetSelectedGameObject(botaoSelecionado.gameObject);
         }
     }
 
@@ -120,8 +136,8 @@ public class FimDeJogo : MonoBehaviour
     }
     public void TentarNovamente()
     {
-        // Reabre a arena diretamente, mantendo as escolhas estaticas do projeto.
-        CarregarCena(SceneManager.GetActiveScene().path);
+        if (!foiVitoria)
+            CarregarCena(SceneManager.GetActiveScene().path, repetirAposDerrota: true);
     }
 
     public void VoltarAoMenu()
@@ -129,7 +145,7 @@ public class FimDeJogo : MonoBehaviour
         CarregarCena(cenaMenu);
     }
 
-    private void CarregarCena(string cena)
+    private void CarregarCena(string cena, bool repetirAposDerrota = false)
     {
         if (carregandoCena || !pausou)
             return;
@@ -141,6 +157,8 @@ public class FimDeJogo : MonoBehaviour
         }
 
         carregandoCena = true;
+        if (repetirAposDerrota)
+            RepetindoAposDerrota?.Invoke();
         RetomarTempo();
         SceneManager.LoadScene(cena);
     }

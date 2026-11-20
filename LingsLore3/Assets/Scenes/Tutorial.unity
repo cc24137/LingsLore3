@@ -2062,6 +2062,7 @@ MonoBehaviour:
   titulo: {fileID: 2081674274}
   mensagem: {fileID: 522449308}
   botaoTentarNovamente: {fileID: 490724744}
+  botaoVoltarAoMenu: {fileID: 2112023214}
   atrasoParaExibir: 1.5
   cenaMenu: MenuInicial
 --- !u!114 &337561536
