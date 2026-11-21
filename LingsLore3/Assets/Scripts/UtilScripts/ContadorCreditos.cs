@@ -30,6 +30,7 @@ public class ContadorCreditos : MonoBehaviour
     [Header("Cronometro e jogador")]
     [SerializeField] private TMP_Text textoTempo;
     [SerializeField] private PlayerResources jogador;
+    [SerializeField] private PortaoArena saidaDoTutorial;
     private PlayerMotor motorJogador;
     private PlayerMelee meleeJogador;
     private PlayerHashi hashiJogador;
@@ -43,6 +44,7 @@ public class ContadorCreditos : MonoBehaviour
     private bool coletaAutomatica;
     private bool tempoAtivo;
     private bool tutorialConcluido;
+    private bool ignorarNaRetentativa;
     private bool reiniciandoPorMorte;
     private float tempoRestante;
     private MoedaColetavel[][] notasPorRodada;
@@ -64,6 +66,25 @@ public class ContadorCreditos : MonoBehaviour
     private bool creditosLiberadosPeloAlvo;
 
     public bool TutorialConcluido => tutorialConcluido;
+    public bool PodePularTutorial => saidaDoTutorial != null && coletaAutomatica &&
+        !tutorialConcluido && !reiniciandoPorMorte && !jogador.IsDead;
+
+    public void IgnorarNaRetentativa() => ignorarNaRetentativa = true;
+
+    public void OcultarObjetivo()
+    {
+        if (textoContador != null)
+            textoContador.gameObject.SetActive(false);
+    }
+
+    public void PularTutorial()
+    {
+        if (!PodePularTutorial)
+            return;
+
+        rodadas[rodadaAtual].grupoCreditos.SetActive(false);
+        FinalizarTutorial();
+    }
 
     private void Awake()
     {
@@ -192,6 +213,19 @@ public class ContadorCreditos : MonoBehaviour
         }
 
         coletaAutomatica = true;
+        if (ignorarNaRetentativa)
+        {
+            FinalizarTutorial();
+            OcultarObjetivo();
+            return;
+        }
+
+        if (saidaDoTutorial != null)
+        {
+            saidaDoTutorial.ConfigurarPosicao(false);
+            jogador.DefinirRespawnDoTutorial(true);
+        }
+
         IniciarRodada(0);
     }
 
@@ -495,17 +529,29 @@ public class ContadorCreditos : MonoBehaviour
             if (rodadaAtual + 1 < rodadas.Length)
                 IniciarRodada(rodadaAtual + 1);
             else
-            {
-                tutorialConcluido = true;
-                if (motorJogador != null)
-                    motorJogador.SetAttackLessonMode(PlayerMotor.AttackLessonMode.All);
-
-                if (textoTempo != null)
-                    textoTempo.gameObject.SetActive(false);
-
-                AtualizarTexto();
-            }
+                FinalizarTutorial();
         }
+    }
+
+    private void FinalizarTutorial()
+    {
+        tutorialConcluido = true;
+        tempoAtivo = false;
+        motorJogador?.SetAttackLessonMode(PlayerMotor.AttackLessonMode.All);
+
+        if (textoTempo != null)
+            textoTempo.gameObject.SetActive(false);
+
+        if (saidaDoTutorial != null)
+        {
+            if (alvoDaRodada != null)
+                alvoDaRodada.gameObject.SetActive(false);
+            hashiJogador?.SetAimIndicatorVisible(false);
+            jogador.DefinirRespawnDoTutorial(false);
+            saidaDoTutorial.ConfigurarPosicao(true);
+        }
+
+        AtualizarTexto();
     }
 
     private void IniciarRodada(int indice)
@@ -639,7 +685,9 @@ public class ContadorCreditos : MonoBehaviour
     {
         if (tutorialConcluido)
         {
-            textoContador.text = "Tutorial concluído! Pressione Enter para ir ao jogo.";
+            textoContador.text = saidaDoTutorial != null
+                ? "Siga pelo portão aberto para entrar na primeira arena de chefe."
+                : "Tutorial concluído! Pressione Enter para ir ao jogo.";
             return;
         }
 
@@ -682,7 +730,11 @@ public class ContadorCreditos : MonoBehaviour
     private void OnDestroy()
     {
         if (jogador != null)
+        {
             jogador.Died -= AoJogadorMorrer;
+            if (saidaDoTutorial != null)
+                jogador.DefinirRespawnDoTutorial(false);
+        }
 
         if (motorJogador != null)
             motorJogador.SetAttackLessonMode(PlayerMotor.AttackLessonMode.All);

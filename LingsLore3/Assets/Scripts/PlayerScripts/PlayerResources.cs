@@ -28,6 +28,7 @@ public class PlayerResources : MonoBehaviour
     private PlayerMotor motor;
     private float lastStaminaUseTime = float.NegativeInfinity;
     private float respawnInvulnerableUntil = float.NegativeInfinity;
+    private bool respawnDoTutorial;
 
     // Evento C# usado pelo ContadorCreditos para reiniciar a rodada atual.
     public event Action Died;
@@ -124,7 +125,7 @@ public class PlayerResources : MonoBehaviour
             Died?.Invoke();
 
             // Mantem a tela de derrota na arena normal; no Tutorial, desmarcar no Inspector.
-            if (invokeUnityEventOnDeath)
+            if (invokeUnityEventOnDeath && !respawnDoTutorial)
                 onDeath.Invoke();
         }
         else
@@ -159,6 +160,8 @@ public class PlayerResources : MonoBehaviour
     {
         respawnInvulnerableUntil = Time.time + Mathf.Max(0f, duration);
     }
+
+    public void DefinirRespawnDoTutorial(bool ativo) => respawnDoTutorial = ativo;
 
     private void OnValidate()
     {

@@ -23,6 +23,7 @@ public class MenuPausa : MonoBehaviour
     [SerializeField] private Sprite altoFalanteSilenciado;
     [SerializeField] private string cenaMenu = "MenuInicial";
     [SerializeField] private string cenaAvanco;
+    [SerializeField] private ContadorCreditos tutorialDoCircuito;
 
     private bool pausado;
     private bool carregandoAvanco;
@@ -33,7 +34,10 @@ public class MenuPausa : MonoBehaviour
     private GameObject selecaoAnterior;
     private int quadroDaTransicao = -1;
 
-    private bool TemAvanco => botaoAvancar != null && !string.IsNullOrEmpty(cenaAvanco);
+    private bool TemAvanco => botaoAvancar != null && (tutorialDoCircuito != null
+        ? tutorialDoCircuito.PodePularTutorial
+        : !string.IsNullOrEmpty(cenaAvanco));
+    private bool PodePularNaPausa => tutorialDoCircuito != null && pausado && painel.activeSelf;
 
     public static MenuPausa Ativo { get; private set; }
     public static bool EstaPausado => Ativo != null && Ativo.pausado;
@@ -94,7 +98,7 @@ public class MenuPausa : MonoBehaviour
         bool mostrar = !pausado && !carregandoAvanco && Time.timeScale > 0f;
         botaoPausar.gameObject.SetActive(mostrar);
         if (botaoAvancar != null)
-            botaoAvancar.gameObject.SetActive(mostrar && TemAvanco);
+            botaoAvancar.gameObject.SetActive(TemAvanco && (mostrar || PodePularNaPausa));
     }
 
     public bool PonteiroSobreBotao()
@@ -196,8 +200,18 @@ public class MenuPausa : MonoBehaviour
 
     public void Avancar()
     {
-        if (!isActiveAndEnabled || !TemAvanco || carregandoAvanco || BloqueiaEntradaDeJogo)
+        if (!isActiveAndEnabled || !TemAvanco || carregandoAvanco ||
+            (BloqueiaEntradaDeJogo && !PodePularNaPausa))
             return;
+
+        if (tutorialDoCircuito != null)
+        {
+            tutorialDoCircuito.PularTutorial();
+            if (pausado)
+                Fechar(restaurarCursor: true);
+            AtualizarBotoes();
+            return;
+        }
 
         if (!Application.CanStreamedLevelBeLoaded(cenaAvanco))
         {

@@ -781,7 +781,7 @@ MonoBehaviour:
   velocidade: 40
   posicaoInicial: -200
   posicaoFinal: 6000
-  cenaJogo: Tutorial
+  cenaJogo: CircuitoArenas
 --- !u!4 &1260252911
 Transform:
   m_ObjectHideFlags: 0

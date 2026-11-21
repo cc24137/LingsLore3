@@ -5,19 +5,35 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public sealed class SequenciaChefesArena : MonoBehaviour
 {
+    [Serializable]
+    private sealed class AcessoArena
+    {
+        public PortaoArena entrada;
+        public PortaoArena saida;
+        public Transform pontoRetentativa;
+    }
+
     [SerializeField] private EnemyHealth[] chefes;
     [SerializeField] private PlayerResources jogador;
     [SerializeField] private FimDeJogo fimDeJogo;
     [SerializeField, Min(0f)] private float intervaloEntreChefes = 0.75f;
+    [SerializeField] private AcessoArena[] acessos;
+    [SerializeField] private ContadorCreditos tutorial;
 
     private static int etapaDaRetentativa;
+    private static string cenaDaRetentativa;
     private int etapaAtual;
     private EnemyHealth chefeAtual;
+    private PortaoArena entradaAtual;
+    private bool retomando;
+
+    private bool TemAcessos => acessos != null && acessos.Length > 0;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void LimparRetentativa()
     {
         etapaDaRetentativa = 0;
+        cenaDaRetentativa = null;
     }
 
     private void Awake()
@@ -30,22 +46,86 @@ public sealed class SequenciaChefesArena : MonoBehaviour
             return;
         }
 
+        if (TemAcessos && (acessos.Length != chefes.Length ||
+            Array.Exists(acessos, acesso => acesso == null || acesso.entrada == null ||
+                acesso.pontoRetentativa == null) ||
+            Array.FindIndex(acessos, 0, chefes.Length - 1, acesso => acesso.saida == null) >= 0))
+        {
+            Debug.LogError("Configure a entrada, a saída e o ponto de retentativa de cada arena.", this);
+            enabled = false;
+            return;
+        }
+
         // Só uma recarga solicitada pela tela de derrota retoma uma etapa.
-        etapaAtual = Mathf.Clamp(etapaDaRetentativa, 0, chefes.Length - 1);
+        retomando = cenaDaRetentativa == gameObject.scene.path;
+        etapaAtual = retomando ? Mathf.Clamp(etapaDaRetentativa, 0, chefes.Length - 1) : 0;
+        if (retomando)
+            tutorial?.IgnorarNaRetentativa();
         LimparRetentativa();
 
         for (int i = 0; i < chefes.Length; i++)
         {
-            if (i != etapaAtual)
+            if (TemAcessos || i != etapaAtual)
                 chefes[i].gameObject.SetActive(false);
         }
 
         fimDeJogo.RepetindoAposDerrota += PrepararRetentativa;
-        AtivarChefeAtual();
+        if (!TemAcessos)
+            AtivarChefeAtual();
+    }
+
+    private void Start()
+    {
+        if (!TemAcessos)
+            return;
+
+        for (int i = 0; i < acessos.Length; i++)
+        {
+            acessos[i].entrada.ConfigurarPosicao(false);
+            acessos[i].saida?.ConfigurarPosicao(i < etapaAtual);
+        }
+
+        if (retomando)
+        {
+            Transform ponto = acessos[etapaAtual].pontoRetentativa;
+            if (jogador.TryGetComponent(out Rigidbody corpo))
+            {
+                corpo.position = ponto.position;
+                corpo.rotation = ponto.rotation;
+                corpo.linearVelocity = Vector3.zero;
+                corpo.angularVelocity = Vector3.zero;
+            }
+            else
+            {
+                jogador.transform.SetPositionAndRotation(ponto.position, ponto.rotation);
+            }
+            Physics.SyncTransforms();
+            AtivarChefeAtual();
+        }
+        else
+        {
+            AguardarEntrada();
+        }
+    }
+
+    private void AguardarEntrada()
+    {
+        entradaAtual = acessos[etapaAtual].entrada;
+        entradaAtual.FechouAposEntrada += AoEntrarNaArena;
+        entradaAtual.ConfigurarPosicao(true, fecharAoPassar: true);
+    }
+
+    private void AoEntrarNaArena()
+    {
+        entradaAtual.FechouAposEntrada -= AoEntrarNaArena;
+        entradaAtual = null;
+        if (!jogador.IsDead)
+            AtivarChefeAtual();
     }
 
     private void AtivarChefeAtual()
     {
+        tutorial?.OcultarObjetivo();
         chefeAtual = chefes[etapaAtual];
         chefeAtual.RestoreHealth();
         chefeAtual.Died += AoDerrotarChefe;
@@ -83,6 +163,11 @@ public sealed class SequenciaChefesArena : MonoBehaviour
 
         if (ultimoChefe)
             fimDeJogo.ExibirVitoria();
+        else if (TemAcessos)
+        {
+            acessos[etapaAtual - 1].saida.ConfigurarPosicao(true);
+            AguardarEntrada();
+        }
         else
             AtivarChefeAtual();
     }
@@ -90,6 +175,7 @@ public sealed class SequenciaChefesArena : MonoBehaviour
     private void PrepararRetentativa()
     {
         etapaDaRetentativa = etapaAtual;
+        cenaDaRetentativa = gameObject.scene.path;
     }
 
     private void OnDestroy()
@@ -98,5 +184,7 @@ public sealed class SequenciaChefesArena : MonoBehaviour
             fimDeJogo.RepetindoAposDerrota -= PrepararRetentativa;
         if (chefeAtual != null)
             chefeAtual.Died -= AoDerrotarChefe;
+        if (entradaAtual != null)
+            entradaAtual.FechouAposEntrada -= AoEntrarNaArena;
     }
 }

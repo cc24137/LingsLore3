@@ -16,6 +16,8 @@ public sealed class PortaoArena : MonoBehaviour
     private Collider corpoDoJogador;
     private float progresso;
 
+    public event System.Action FechouAposEntrada;
+
     private void Reset()
     {
         GetComponent<BoxCollider>().isTrigger = true;
@@ -32,6 +34,18 @@ public sealed class PortaoArena : MonoBehaviour
 
         posicaoAberta = grade.position;
         posicaoFechada = posicaoAberta - transform.up * alturaDaAbertura;
+    }
+
+    public void ConfigurarPosicao(bool aberta, bool fecharAoPassar = false)
+    {
+        if (grade == null)
+            return;
+
+        jogador = null;
+        corpoDoJogador = null;
+        progresso = aberta ? 0f : 1f;
+        grade.position = aberta ? posicaoAberta : posicaoFechada;
+        enabled = aberta && fecharAoPassar;
     }
 
     private void OnTriggerStay(Collider outro)
@@ -55,6 +69,7 @@ public sealed class PortaoArena : MonoBehaviour
             enabled = false;
             if (encontro != null)
                 encontro.SetActive(true);
+            FechouAposEntrada?.Invoke();
             return;
         }
 

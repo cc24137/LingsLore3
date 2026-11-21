@@ -29,6 +29,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/ArenaPrincipal.unity
     guid: 38d05a739b3b49aa8e214b92db197e72
+  - enabled: 1
+    path: Assets/Scenes/CircuitoArenas.unity
+    guid: 64c7652fc1606bd4c8cdfcd12a9fa8e4
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
