@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.Events;
 
 [RequireComponent(typeof(Rigidbody))]
@@ -19,6 +20,7 @@ public class Enemy : EnemyHealth
     [SerializeField, Min(0.01f)] private float distanciaChegadaAtaque = 0.35f;
     [SerializeField, Min(0.01f)] private float duracaoMaximaAtaque = 3f;
     [Min(0f)] public float delayAfterAttack = 2f;
+    [Min(0f)] public float tempoDaAnimacaoCue = 2f;
 
     [Header("Dano ao jogador")]
     [SerializeField, Min(0f)] private float danoFrente = 25f;
@@ -27,20 +29,23 @@ public class Enemy : EnemyHealth
     [Tooltip("Conecte ao metodo que reduz a vida do jogador, usando o float dinamico.")]
     [SerializeField] private UnityEvent<float> aoCausarDano = new UnityEvent<float>();
 
-    private enum State { idle, walking, jumpAttack }
+    private enum State { idle, walking, jumpAttack, groundAttack, givingCue }
 
     [Header("Estado atual (controlado pelo codigo)")]
     [SerializeField] private State estado = State.walking;
 
     private static readonly int IsIdle = Animator.StringToHash("isIdle");
     private static readonly int IsWalking = Animator.StringToHash("isWalking");
+    private static readonly int IsGivingCue = Animator.StringToHash("isGivingCue");
 
     private Rigidbody body;
     private Vector3 jumpAttackCoordinate;
     private float fimDoAtaque;
     private float fimDoDescanso;
+    private float fimDaCue;
     private float proximoDanoBarbatana;
     private bool frenteAcertouNesteAtaque;
+    private State proximoAtaque;
 
     protected override void Awake()
     {
@@ -66,10 +71,11 @@ public class Enemy : EnemyHealth
 
     private void FixedUpdate()
     {
+        Debug.Log(estado);
         if (IsDead || jogadorPosition == null || !jogadorPosition.gameObject.activeInHierarchy)
         {
             PararMovimento();
-            AtualizarAnimacao(false);
+            AtualizarAnimacao();
             return;
         }
 
@@ -77,7 +83,7 @@ public class Enemy : EnemyHealth
         {
             case State.idle:
                 PararMovimento();
-                AtualizarAnimacao(false);
+                AtualizarAnimacao();
                 if (Time.time >= fimDoDescanso)
                     MudarEstado(State.walking);
                 break;
@@ -86,7 +92,7 @@ public class Enemy : EnemyHealth
                 if (DistanciaHorizontal(jogadorPosition.position) >= distanciaParaAtaquePulo)
                 {
                     setJumpAttack();
-                    AtualizarAtaquePulo();
+                    AtualizarCueState();
                 }
                 else
                 {
@@ -96,9 +102,23 @@ public class Enemy : EnemyHealth
                 }
                 break;
 
+            case State.givingCue:
+                AtualizarCueState();
+                break;
+
             case State.jumpAttack:
                 AtualizarAtaquePulo();
                 break;
+        }
+    }
+
+    private void AtualizarCueState()
+    {
+        PararMovimento();
+        if (Time.time > fimDaCue)
+        {
+            fimDoAtaque = Time.time + duracaoMaximaAtaque;
+            MudarEstado(State.jumpAttack);
         }
     }
 
@@ -108,8 +128,9 @@ public class Enemy : EnemyHealth
         jumpAttackCoordinate = jogadorPosition.position;
         jumpAttackCoordinate.y = body.position.y;
         frenteAcertouNesteAtaque = false;
-        fimDoAtaque = Time.time + duracaoMaximaAtaque;
-        MudarEstado(State.jumpAttack);
+        //fimDoAtaque = Time.time + duracaoMaximaAtaque;
+        fimDaCue = Time.time + tempoDaAnimacaoCue;
+        MudarEstado(State.givingCue);
     }
 
     private void AtualizarAtaquePulo()
@@ -123,7 +144,7 @@ public class Enemy : EnemyHealth
         }
 
         MoverAte(jumpAttackCoordinate, velocidadeAtaquePulo, distanciaChegadaAtaque);
-        AtualizarAnimacao(true);
+        AtualizarAnimacao();
     }
 
     private bool MoverAte(Vector3 destino, float velocidade, float distanciaLimite)
@@ -174,18 +195,23 @@ public class Enemy : EnemyHealth
     private void MudarEstado(State novoEstado)
     {
         estado = novoEstado;
-        if (estado == State.idle)
+        if (estado == State.idle || estado == State.givingCue)
             PararMovimento();
-        AtualizarAnimacao(estado != State.idle);
+        AtualizarAnimacao();
     }
+private void AtualizarAnimacao(bool andando = true)
+{
+    if (animator == null)
+        return;
 
-    private void AtualizarAnimacao(bool andando)
-    {
-        if (animator == null)
-            return;
-        animator.SetBool(IsIdle, !andando);
-        animator.SetBool(IsWalking, andando);
-    }
+    bool preparando = estado == State.givingCue;
+    bool movimentando = estado == State.jumpAttack ||
+        (estado == State.walking && andando);
+
+    animator.SetBool(IsIdle, !preparando && !movimentando);
+    animator.SetBool(IsWalking, movimentando);
+    animator.SetBool(IsGivingCue, preparando);
+}
 
     // Mantem a assinatura usada pelo seu script de hitbox original.
     public void JogadorEntrouNaHitbox(HitboxParte.ParteCorpo parte)
@@ -244,7 +270,7 @@ public class Enemy : EnemyHealth
     {
         Died -= AoMorrer;
         PararMovimento();
-        AtualizarAnimacao(false);
+        AtualizarAnimacao();
     }
 
     private void OnValidate()
