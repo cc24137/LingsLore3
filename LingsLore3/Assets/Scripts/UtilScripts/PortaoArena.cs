@@ -1,0 +1,91 @@
+using UnityEngine;
+
+[DisallowMultipleComponent]
+[RequireComponent(typeof(BoxCollider))]
+public sealed class PortaoArena : MonoBehaviour
+{
+    [SerializeField] private Rigidbody grade;
+    [SerializeField, Min(0.1f)] private float alturaDaAbertura = 5.05f;
+    [SerializeField, Min(0.1f)] private float tempoDeFechamento = 0.95f;
+    [SerializeField, Min(0f)] private float folgaDoVao = 0.85f;
+    [SerializeField] private GameObject encontro;
+
+    private Vector3 posicaoAberta;
+    private Vector3 posicaoFechada;
+    private PlayerMotor jogador;
+    private Collider corpoDoJogador;
+    private float progresso;
+
+    private void Reset()
+    {
+        GetComponent<BoxCollider>().isTrigger = true;
+    }
+
+    private void Awake()
+    {
+        if (grade == null)
+        {
+            Debug.LogError("Associe o Rigidbody da grade ao portão da arena.", this);
+            enabled = false;
+            return;
+        }
+
+        posicaoAberta = grade.position;
+        posicaoFechada = posicaoAberta - transform.up * alturaDaAbertura;
+    }
+
+    private void OnTriggerStay(Collider outro)
+    {
+        if (!isActiveAndEnabled || jogador != null || outro.isTrigger)
+            return;
+
+        Rigidbody corpo = outro.attachedRigidbody;
+        if (corpo != null && corpo.TryGetComponent(out PlayerMotor motor) &&
+            !motor.IsDead && PassouDoVao(outro))
+        {
+            jogador = motor;
+            corpoDoJogador = outro;
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        if (progresso == 1f)
+        {
+            enabled = false;
+            if (encontro != null)
+                encontro.SetActive(true);
+            return;
+        }
+
+        // Se Ling voltar para o vão enquanto a grade desce, ela sobe de novo.
+        if (jogador != null && (jogador.IsDead || !PassouDoVao(corpoDoJogador)))
+        {
+            jogador = null;
+            corpoDoJogador = null;
+        }
+
+        bool fechando = jogador != null;
+        float destino = fechando ? 1f : 0f;
+        if (progresso == destino)
+            return;
+
+        float duracao = fechando ? tempoDeFechamento : tempoDeFechamento * 0.5f;
+        progresso = Mathf.MoveTowards(progresso, destino, Time.fixedDeltaTime / duracao);
+        float deslocamento = Mathf.SmoothStep(0f, 1f, progresso);
+        grade.MovePosition(Vector3.Lerp(posicaoAberta, posicaoFechada, deslocamento));
+    }
+
+    private bool PassouDoVao(Collider corpo)
+    {
+        if (corpo == null || !corpo.enabled || !corpo.gameObject.activeInHierarchy)
+            return false;
+
+        Vector3 frente = transform.forward;
+        Bounds limites = corpo.bounds;
+        float raio = Vector3.Dot(limites.extents,
+            new Vector3(Mathf.Abs(frente.x), Mathf.Abs(frente.y), Mathf.Abs(frente.z)));
+        float distancia = Vector3.Dot(limites.center - posicaoFechada, frente);
+        return distancia - raio > folgaDoVao;
+    }
+}
