@@ -19,8 +19,10 @@ public class Enemy : EnemyHealth
     [SerializeField, Min(0.01f)] private float velocidadeAtaquePulo = 25f;
     [SerializeField, Min(0.01f)] private float distanciaChegadaAtaque = 0.35f;
     [SerializeField, Min(0.01f)] private float duracaoMaximaAtaque = 3f;
+    [SerializeField, Min(0f)]
+    private float distanciaAposJogador = 3f;
     [Min(0f)] public float delayAfterAttack = 2f;
-    [Min(0f)] public float tempoDaAnimacaoCue = 2f;
+    [Min(0f)] public float tempoDaAnimacaoCue = 1f;
 
     [Header("Dano ao jogador")]
     [SerializeField, Min(0f)] private float danoFrente = 25f;
@@ -30,6 +32,11 @@ public class Enemy : EnemyHealth
     [SerializeField] private UnityEvent<float> aoCausarDano = new UnityEvent<float>();
 
     private enum State { idle, walking, jumpAttack, groundAttack, givingCue }
+    [Header("Inclinacao visual")]
+    [SerializeField] private Transform pivotVisual;
+    [SerializeField] private float inclinacaoVisualZ;
+    private Quaternion rotacaoVisualInicial;
+
 
     [Header("Estado atual (controlado pelo codigo)")]
     [SerializeField] private State estado = State.walking;
@@ -49,6 +56,9 @@ public class Enemy : EnemyHealth
 
     protected override void Awake()
     {
+        if (pivotVisual != null)
+            rotacaoVisualInicial = pivotVisual.localRotation;
+
         base.Awake();
         body = GetComponent<Rigidbody>();
         if (animator == null)
@@ -69,9 +79,19 @@ public class Enemy : EnemyHealth
         MudarEstado(State.walking);
     }
 
+    private void LateUpdate()
+    {
+        if (pivotVisual == null)
+            return;
+
+        pivotVisual.localRotation =
+            rotacaoVisualInicial *
+            Quaternion.AngleAxis(inclinacaoVisualZ, Vector3.forward);
+    }
+
     private void FixedUpdate()
     {
-        Debug.Log(estado);
+        //Debug.Log(estado);
         if (IsDead || jogadorPosition == null || !jogadorPosition.gameObject.activeInHierarchy)
         {
             PararMovimento();
@@ -91,7 +111,7 @@ public class Enemy : EnemyHealth
             case State.walking:
                 if (DistanciaHorizontal(jogadorPosition.position) >= distanciaParaAtaquePulo)
                 {
-                    setJumpAttack();
+                    SetAttack();
                     AtualizarCueState();
                 }
                 else
@@ -112,25 +132,64 @@ public class Enemy : EnemyHealth
         }
     }
 
+    private void SetAttack()
+    {
+        EscolherProximoAtaque();
+        fimDaCue = Time.time + tempoDaAnimacaoCue;
+        MudarEstado(State.givingCue);
+    }
+    private void EscolherProximoAtaque()
+    {
+        int a = Random.Range(1, 11);
+        if (a <= 10)
+        {
+            proximoAtaque = State.jumpAttack;
+        }
+        else
+        {
+            proximoAtaque = State.groundAttack;
+        }
+    }
+
     private void AtualizarCueState()
     {
         PararMovimento();
         if (Time.time > fimDaCue)
         {
-            fimDoAtaque = Time.time + duracaoMaximaAtaque;
-            MudarEstado(State.jumpAttack);
+            Debug.Log("Acaba cue");
+            if (proximoAtaque == State.jumpAttack)
+            {
+                Debug.Log("Agora eh pulo");
+                SetJumpAttack();
+            }
         }
     }
 
-    private void setJumpAttack()
+    private Vector3 CalcularDestinoJumpAttack(
+        Vector3 posicaoBoss,
+        Vector3 posicaoJogador,
+        float distanciaAposJogador)
     {
+        posicaoJogador.y = posicaoBoss.y;
+
+        Vector3 direcao = (posicaoJogador - posicaoBoss).normalized;
+
+        return posicaoJogador +
+            direcao * Mathf.Max(0f, distanciaAposJogador);
+    }
+
+    private void SetJumpAttack()
+    {
+        MudarEstado(State.jumpAttack);
         // Guarda uma posicao, em vez de uma referencia que acompanha o jogador.
-        jumpAttackCoordinate = jogadorPosition.position;
+        jumpAttackCoordinate = CalcularDestinoJumpAttack(
+            body.position,
+            jogadorPosition.position,
+            distanciaAposJogador
+        );
         jumpAttackCoordinate.y = body.position.y;
         frenteAcertouNesteAtaque = false;
-        //fimDoAtaque = Time.time + duracaoMaximaAtaque;
-        fimDaCue = Time.time + tempoDaAnimacaoCue;
-        MudarEstado(State.givingCue);
+        fimDoAtaque = Time.time + duracaoMaximaAtaque;
     }
 
     private void AtualizarAtaquePulo()
@@ -170,13 +229,36 @@ public class Enemy : EnemyHealth
 
     private void RotacionarPara(Vector3 destino)
     {
-        Vector3 direcao = destino - body.position;
-        direcao.y = 0f;
-        if (direcao.sqrMagnitude < 0.0001f)
+        Quaternion rotacaoAtual = body.rotation;
+
+        Vector3 direcaoDestino = destino - body.position;
+        direcaoDestino.y = 0f;
+
+        Vector3 frenteAtual = rotacaoAtual * Vector3.forward;
+        frenteAtual.y = 0f;
+
+        if (direcaoDestino.sqrMagnitude < 0.0001f ||
+            frenteAtual.sqrMagnitude < 0.0001f)
             return;
 
-        body.MoveRotation(Quaternion.RotateTowards(body.rotation,
-            Quaternion.LookRotation(direcao), velocidadeRotacao * Time.fixedDeltaTime));
+        float diferencaY = Vector3.SignedAngle(
+            frenteAtual,
+            direcaoDestino,
+            Vector3.up
+        );
+
+        float passoMaximo = Mathf.Max(0f, velocidadeRotacao)
+            * Time.fixedDeltaTime;
+
+        float passoY = Mathf.Clamp(
+            diferencaY,
+            -passoMaximo,
+            passoMaximo
+        );
+
+        Quaternion giroY = Quaternion.AngleAxis(passoY, Vector3.up);
+
+        body.MoveRotation(giroY * rotacaoAtual);
     }
 
     private float DistanciaHorizontal(Vector3 destino)
