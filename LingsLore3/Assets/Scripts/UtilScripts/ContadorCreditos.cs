@@ -548,7 +548,7 @@ public class ContadorCreditos : MonoBehaviour
                 alvoDaRodada.gameObject.SetActive(false);
             hashiJogador?.SetAimIndicatorVisible(false);
             jogador.DefinirRespawnDoTutorial(false);
-            saidaDoTutorial.ConfigurarPosicao(true);
+            saidaDoTutorial.AbrirSuavemente();
         }
 
         AtualizarTexto();

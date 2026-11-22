@@ -6,6 +6,7 @@ public sealed class PortaoArena : MonoBehaviour
 {
     [SerializeField] private Rigidbody grade;
     [SerializeField, Min(0.1f)] private float alturaDaAbertura = 5.05f;
+    [SerializeField, Min(0.1f)] private float tempoDeAbertura = 1.8f;
     [SerializeField, Min(0.1f)] private float tempoDeFechamento = 0.95f;
     [SerializeField, Min(0f)] private float folgaDoVao = 0.85f;
     [SerializeField] private GameObject encontro;
@@ -15,7 +16,10 @@ public sealed class PortaoArena : MonoBehaviour
     private PlayerMotor jogador;
     private Collider corpoDoJogador;
     private float progresso;
+    private bool abrindo;
+    private bool fecharAoAbrir;
 
+    public event System.Action EntrouNaArena;
     public event System.Action FechouAposEntrada;
 
     private void Reset()
@@ -43,14 +47,27 @@ public sealed class PortaoArena : MonoBehaviour
 
         jogador = null;
         corpoDoJogador = null;
+        abrindo = false;
         progresso = aberta ? 0f : 1f;
         grade.position = aberta ? posicaoAberta : posicaoFechada;
         enabled = aberta && fecharAoPassar;
     }
 
+    public void AbrirSuavemente(bool fecharAoPassar = false)
+    {
+        if (grade == null)
+            return;
+
+        jogador = null;
+        corpoDoJogador = null;
+        fecharAoAbrir = fecharAoPassar;
+        abrindo = progresso > 0f;
+        enabled = abrindo || fecharAoPassar;
+    }
+
     private void OnTriggerStay(Collider outro)
     {
-        if (!isActiveAndEnabled || jogador != null || outro.isTrigger)
+        if (!isActiveAndEnabled || (abrindo && !fecharAoAbrir) || jogador != null || outro.isTrigger)
             return;
 
         Rigidbody corpo = outro.attachedRigidbody;
@@ -59,11 +76,23 @@ public sealed class PortaoArena : MonoBehaviour
         {
             jogador = motor;
             corpoDoJogador = outro;
+            EntrouNaArena?.Invoke();
         }
     }
 
     private void FixedUpdate()
     {
+        if (abrindo)
+        {
+            MoverGrade(0f, tempoDeAbertura);
+            if (progresso == 0f)
+            {
+                abrindo = false;
+                enabled = fecharAoAbrir;
+            }
+            return;
+        }
+
         if (progresso == 1f)
         {
             enabled = false;
@@ -85,7 +114,11 @@ public sealed class PortaoArena : MonoBehaviour
         if (progresso == destino)
             return;
 
-        float duracao = fechando ? tempoDeFechamento : tempoDeFechamento * 0.5f;
+        MoverGrade(destino, fechando ? tempoDeFechamento : tempoDeFechamento * 0.5f);
+    }
+
+    private void MoverGrade(float destino, float duracao)
+    {
         progresso = Mathf.MoveTowards(progresso, destino, Time.fixedDeltaTime / duracao);
         float deslocamento = Mathf.SmoothStep(0f, 1f, progresso);
         grade.MovePosition(Vector3.Lerp(posicaoAberta, posicaoFechada, deslocamento));

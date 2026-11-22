@@ -11,6 +11,8 @@ public sealed class SequenciaChefesArena : MonoBehaviour
         public PortaoArena entrada;
         public PortaoArena saida;
         public Transform pontoRetentativa;
+        public LuzesDoCorredor corredorDeEntrada;
+        public GameObject iluminacao;
     }
 
     [SerializeField] private EnemyHealth[] chefes;
@@ -100,27 +102,57 @@ public sealed class SequenciaChefesArena : MonoBehaviour
                 jogador.transform.SetPositionAndRotation(ponto.position, ponto.rotation);
             }
             Physics.SyncTransforms();
+            AcenderIluminacaoAtual();
             AtivarChefeAtual();
         }
         else
         {
-            AguardarEntrada();
+            StartCoroutine(AguardarEntrada());
         }
     }
 
-    private void AguardarEntrada()
+    private IEnumerator AguardarEntrada()
     {
-        entradaAtual = acessos[etapaAtual].entrada;
-        entradaAtual.FechouAposEntrada += AoEntrarNaArena;
-        entradaAtual.ConfigurarPosicao(true, fecharAoPassar: true);
+        // A morte durante o tutorial reinicia a rodada, sem recarregar a cena.
+        while (etapaAtual == 0 && tutorial != null && !tutorial.TutorialConcluido)
+            yield return null;
+
+        AcessoArena acesso = acessos[etapaAtual];
+        LuzesDoCorredor corredor = acesso.corredorDeEntrada;
+        while (!jogador.IsDead && (MenuPausa.EstaPausado || (corredor != null && !corredor.TodasAcesas)))
+            yield return null;
+
+        if (jogador.IsDead)
+            yield break;
+
+        entradaAtual = acesso.entrada;
+        entradaAtual.EntrouNaArena += AcenderIluminacaoAtual;
+        entradaAtual.FechouAposEntrada += AoFecharEntrada;
+        entradaAtual.AbrirSuavemente(fecharAoPassar: true);
     }
 
-    private void AoEntrarNaArena()
+    private void AcenderIluminacaoAtual()
     {
-        entradaAtual.FechouAposEntrada -= AoEntrarNaArena;
-        entradaAtual = null;
+        GameObject iluminacao = acessos[etapaAtual].iluminacao;
+        if (iluminacao != null)
+            iluminacao.SetActive(true);
+    }
+
+    private void AoFecharEntrada()
+    {
+        LimparEntradaAtual();
         if (!jogador.IsDead)
             AtivarChefeAtual();
+    }
+
+    private void LimparEntradaAtual()
+    {
+        if (entradaAtual == null)
+            return;
+
+        entradaAtual.EntrouNaArena -= AcenderIluminacaoAtual;
+        entradaAtual.FechouAposEntrada -= AoFecharEntrada;
+        entradaAtual = null;
     }
 
     private void AtivarChefeAtual()
@@ -165,8 +197,8 @@ public sealed class SequenciaChefesArena : MonoBehaviour
             fimDeJogo.ExibirVitoria();
         else if (TemAcessos)
         {
-            acessos[etapaAtual - 1].saida.ConfigurarPosicao(true);
-            AguardarEntrada();
+            acessos[etapaAtual - 1].saida.AbrirSuavemente();
+            yield return AguardarEntrada();
         }
         else
             AtivarChefeAtual();
@@ -184,7 +216,6 @@ public sealed class SequenciaChefesArena : MonoBehaviour
             fimDeJogo.RepetindoAposDerrota -= PrepararRetentativa;
         if (chefeAtual != null)
             chefeAtual.Died -= AoDerrotarChefe;
-        if (entradaAtual != null)
-            entradaAtual.FechouAposEntrada -= AoEntrarNaArena;
+        LimparEntradaAtual();
     }
 }
