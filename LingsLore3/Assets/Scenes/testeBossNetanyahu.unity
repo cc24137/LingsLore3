@@ -1405,6 +1405,14 @@ MonoBehaviour:
   prefabPocaDeFogo: {fileID: 150200005, guid: 465ba080a9b94ad8a937d64c43e1bf15, type: 3}
   duracaoDaTransicao: 1.4
   multiplicadorDeTamanhoNaFase2: 1.15
+  prefabMiniTralalero: {fileID: 150300006, guid: fc10f31b471044179ec693d3c5de2c60, type: 3}
+  quantidadeDeMinis: 4
+  distanciaParaInvocar: 16
+  raioDaInvocacao: 4.25
+  avisoDaInvocacao: 0.75
+  tempoAntesDaOrdem: 1.3
+  avisoDaOrdem: 0.65
+  intervaloEntreInvocacoes: 8
   velocidadeInicialDaCorrida: 7
   velocidadeMaximaDaCorrida: 13
   aceleracaoDaCorrida: 5

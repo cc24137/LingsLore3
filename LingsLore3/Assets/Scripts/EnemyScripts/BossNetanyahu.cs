@@ -7,7 +7,7 @@ using UnityEngine;
 public sealed class BossNetanyahu : MonoBehaviour
 {
     private enum Estado { Descansando, Aproximando, Preparando, Atacando, Encerrado, Transicao }
-    private enum Ataque { Nenhum, Bombas, Combo, Investida, Pisada, BombaIncendiaria }
+    private enum Ataque { Nenhum, Bombas, Combo, Investida, Pisada, BombaIncendiaria, ComandarMinis }
 
     [Header("Cena de teste")]
     [SerializeField] private PlayerResources ling;
@@ -25,6 +25,16 @@ public sealed class BossNetanyahu : MonoBehaviour
     [SerializeField] private PocaDeFogo prefabPocaDeFogo;
     [SerializeField, Min(0f)] private float duracaoDaTransicao = 1.4f;
     [SerializeField, Min(1f)] private float multiplicadorDeTamanhoNaFase2 = 1.15f;
+
+    [Header("Minis do Tralalero")]
+    [SerializeField] private MiniTralalero prefabMiniTralalero;
+    [SerializeField, Min(1)] private int quantidadeDeMinis = 4;
+    [SerializeField, Min(0.1f)] private float distanciaParaInvocar = 16f;
+    [SerializeField, Min(0.1f)] private float raioDaInvocacao = 4.25f;
+    [SerializeField, Min(0f)] private float avisoDaInvocacao = 0.75f;
+    [SerializeField, Min(0f)] private float tempoAntesDaOrdem = 1.3f;
+    [SerializeField, Min(0f)] private float avisoDaOrdem = 0.65f;
+    [SerializeField, Min(0f)] private float intervaloEntreInvocacoes = 8f;
 
     [Header("Corrida de aproximação")]
     [SerializeField, Min(0.1f)] private float velocidadeInicialDaCorrida = 7f;
@@ -63,6 +73,7 @@ public sealed class BossNetanyahu : MonoBehaviour
     [SerializeField] private Ataque ataqueEscolhido;
 
     private readonly WaitForFixedUpdate passoFisico = new WaitForFixedUpdate();
+    private readonly List<MiniTralalero> minis = new List<MiniTralalero>();
     private EnemyHealth vida;
     private Rigidbody corpo;
     private Rigidbody corpoDoLing;
@@ -74,6 +85,8 @@ public sealed class BossNetanyahu : MonoBehaviour
     private Vector3 escalaInicial;
     private float alturaInicialDaBaseAoPivo;
     private float multiplicadorAtual = 1f;
+    private float proximaInvocacao;
+    private bool jaInvocou;
     private bool emInvestida;
     private bool ignorandoColisaoComLing;
 
@@ -141,8 +154,7 @@ public sealed class BossNetanyahu : MonoBehaviour
             float distanciaAntesDoRecuo = Mathf.Max(distanciaParaBombas - margemParaRecuo, distanciaParaBombas * 0.5f);
             if (vida.CurrentBar == 2)
             {
-                ataqueEscolhido = Ataque.BombaIncendiaria;
-                yield return ExecutarQuandoPerto(LancarBombas(incendiaria: true), distanciaAntesDoRecuo);
+                yield return ExecutarRodadaDaFase2(distanciaAntesDoRecuo);
                 continue;
             }
 
@@ -164,6 +176,101 @@ public sealed class BossNetanyahu : MonoBehaviour
                     break;
             }
         }
+    }
+
+    private IEnumerator ExecutarRodadaDaFase2(float distanciaAntesDoRecuo)
+    {
+        minis.RemoveAll(mini => mini == null || !mini.EstaAtivo);
+        bool podeInvocar = prefabMiniTralalero != null && minis.Count == 0 && Time.time >= proximaInvocacao;
+        if (podeInvocar && (!jaInvocou || Random.value < 0.5f))
+        {
+            ataqueEscolhido = Ataque.ComandarMinis;
+            yield return ExecutarQuandoPerto(ComandarMinis(), distanciaParaInvocar);
+        }
+        else
+        {
+            ataqueEscolhido = Ataque.BombaIncendiaria;
+            yield return ExecutarQuandoPerto(LancarBombas(incendiaria: true), distanciaAntesDoRecuo);
+        }
+    }
+
+    private IEnumerator ComandarMinis()
+    {
+        List<Vector3> pontos = EscolherPontosDosMinis();
+        if (pontos.Count == 0)
+        {
+            proximaInvocacao = Time.time + recuperacao * 2f;
+            yield break;
+        }
+
+        estado = Estado.Preparando;
+        corpo.rotation = Quaternion.LookRotation(DirecaoDoLing());
+        CriarEfeitos("Aviso de invocação");
+        foreach (Vector3 ponto in pontos)
+            MarcarArea(ponto, 0.85f, Vector3.forward, 180f);
+
+        yield return new WaitForSeconds(avisoDaInvocacao);
+        LimparEfeitos();
+
+        estado = Estado.Atacando;
+        jaInvocou = true;
+        proximaInvocacao = Time.time + intervaloEntreInvocacoes;
+        Bounds arena = piso.bounds;
+        foreach (Vector3 ponto in pontos)
+        {
+            Vector3 direcao = VetorHorizontal(corpoDoLing.position - ponto);
+            Quaternion rotacao = direcao.sqrMagnitude > 0.001f ? Quaternion.LookRotation(direcao) : corpo.rotation;
+            MiniTralalero mini = Instantiate(prefabMiniTralalero, ponto, rotacao);
+            minis.Add(mini);
+            mini.Iniciar(ling, corpoDoLing, colisaoDoLing, obstaculos, arena, minis);
+        }
+
+        yield return new WaitForSeconds(tempoAntesDaOrdem);
+        estado = Estado.Preparando;
+        CriarEfeitos("Ordem de ataque dos minis");
+        foreach (MiniTralalero mini in minis)
+        {
+            if (mini == null || !mini.EstaAtivo)
+                continue;
+
+            mini.PrepararInvestida();
+            Vector3 ponto = mini.transform.position;
+            ponto.y = arena.max.y;
+            MarcarArea(ponto, 0.85f, Vector3.forward, 180f);
+        }
+
+        yield return new WaitForSeconds(avisoDaOrdem);
+        estado = Estado.Atacando;
+        foreach (MiniTralalero mini in minis)
+        {
+            if (mini != null && mini.EstaAtivo)
+                mini.Investir();
+        }
+
+        LimparEfeitos();
+    }
+
+    private List<Vector3> EscolherPontosDosMinis()
+    {
+        const int tentativasPorSetor = 6;
+        var pontos = new List<Vector3>(quantidadeDeMinis);
+        int mascara = obstaculos.value | (1 << gameObject.layer);
+        float alturaDoPiso = piso.bounds.max.y;
+        for (int i = 0; i < quantidadeDeMinis * tentativasPorSetor && pontos.Count < quantidadeDeMinis; i++)
+        {
+            float setor = i % quantidadeDeMinis + i / quantidadeDeMinis / (float)tentativasPorSetor;
+            Vector3 direcao = Quaternion.Euler(0f, setor * 360f / quantidadeDeMinis, 0f) * transform.forward;
+            Vector3 ponto = LimitarAoPiso(corpo.position + direcao * raioDaInvocacao, 1f);
+            ponto.y = alturaDoPiso;
+            if (VetorHorizontal(ponto - corpoDoLing.position).sqrMagnitude < 4f
+                || Physics.CheckSphere(ponto + Vector3.up * 0.65f, 0.8f, mascara, QueryTriggerInteraction.Ignore)
+                || pontos.Exists(anterior => (anterior - ponto).sqrMagnitude < 2.25f))
+                continue;
+
+            pontos.Add(ponto);
+        }
+
+        return pontos;
     }
 
     private IEnumerator CrescerNaTransicao(float duracao)
@@ -305,6 +412,22 @@ public sealed class BossNetanyahu : MonoBehaviour
         pocaAtiva.gameObject.SetActive(false);
         Destroy(pocaAtiva.gameObject);
         pocaAtiva = null;
+    }
+
+    private void LimparMinis()
+    {
+        foreach (MiniTralalero mini in minis)
+        {
+            if (mini == null)
+                continue;
+
+            mini.gameObject.SetActive(false);
+            Destroy(mini.gameObject);
+        }
+
+        minis.Clear();
+        jaInvocou = false;
+        proximaInvocacao = 0f;
     }
 
     private IEnumerator ExecutarCombo()
@@ -661,6 +784,7 @@ public sealed class BossNetanyahu : MonoBehaviour
         emInvestida = false;
         LimparEfeitos();
         LimparPocaDeFogo();
+        LimparMinis();
         colisaoDoBoss.enabled = true;
         estado = barra == 2 ? Estado.Transicao : Estado.Descansando;
         float espera = barra == 2 ? duracaoDaTransicao : 0.9f;
@@ -679,6 +803,7 @@ public sealed class BossNetanyahu : MonoBehaviour
         StopAllCoroutines();
         LimparEfeitos();
         LimparPocaDeFogo();
+        LimparMinis();
     }
 
     private void LimparEfeitos()
@@ -705,6 +830,7 @@ public sealed class BossNetanyahu : MonoBehaviour
         StopAllCoroutines();
         LimparEfeitos();
         LimparPocaDeFogo();
+        LimparMinis();
     }
 
     private void OnDestroy() => Destroy(materialDosAvisos);
