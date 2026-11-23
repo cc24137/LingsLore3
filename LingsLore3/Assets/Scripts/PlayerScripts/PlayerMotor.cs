@@ -58,7 +58,6 @@ public class PlayerMotor : MonoBehaviour
     private bool attackHeld;
     private bool queuedLightAttack;
     private PlayerMelee.AttackType queuedChargedAttack;
-    private bool airAttackUsed;
     private float pendingHitBounceHeight;
     private int? lastBouncedAttackSerial;
     private float chargeTimer;
@@ -298,10 +297,7 @@ public class PlayerMotor : MonoBehaviour
         }
 
         if (IsGrounded)
-        {
-            airAttackUsed = false;
             wasAirborne = false;
-        }
 
         if (IsKnockedBack)
         {
@@ -477,8 +473,8 @@ public class PlayerMotor : MonoBehaviour
                         ArmCharge(ChargeIntent.Up);
                     }
                 }
-                else if ((attackLessonMode == AttackLessonMode.All ||
-                    attackLessonMode == AttackLessonMode.AirSpinOnly) && !airAttackUsed)
+                else if (attackLessonMode == AttackLessonMode.All ||
+                    attackLessonMode == AttackLessonMode.AirSpinOnly)
                 {
                     TryStartAttack(PlayerMelee.AttackType.AirSpin, direction);
                 }
@@ -599,9 +595,6 @@ public class PlayerMotor : MonoBehaviour
         queuedChargedAttack = PlayerMelee.AttackType.None;
         melee.BeginAttack(type, attackDirection);
         IsSprinting = false;
-
-        if (type == PlayerMelee.AttackType.AirSpin)
-            airAttackUsed = true;
 
         return true;
     }
@@ -786,7 +779,6 @@ public class PlayerMotor : MonoBehaviour
         wasAirborne = false;
         airborneReferenceSpeed = 0f;
         IsSprinting = false;
-        airAttackUsed = false;
         attackHeld = false;
         CancelCombat();
 

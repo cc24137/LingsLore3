@@ -54,6 +54,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
     [Header("Investida")]
     [SerializeField, Min(0.1f)] private float distanciaParaInvestida = 11f;
     [SerializeField, Min(0.1f)] private float avisoDaInvestida = 0.65f;
+    [SerializeField, Min(1f)] private float multiplicadorDeLarguraDaInvestida = 1.5f;
     [SerializeField, Min(0.1f)] private float velocidadeDaInvestida = 32f;
     [SerializeField, Min(0f)] private float danoDaInvestida = 20f;
 
@@ -542,7 +543,8 @@ public sealed partial class BossNetanyahu : MonoBehaviour
 
         CriarEfeitos("Investida do boss");
         Vector3 inicioDaFaixa = new Vector3(origem.x, piso.bounds.max.y, origem.z);
-        LineRenderer faixa = MarcarTrajeto(inicioDaFaixa, frente, distancia, RaioDoBoss);
+        float raioDaInvestida = RaioDoBoss * multiplicadorDeLarguraDaInvestida;
+        LineRenderer faixa = MarcarTrajeto(inicioDaFaixa, frente, distancia, raioDaInvestida);
         yield return new WaitForSeconds(avisoDaInvestida);
 
         estado = Estado.Atacando;
@@ -554,8 +556,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         {
             yield return passoFisico;
             float proximo = Mathf.Min(distancia, avancou + velocidadeDaInvestida * Time.fixedDeltaTime);
-            if (!passouPeloLing && (SobrepostoAoLing() || VarrerCapsula(corpo.position, frente,
-                proximo - avancou, 1 << ling.gameObject.layer, out _)))
+            if (!passouPeloLing && InvestidaAtingeLing(frente, proximo - avancou, raioDaInvestida))
             {
                 passouPeloLing = true;
                 ling.TakeDamage(danoDaInvestida, corpo.position - frente * RaioDoBoss);
@@ -570,6 +571,15 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         yield return passoFisico;
         emInvestida = false;
         LimparEfeitos();
+    }
+
+    private bool InvestidaAtingeLing(Vector3 frente, float distancia, float raio)
+    {
+        ObterExtremosDaCapsula(corpo.position, raio, out Vector3 inferior, out Vector3 superior);
+        int mascara = 1 << ling.gameObject.layer;
+        return Physics.CheckCapsule(inferior, superior, raio, mascara, QueryTriggerInteraction.Ignore) ||
+            Physics.CapsuleCast(inferior, superior, raio, frente, out _, distancia, mascara,
+                QueryTriggerInteraction.Ignore);
     }
 
     private IEnumerator ExecutarPisada()
@@ -662,11 +672,18 @@ public sealed partial class BossNetanyahu : MonoBehaviour
     private bool VarrerCapsula(Vector3 origem, Vector3 direcao, float distancia, int mascara, out RaycastHit hit)
     {
         float raio = RaioDoBoss;
+        ObterExtremosDaCapsula(origem, raio, out Vector3 inferior, out Vector3 superior);
+        return Physics.CapsuleCast(inferior, superior, raio, direcao, out hit,
+            distancia, mascara, QueryTriggerInteraction.Ignore);
+    }
+
+    private void ObterExtremosDaCapsula(Vector3 origem, float raio, out Vector3 inferior, out Vector3 superior)
+    {
         Vector3 escala = transform.lossyScale;
         Vector3 centro = origem + corpo.rotation * Vector3.Scale(colisaoDoBoss.center, escala);
         Vector3 eixo = Vector3.up * Mathf.Max(0f, colisaoDoBoss.height * Mathf.Abs(escala.y) * 0.5f - raio);
-        return Physics.CapsuleCast(centro - eixo, centro + eixo, raio, direcao, out hit,
-            distancia, mascara, QueryTriggerInteraction.Ignore);
+        inferior = centro - eixo;
+        superior = centro + eixo;
     }
 
     private bool SobrepostoAoLing() => Physics.ComputePenetration(

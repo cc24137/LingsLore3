@@ -926,7 +926,7 @@ MonoBehaviour:
   damage: 20
   hitBounceHeight: 0
   shotInterval: 0.25
-  reloadTime: 10
+  reloadTime: 5
   aimDistance: 80
   hitMask:
     serializedVersion: 2

@@ -19,7 +19,7 @@ public class PlayerHashi : MonoBehaviour
     [Tooltip("Altura do rebote do Ling ao acertar. Zero desativa.")]
     [SerializeField, Min(0f)] private float hitBounceHeight;
     [SerializeField, Min(0.01f)] private float shotInterval = 0.25f;
-    [SerializeField, Min(0.01f)] private float reloadTime = 10f;
+    [SerializeField, Min(0.01f)] private float reloadTime = 5f;
     [SerializeField, Min(1f)] private float aimDistance = 80f;
 
     [Tooltip("Inclua inimigos e obstaculos.")]

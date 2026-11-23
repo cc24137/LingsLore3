@@ -10,7 +10,7 @@ public class ThirdPersonCamera : MonoBehaviour
     [SerializeField, Min(0.1f)] private float distance = 6f;
     [SerializeField, Min(0f)] private float mouseSensitivity = 0.12f;
 
-    [SerializeField] private float minPitch = -15f;
+    [SerializeField] private float minPitch = -58f;
     [SerializeField] private float maxPitch = 65f;
 
     [SerializeField] private LayerMask obstacleMask;

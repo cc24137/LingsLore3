@@ -1,7 +1,5 @@
 using UnityEngine;
 
-// Apenas envia parametros ao Animator, incluindo o dodge.
-// Nao controla tempo, velocidade, root motion ou transforms visuais.
 // Estados, transicoes e clips sao configurados no Animator Controller.
 [RequireComponent(typeof(PlayerMotor), typeof(PlayerMelee))]
 public class LingAnimator : MonoBehaviour
@@ -11,6 +9,7 @@ public class LingAnimator : MonoBehaviour
     private PlayerMotor motor;
     private PlayerMelee melee;
     private bool configured;
+    private int lastAirSpinSerial;
 
     private static readonly int Moving = Animator.StringToHash("Moving");
     private static readonly int Sprinting = Animator.StringToHash("Sprinting");
@@ -20,6 +19,7 @@ public class LingAnimator : MonoBehaviour
     private static readonly int Dodging = Animator.StringToHash("Dodging");
     private static readonly int Attacking = Animator.StringToHash("Attacking");
     private static readonly int AttackId = Animator.StringToHash("AttackId");
+    private static readonly int AirSpin = Animator.StringToHash("AirSpin");
     private static readonly int Charging = Animator.StringToHash("Charging");
     private static readonly int ChargeDown = Animator.StringToHash("ChargeDown");
     private static readonly int Free = Animator.StringToHash("Free");
@@ -94,5 +94,15 @@ public class LingAnimator : MonoBehaviour
         animator.SetBool(Charging, charging);
         animator.SetBool(ChargeDown, motor.IsChargingDown);
         animator.SetBool(Free, free);
+
+        if (attacking && melee.CurrentAttack == PlayerMelee.AttackType.AirSpin &&
+            lastAirSpinSerial != melee.AttackSerial)
+        {
+            lastAirSpinSerial = melee.AttackSerial;
+            // Dois passos de fisica podem encerrar e reiniciar o giro entre frames do Animator.
+            AnimatorStateInfo currentState = animator.GetCurrentAnimatorStateInfo(0);
+            if (currentState.shortNameHash == AirSpin)
+                animator.Play(currentState.fullPathHash, 0, 0f);
+        }
     }
 }

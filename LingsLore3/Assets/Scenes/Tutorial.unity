@@ -3120,7 +3120,7 @@ MonoBehaviour:
   targetHeight: 1.8
   distance: 7
   mouseSensitivity: 0.12
-  minPitch: -15
+  minPitch: -58
   maxPitch: 75
   obstacleMask:
     serializedVersion: 2

@@ -14,7 +14,7 @@ public sealed partial class BossNetanyahu
     [SerializeField] private GameObject modeloTralaleroDoGiro;
     [SerializeField, Min(0.1f)] private float raioDoGiro = 9f;
     [SerializeField, Min(0.1f)] private float alturaDoGiro = 4f;
-    [SerializeField, Min(0.1f)] private float avisoDoGiro = 1.25f;
+    [SerializeField, Min(0.1f)] private float avisoDoGiro = 0.85f;
     [SerializeField, Min(0.1f)] private float duracaoDoGiro = 0.30f;
     [SerializeField, Min(0f)] private float danoDoGiro = 24f;
 
