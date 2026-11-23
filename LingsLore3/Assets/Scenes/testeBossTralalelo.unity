@@ -310,11 +310,11 @@ Transform:
   m_GameObject: {fileID: 417758523}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -12.8, y: 0.18, z: -0.13}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1807355543}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!20 &497660191 stripped
 Camera:
@@ -930,6 +930,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 581668105}
+  - {fileID: 417758525}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!136 &1807355544
@@ -983,8 +984,15 @@ MonoBehaviour:
   distanciaChegadaAtaque: 0.35
   duracaoMaximaAtaque: 3
   distanciaAposJogador: 3
+  velocidadeGiroPulo: 360
   delayAfterAttack: 1.5
   tempoDaAnimacaoCue: 2
+  apoioPiso: {fileID: 417758524}
+  profundidadeAtaqueChao: 4
+  velocidadeVerticalAtaqueChao: 10
+  tempoSubmerso: 1
+  delayAntesDeEmergir: 0.8
+  prefabMarcadorEmergencia: {fileID: 4992360360281387392, guid: 67b6c77265d139445957c5a9963524e5, type: 3}
   danoFrente: 25
   danoBarbatana: 10
   intervaloDanoBarbatana: 0.75
@@ -1536,6 +1544,26 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3295788631210261642, guid: 6c05e70ae1611a84797e1a85cd5e61b8, type: 3}
+      propertyPath: m_Size.x
+      value: 0.013898694
+      objectReference: {fileID: 0}
+    - target: {fileID: 3295788631210261642, guid: 6c05e70ae1611a84797e1a85cd5e61b8, type: 3}
+      propertyPath: m_Size.z
+      value: 0.020708311
+      objectReference: {fileID: 0}
+    - target: {fileID: 3295788631210261642, guid: 6c05e70ae1611a84797e1a85cd5e61b8, type: 3}
+      propertyPath: m_Center.x
+      value: 0.00029762386
+      objectReference: {fileID: 0}
+    - target: {fileID: 3295788631210261642, guid: 6c05e70ae1611a84797e1a85cd5e61b8, type: 3}
+      propertyPath: m_Center.y
+      value: -0.0031789173
+      objectReference: {fileID: 0}
+    - target: {fileID: 3295788631210261642, guid: 6c05e70ae1611a84797e1a85cd5e61b8, type: 3}
+      propertyPath: m_Center.z
+      value: 0.0142212035
+      objectReference: {fileID: 0}
     - target: {fileID: 3821461692428011350, guid: 6c05e70ae1611a84797e1a85cd5e61b8, type: 3}
       propertyPath: m_Enabled
       value: 0
@@ -1726,4 +1754,3 @@ SceneRoots:
   - {fileID: 863917025}
   - {fileID: 2845741620339171421}
   - {fileID: 1807355543}
-  - {fileID: 417758525}

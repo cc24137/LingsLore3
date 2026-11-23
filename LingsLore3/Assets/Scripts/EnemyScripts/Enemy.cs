@@ -9,20 +9,44 @@ public class Enemy : EnemyHealth
     [SerializeField] private Transform jogadorPosition;
     [SerializeField] private Animator animator;
 
+
+
     [Header("Perseguicao")]
     [SerializeField, Min(0.01f)] private float velocidadeAndando = 2.5f;
+
     [SerializeField, Min(0f)] private float distanciaParada = 1.5f;
+
     [SerializeField, Min(0f)] private float velocidadeRotacao = 360f;
+
+
 
     [Header("Ataque de pulo (investida horizontal)")]
     [SerializeField, Min(0.01f)] private float distanciaParaAtaquePulo = 8f;
+
     [SerializeField, Min(0.01f)] private float velocidadeAtaquePulo = 25f;
+
     [SerializeField, Min(0.01f)] private float distanciaChegadaAtaque = 0.35f;
+
     [SerializeField, Min(0.01f)] private float duracaoMaximaAtaque = 3f;
-    [SerializeField, Min(0f)]
-    private float distanciaAposJogador = 3f;
+
+    [SerializeField, Min(0f)] private float distanciaAposJogador = 3f;
+
+    [SerializeField, Min(0f)] private float velocidadeGiroPulo = 360f;
+
     [Min(0f)] public float delayAfterAttack = 2f;
+
     [Min(0f)] public float tempoDaAnimacaoCue = 1f;
+
+    [Header("Ataque pelo chao")]
+    [SerializeField] private Collider apoioPiso;
+    [SerializeField, Min(0.01f)] private float profundidadeAtaqueChao = 4f;
+    [SerializeField, Min(0.01f)] private float velocidadeVerticalAtaqueChao = 6f;
+    [SerializeField, Min(0f)] private float tempoSubmerso = 1f;
+    [SerializeField, Min(0f)] private float delayAntesDeEmergir = 1.5f;
+
+    [SerializeField] private GameObject prefabMarcadorEmergencia;
+
+
 
     [Header("Dano ao jogador")]
     [SerializeField, Min(0f)] private float danoFrente = 25f;
@@ -31,11 +55,19 @@ public class Enemy : EnemyHealth
     [Tooltip("Conecte ao metodo que reduz a vida do jogador, usando o float dinamico.")]
     [SerializeField] private UnityEvent<float> aoCausarDano = new UnityEvent<float>();
 
+
+
     private enum State { idle, walking, jumpAttack, groundAttack, givingCue }
     [Header("Inclinacao visual")]
+
     [SerializeField] private Transform pivotVisual;
+
     [SerializeField] private float inclinacaoVisualZ;
+
     private Quaternion rotacaoVisualInicial;
+    private float inclinacaoVisualX;
+
+
 
 
     [Header("Estado atual (controlado pelo codigo)")]
@@ -45,6 +77,7 @@ public class Enemy : EnemyHealth
     private static readonly int IsWalking = Animator.StringToHash("isWalking");
     private static readonly int IsGivingCue = Animator.StringToHash("isGivingCue");
 
+
     private Rigidbody body;
     private Vector3 jumpAttackCoordinate;
     private float fimDoAtaque;
@@ -53,6 +86,22 @@ public class Enemy : EnemyHealth
     private float proximoDanoBarbatana;
     private bool frenteAcertouNesteAtaque;
     private State proximoAtaque;
+    private enum EtapaAtaqueChao { nenhuma, descendo, submerso, avisando, subindo }
+    private EtapaAtaqueChao etapaAtaqueChao;
+    private GameObject marcadorEmergencia;
+    private Collider colisorPrincipal;
+    private bool colisorPrincipalEstavaAtivo;
+    private bool apoioPisoEstavaAtivo;
+    private bool bodyEraCinematico;
+    private bool gravidadeEstavaAtiva;
+    private Vector3 posicaoAntesDeSubmergir;
+    private Vector3 posicaoDeEmergencia;
+    private float fimDaEtapaAtaqueChao;
+
+
+
+
+
 
     protected override void Awake()
     {
@@ -61,6 +110,7 @@ public class Enemy : EnemyHealth
 
         base.Awake();
         body = GetComponent<Rigidbody>();
+        colisorPrincipal = GetComponent<Collider>();
         if (animator == null)
             animator = GetComponentInChildren<Animator>(true);
 
@@ -68,6 +118,8 @@ public class Enemy : EnemyHealth
             Debug.LogWarning("Enemy: arraste o objeto principal do jogador para Jogador Position.", this);
         if (animator == null)
             Debug.LogWarning("Enemy: configure o Animator para exibir as animacoes.", this);
+        if (apoioPiso == null || pivotVisual == null || colisorPrincipal == null)
+            Debug.LogWarning("Enemy: configure Pivot Visual, Apoio Piso e um Collider no objeto principal para o ataque pelo chao.", this);
     }
 
     private void OnEnable()
@@ -86,6 +138,7 @@ public class Enemy : EnemyHealth
 
         pivotVisual.localRotation =
             rotacaoVisualInicial *
+            Quaternion.AngleAxis(inclinacaoVisualX, Vector3.right) *
             Quaternion.AngleAxis(inclinacaoVisualZ, Vector3.forward);
     }
 
@@ -129,6 +182,10 @@ public class Enemy : EnemyHealth
             case State.jumpAttack:
                 AtualizarAtaquePulo();
                 break;
+
+            case State.groundAttack:
+                AtualizarAtaqueChao();
+                break;
         }
     }
 
@@ -140,8 +197,8 @@ public class Enemy : EnemyHealth
     }
     private void EscolherProximoAtaque()
     {
-        int a = Random.Range(1, 11);
-        if (a <= 10)
+        int a = Random.Range(0, 2);
+        if (a < 0)
         {
             proximoAtaque = State.jumpAttack;
         }
@@ -161,6 +218,10 @@ public class Enemy : EnemyHealth
             {
                 Debug.Log("Agora eh pulo");
                 SetJumpAttack();
+            }
+            else if (proximoAtaque == State.groundAttack)
+            {
+                SetGroundAttack();
             }
         }
     }
@@ -205,6 +266,158 @@ public class Enemy : EnemyHealth
         MoverAte(jumpAttackCoordinate, velocidadeAtaquePulo, distanciaChegadaAtaque);
         AtualizarAnimacao();
     }
+
+    private void SetGroundAttack()
+    {
+        if (pivotVisual == null || colisorPrincipal == null || apoioPiso == null)
+        {
+            fimDoDescanso = Time.time + delayAfterAttack;
+            MudarEstado(State.idle);
+            return;
+        }
+
+        frenteAcertouNesteAtaque = false;
+
+        posicaoAntesDeSubmergir = body.position;
+        colisorPrincipalEstavaAtivo = colisorPrincipal.enabled;
+        apoioPisoEstavaAtivo = apoioPiso.enabled;
+        bodyEraCinematico = body.isKinematic;
+        gravidadeEstavaAtiva = body.useGravity;
+        PararMovimento();
+        body.isKinematic = true;
+        body.useGravity = false;
+        colisorPrincipal.enabled = false;
+        apoioPiso.enabled = false;
+        inclinacaoVisualX = 90f;
+        etapaAtaqueChao = EtapaAtaqueChao.descendo;
+        MudarEstado(State.groundAttack);
+    }
+
+    private void AtualizarAtaqueChao()
+    {
+        Vector3 destino;
+        switch (etapaAtaqueChao)
+        {
+            case EtapaAtaqueChao.descendo:
+                destino = posicaoAntesDeSubmergir - Vector3.up * profundidadeAtaqueChao;
+                body.MovePosition(Vector3.MoveTowards(body.position, destino,
+                    velocidadeVerticalAtaqueChao * Time.fixedDeltaTime));
+                if (Vector3.Distance(body.position, destino) <=
+                    velocidadeVerticalAtaqueChao * Time.fixedDeltaTime + 0.001f)
+                {
+                    etapaAtaqueChao = EtapaAtaqueChao.submerso;
+                    fimDaEtapaAtaqueChao = Time.time + tempoSubmerso;
+                }
+                break;
+
+            case EtapaAtaqueChao.submerso:
+                if (Time.time >= fimDaEtapaAtaqueChao)
+                {
+                    // Captura a posicao apenas uma vez; o jogador pode desviar durante o aviso.
+                    posicaoDeEmergencia = jogadorPosition.position;
+                    posicaoDeEmergencia.y = posicaoAntesDeSubmergir.y;
+
+                    Vector3 posicaoMarcador = new Vector3(
+                        posicaoDeEmergencia.x,
+                        jogadorPosition.position.y + 0.03f,
+                        posicaoDeEmergencia.z
+                    );
+
+                    if (prefabMarcadorEmergencia != null)
+                    {
+                        marcadorEmergencia = Instantiate(
+                            prefabMarcadorEmergencia,
+                            posicaoMarcador,
+                            Quaternion.identity
+                        );
+                        marcadorEmergencia
+                            .GetComponent<MarcadorEmergencia>()
+                            .Iniciar(delayAntesDeEmergir);
+                    }
+
+                    body.MovePosition(posicaoDeEmergencia - Vector3.up * profundidadeAtaqueChao);
+                    etapaAtaqueChao = EtapaAtaqueChao.avisando;
+                    fimDaEtapaAtaqueChao = Time.time + delayAntesDeEmergir;
+                }
+                break;
+
+            case EtapaAtaqueChao.avisando:
+                if (Time.time >= fimDaEtapaAtaqueChao)
+                {
+                    if (marcadorEmergencia != null)
+                        Destroy(marcadorEmergencia);
+
+                    marcadorEmergencia = null;
+                    inclinacaoVisualX = 270f;
+                    etapaAtaqueChao = EtapaAtaqueChao.subindo;
+                }
+                break;
+
+            case EtapaAtaqueChao.subindo:
+                destino = posicaoDeEmergencia;
+                body.MovePosition(Vector3.MoveTowards(body.position, destino,
+                    velocidadeVerticalAtaqueChao * Time.fixedDeltaTime));
+                if (Vector3.Distance(body.position, destino) <=
+                    velocidadeVerticalAtaqueChao * Time.fixedDeltaTime + 0.001f)
+                {
+                    body.position = destino;
+                    FinalizarAtaqueChao(false);
+                    fimDoDescanso = Time.time + delayAfterAttack;
+                    MudarEstado(State.idle);
+                }
+                break;
+        }
+        AtualizarAnimacao();
+    }
+
+    private void FinalizarAtaqueChao(bool interrompido)
+    {
+        if (etapaAtaqueChao == EtapaAtaqueChao.nenhuma)
+            return;
+
+        if (interrompido)
+            body.position = posicaoAntesDeSubmergir;
+
+        inclinacaoVisualX = 0f;
+        if (pivotVisual != null)
+            pivotVisual.localRotation = rotacaoVisualInicial *
+                Quaternion.AngleAxis(inclinacaoVisualZ, Vector3.forward);
+        body.isKinematic = bodyEraCinematico;
+        body.useGravity = gravidadeEstavaAtiva;
+        colisorPrincipal.enabled = colisorPrincipalEstavaAtivo;
+        apoioPiso.enabled = apoioPisoEstavaAtivo;
+        etapaAtaqueChao = EtapaAtaqueChao.nenhuma;
+    }
+    
+    /*
+    // versao do atualizar ataque pulo com giro, mas que nao deu tao certo
+    private void AtualizarAtaquePulo()
+    {
+        if (Time.time >= fimDoAtaque ||
+            DistanciaHorizontal(jumpAttackCoordinate) <= distanciaChegadaAtaque + 0.01f)
+        {
+            inclinacaoVisualZ = 0f;
+
+            fimDoDescanso = Time.time + delayAfterAttack;
+            MudarEstado(State.idle);
+            return;
+        }
+
+        inclinacaoVisualZ = Mathf.Repeat(
+            inclinacaoVisualZ + velocidadeGiroPulo * Time.fixedDeltaTime,
+            360f
+        );
+
+        MoverAte(
+            jumpAttackCoordinate,
+            velocidadeAtaquePulo,
+            distanciaChegadaAtaque
+        );
+
+        AtualizarAnimacao();
+    }
+    */
+
 
     private bool MoverAte(Vector3 destino, float velocidade, float distanciaLimite)
     {
@@ -287,7 +500,7 @@ private void AtualizarAnimacao(bool andando = true)
         return;
 
     bool preparando = estado == State.givingCue;
-    bool movimentando = estado == State.jumpAttack ||
+    bool movimentando = estado == State.jumpAttack || estado == State.groundAttack ||
         (estado == State.walking && andando);
 
     animator.SetBool(IsIdle, !preparando && !movimentando);
@@ -307,7 +520,7 @@ private void AtualizarAnimacao(bool andando = true)
         {
             case HitboxParte.ParteCorpo.Frente:
             //Debug.Log()
-                if (estado != State.jumpAttack || frenteAcertouNesteAtaque)
+                if ((estado != State.jumpAttack && estado != State.groundAttack) || frenteAcertouNesteAtaque)
                     return;
                 dano = danoFrente;
                 if (dano <= 0f)
@@ -316,6 +529,8 @@ private void AtualizarAnimacao(bool andando = true)
                 break;
 
             case HitboxParte.ParteCorpo.Barbatana:
+                if (estado == State.groundAttack)
+                    return;
                 if (Time.time < proximoDanoBarbatana)
                     return;
                 dano = danoBarbatana;
@@ -345,11 +560,13 @@ private void AtualizarAnimacao(bool andando = true)
 
     private void AoMorrer(EnemyHealth inimigo)
     {
+        FinalizarAtaqueChao(true);
         MudarEstado(State.idle);
     }
 
     private void OnDisable()
     {
+        FinalizarAtaqueChao(true);
         Died -= AoMorrer;
         PararMovimento();
         AtualizarAnimacao();
@@ -366,5 +583,9 @@ private void AtualizarAnimacao(bool andando = true)
         intervaloDanoBarbatana = Mathf.Max(0.01f, intervaloDanoBarbatana);
         delayAfterAttack = Mathf.Max(0f, delayAfterAttack);
         velocidadeRotacao = Mathf.Max(0f, velocidadeRotacao);
+        profundidadeAtaqueChao = Mathf.Max(0.01f, profundidadeAtaqueChao);
+        velocidadeVerticalAtaqueChao = Mathf.Max(0.01f, velocidadeVerticalAtaqueChao);
+        tempoSubmerso = Mathf.Max(0f, tempoSubmerso);
+        delayAntesDeEmergir = Mathf.Max(0f, delayAntesDeEmergir);
     }
 }
