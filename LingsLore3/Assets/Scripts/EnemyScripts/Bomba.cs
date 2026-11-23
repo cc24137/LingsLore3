@@ -26,6 +26,7 @@ public sealed class Bomba : MonoBehaviour
     private bool lancada;
 
     public float RaioDaExplosao => raioDaExplosao;
+    public event System.Action<Vector3> Explodiu;
 
     public void Lancar(Vector3 destino, PlayerResources alvo, LayerMask obstaculos,
         ISet<PlayerResources> alvosDaSalva = null)
@@ -65,6 +66,8 @@ public sealed class Bomba : MonoBehaviour
         aviso.widthMultiplier = 0.22f;
         Colorir(aviso, corDoImpacto);
         CausarDano(destino, alvo, obstaculos, alvosDaSalva);
+        if (isActiveAndEnabled)
+            Explodiu?.Invoke(destino);
 
         yield return new WaitForSeconds(duracaoDoImpacto);
         Destroy(gameObject);

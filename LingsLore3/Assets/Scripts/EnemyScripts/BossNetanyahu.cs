@@ -6,8 +6,8 @@ using UnityEngine;
 [RequireComponent(typeof(EnemyHealth), typeof(Rigidbody), typeof(CapsuleCollider))]
 public sealed class BossNetanyahu : MonoBehaviour
 {
-    private enum Estado { Descansando, Aproximando, Preparando, Atacando, Encerrado }
-    private enum Ataque { Nenhum, Bombas, Combo, Investida, Pisada }
+    private enum Estado { Descansando, Aproximando, Preparando, Atacando, Encerrado, Transicao }
+    private enum Ataque { Nenhum, Bombas, Combo, Investida, Pisada, BombaIncendiaria }
 
     [Header("Cena de teste")]
     [SerializeField] private PlayerResources ling;
@@ -20,6 +20,11 @@ public sealed class BossNetanyahu : MonoBehaviour
     [SerializeField, Min(0.1f)] private float distanciaParaBombas = 13f;
     [SerializeField, Min(0f)] private float tempoDeRecuo = 0.65f;
     [SerializeField, Min(0f)] private float velocidadeDeRecuo = 3f;
+
+    [Header("Segunda fase")]
+    [SerializeField] private PocaDeFogo prefabPocaDeFogo;
+    [SerializeField, Min(0f)] private float duracaoDaTransicao = 1.4f;
+    [SerializeField, Min(1f)] private float multiplicadorDeTamanhoNaFase2 = 1.15f;
 
     [Header("Corrida de aproximação")]
     [SerializeField, Min(0.1f)] private float velocidadeInicialDaCorrida = 7f;
@@ -65,6 +70,10 @@ public sealed class BossNetanyahu : MonoBehaviour
     private CapsuleCollider colisaoDoLing;
     private Material materialDosAvisos;
     private GameObject efeitosDoAtaque;
+    private PocaDeFogo pocaAtiva;
+    private Vector3 escalaInicial;
+    private float alturaInicialDaBaseAoPivo;
+    private float multiplicadorAtual = 1f;
     private bool emInvestida;
     private bool ignorandoColisaoComLing;
 
@@ -92,14 +101,24 @@ public sealed class BossNetanyahu : MonoBehaviour
         }
 
         materialDosAvisos = new Material(shaderDosAvisos);
+        escalaInicial = transform.localScale;
+        float escalaVertical = transform.lossyScale.y;
+        float meiaAlturaDaCapsula = Mathf.Max(colisaoDoBoss.height * Mathf.Abs(escalaVertical) * 0.5f, RaioDoBoss);
+        alturaInicialDaBaseAoPivo = meiaAlturaDaCapsula - colisaoDoBoss.center.y * escalaVertical;
     }
 
     private void OnEnable()
     {
         vida.Died += AoDerrotarBoss;
+        vida.HealthBarChanged += AoTrocarBarra;
         ling.Died += EncerrarLuta;
-        if (!LutaEncerrada)
-            StartCoroutine(Combater());
+        if (!LutaEncerrada || (!vida.IsDead && !ling.IsDead))
+        {
+            AjustarTamanho(vida.CurrentBar == 2 ? multiplicadorDeTamanhoNaFase2 : 1f);
+            colisaoDoBoss.enabled = true;
+            estado = Estado.Descansando;
+            StartCoroutine(Combater(0.9f));
+        }
     }
 
     private void FixedUpdate()
@@ -108,20 +127,30 @@ public sealed class BossNetanyahu : MonoBehaviour
             IgnorarColisaoComLing(false);
     }
 
-    private IEnumerator Combater()
+    private IEnumerator Combater(float espera)
     {
-        estado = Estado.Descansando;
         ataqueEscolhido = Ataque.Nenhum;
-        yield return new WaitForSeconds(0.9f);
+        if (estado == Estado.Transicao)
+            yield return CrescerNaTransicao(espera);
+        else
+            yield return new WaitForSeconds(espera);
+        estado = Estado.Descansando;
         while (!LutaEncerrada)
         {
+            float margemParaRecuo = tempoDeRecuo * velocidadeDeRecuo;
+            float distanciaAntesDoRecuo = Mathf.Max(distanciaParaBombas - margemParaRecuo, distanciaParaBombas * 0.5f);
+            if (vida.CurrentBar == 2)
+            {
+                ataqueEscolhido = Ataque.BombaIncendiaria;
+                yield return ExecutarQuandoPerto(LancarBombas(incendiaria: true), distanciaAntesDoRecuo);
+                continue;
+            }
+
             ataqueEscolhido = (Ataque)Random.Range((int)Ataque.Bombas, (int)Ataque.Pisada + 1);
             switch (ataqueEscolhido)
             {
                 case Ataque.Bombas:
-                    float margemParaRecuo = tempoDeRecuo * velocidadeDeRecuo;
-                    float distanciaAntesDoRecuo = Mathf.Max(distanciaParaBombas - margemParaRecuo, distanciaParaBombas * 0.5f);
-                    yield return ExecutarQuandoPerto(LancarBombas(), distanciaAntesDoRecuo);
+                    yield return ExecutarQuandoPerto(LancarBombas(incendiaria: false), distanciaAntesDoRecuo);
                     break;
                 case Ataque.Combo:
                     float distanciaDeParada = DistanciaDeParadaDoCombo;
@@ -135,6 +164,32 @@ public sealed class BossNetanyahu : MonoBehaviour
                     break;
             }
         }
+    }
+
+    private IEnumerator CrescerNaTransicao(float duracao)
+    {
+        float tamanhoInicial = multiplicadorAtual;
+        float inicio = Time.time;
+        while (Time.time - inicio < duracao)
+        {
+            yield return passoFisico;
+            float progresso = (Time.time - inicio) / duracao;
+            AjustarTamanho(Mathf.SmoothStep(tamanhoInicial, multiplicadorDeTamanhoNaFase2, progresso));
+        }
+
+        AjustarTamanho(multiplicadorDeTamanhoNaFase2);
+    }
+
+    private void AjustarTamanho(float multiplicador)
+    {
+        if (multiplicador == multiplicadorAtual)
+            return;
+
+        Vector3 posicao = corpo.position;
+        posicao.y += alturaInicialDaBaseAoPivo * (multiplicador - multiplicadorAtual);
+        transform.localScale = escalaInicial * multiplicador;
+        corpo.position = LimitarAoPiso(posicao, RaioDoBoss + 0.1f);
+        multiplicadorAtual = multiplicador;
     }
 
     private IEnumerator ExecutarQuandoPerto(IEnumerator ataque, float distanciaMaxima, float distanciaDeParadaDoDash = 0f)
@@ -179,11 +234,11 @@ public sealed class BossNetanyahu : MonoBehaviour
         return DistanciaLivre(corpo.position, ateLing / distancia, percurso, obstaculos) >= percurso - 0.01f;
     }
 
-    private IEnumerator LancarBombas()
+    private IEnumerator LancarBombas(bool incendiaria)
     {
-        if (prefabBomba == null)
+        if (prefabBomba == null || (incendiaria && prefabPocaDeFogo == null))
         {
-            Debug.LogError("Configure o prefab de bomba do Big Yahu.", this);
+            Debug.LogError("Configure os prefabs da bomba e da poça de fogo do Big Yahu.", this);
             yield break;
         }
 
@@ -209,17 +264,20 @@ public sealed class BossNetanyahu : MonoBehaviour
         Vector3 ateLing = VetorHorizontal(corpoDoLing.position - origem);
         float distancia = Mathf.Max(ateLing.magnitude, 0.01f);
         float abertura = Mathf.Asin(Mathf.Clamp(2.15f * prefabBomba.RaioDaExplosao / distancia, 0.28f, 0.85f)) * Mathf.Rad2Deg;
-        var bombas = new Bomba[3];
-        var alvosDaSalva = new HashSet<PlayerResources>();
+        var bombas = new Bomba[incendiaria ? 1 : 3];
+        var alvosDaSalva = incendiaria ? null : new HashSet<PlayerResources>();
         estado = Estado.Atacando;
         CriarEfeitos("Bombas do boss");
 
         for (int i = 0; i < bombas.Length; i++)
         {
-            Vector3 deslocamento = Quaternion.Euler(0f, (i - 1) * abertura, 0f) * ateLing;
+            float angulo = (i - (bombas.Length - 1) * 0.5f) * abertura;
+            Vector3 deslocamento = Quaternion.Euler(0f, angulo, 0f) * ateLing;
             Vector3 destino = LimitarAoPiso(origem + deslocamento, 0f);
             destino.y = piso.bounds.max.y;
             bombas[i] = Instantiate(prefabBomba, origem, Quaternion.identity, efeitosDoAtaque.transform);
+            if (incendiaria)
+                bombas[i].Explodiu += CriarPocaDeFogo;
             bombas[i].Lancar(destino, ling, obstaculos, alvosDaSalva);
         }
 
@@ -230,6 +288,23 @@ public sealed class BossNetanyahu : MonoBehaviour
         }
 
         LimparEfeitos();
+    }
+
+    private void CriarPocaDeFogo(Vector3 destino)
+    {
+        LimparPocaDeFogo();
+        pocaAtiva = Instantiate(prefabPocaDeFogo, destino, Quaternion.identity);
+        pocaAtiva.Iniciar(ling);
+    }
+
+    private void LimparPocaDeFogo()
+    {
+        if (pocaAtiva == null)
+            return;
+
+        pocaAtiva.gameObject.SetActive(false);
+        Destroy(pocaAtiva.gameObject);
+        pocaAtiva = null;
     }
 
     private IEnumerator ExecutarCombo()
@@ -577,6 +652,25 @@ public sealed class BossNetanyahu : MonoBehaviour
         colisaoDoBoss.enabled = false;
     }
 
+    private void AoTrocarBarra(int barra)
+    {
+        if (ling.IsDead)
+            return;
+
+        StopAllCoroutines();
+        emInvestida = false;
+        LimparEfeitos();
+        LimparPocaDeFogo();
+        colisaoDoBoss.enabled = true;
+        estado = barra == 2 ? Estado.Transicao : Estado.Descansando;
+        float espera = barra == 2 ? duracaoDaTransicao : 0.9f;
+        if (barra == 2)
+            vida.GrantInvulnerability(espera);
+        else
+            AjustarTamanho(1f);
+        StartCoroutine(Combater(espera));
+    }
+
     private void EncerrarLuta()
     {
         estado = Estado.Encerrado;
@@ -584,6 +678,7 @@ public sealed class BossNetanyahu : MonoBehaviour
         emInvestida = false;
         StopAllCoroutines();
         LimparEfeitos();
+        LimparPocaDeFogo();
     }
 
     private void LimparEfeitos()
@@ -599,22 +694,39 @@ public sealed class BossNetanyahu : MonoBehaviour
     private void OnDisable()
     {
         if (vida != null)
+        {
             vida.Died -= AoDerrotarBoss;
+            vida.HealthBarChanged -= AoTrocarBarra;
+        }
         if (ling != null)
             ling.Died -= EncerrarLuta;
         emInvestida = false;
         IgnorarColisaoComLing(false);
         StopAllCoroutines();
         LimparEfeitos();
+        LimparPocaDeFogo();
     }
 
     private void OnDestroy() => Destroy(materialDosAvisos);
 
     private void OnGUI()
     {
-        string textoVida = vida.IsDead ? "Boss derrotado" : "Vida do boss: " + Mathf.CeilToInt(vida.CurrentHealth);
-        GUI.Box(new Rect(16f, 16f, 210f, 54f), textoVida + "\nVida do Ling: " + Mathf.CeilToInt(ling.CurrentHealth));
+        GUI.Box(new Rect(16f, 16f, 225f, 66f), GUIContent.none);
+        string textoVida = vida.IsDead ? "Boss derrotado" : $"Fase {vida.CurrentBar}    HP {Mathf.CeilToInt(vida.CurrentHealth)} / {Mathf.CeilToInt(vida.MaxHealth)}";
+        GUI.Label(new Rect(25f, 21f, 207f, 20f), textoVida);
+        GUI.Label(new Rect(25f, 54f, 207f, 20f), "Vida do Ling: " + Mathf.CeilToInt(ling.CurrentHealth));
+
+        Color corAnterior = GUI.color;
+        GUI.color = new Color(0.18f, 0.18f, 0.18f);
+        GUI.DrawTexture(new Rect(25f, 43f, 207f, 7f), Texture2D.whiteTexture);
+        GUI.color = vida.CurrentBar == 2 ? Vermelho : Amarelo;
+        float proporcao = Mathf.Clamp01(vida.CurrentHealth / vida.MaxHealth);
+        GUI.DrawTexture(new Rect(25f, 43f, 207f * proporcao, 7f), Texture2D.whiteTexture);
+        GUI.color = corAnterior;
+
         if (LutaEncerrada)
-            GUI.Box(new Rect(16f, 76f, 210f, 28f), ling.IsDead ? "Ling caiu" : "Vitória");
+            GUI.Box(new Rect(16f, 87f, 225f, 28f), ling.IsDead ? "Ling caiu" : "Vitória");
+        else if (estado == Estado.Transicao)
+            GUI.Box(new Rect(16f, 87f, 225f, 28f), "Início da fase 2");
     }
 }
