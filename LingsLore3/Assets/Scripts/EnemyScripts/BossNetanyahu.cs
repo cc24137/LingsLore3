@@ -7,7 +7,7 @@ using UnityEngine;
 public sealed partial class BossNetanyahu : MonoBehaviour
 {
     private enum Estado { Descansando, Aproximando, Preparando, Atacando, Encerrado, Transicao, Atordoado }
-    private enum Ataque { Nenhum, Bombas, Combo, Investida, Pisada, BombaIncendiaria, ComandarMinis, ModoAviao, Rasante, Rajada }
+    private enum Ataque { Nenhum, Bombas, Combo, Investida, Pisada, BombaIncendiaria, ComandarMinis, ModoAviao, Rasante, Rajada, GiroTralalero, BombaMassiva }
 
     [Header("Cena de teste")]
     [SerializeField] private PlayerResources ling;
@@ -162,7 +162,9 @@ public sealed partial class BossNetanyahu : MonoBehaviour
                 continue;
             }
 
-            ataqueEscolhido = (Ataque)Random.Range((int)Ataque.Bombas, (int)Ataque.Pisada + 1);
+            ataqueEscolhido = modeloTralaleroDoGiro != null && Random.value < 0.2f
+                ? Ataque.GiroTralalero
+                : (Ataque)Random.Range((int)Ataque.Bombas, (int)Ataque.Pisada + 1);
             switch (ataqueEscolhido)
             {
                 case Ataque.Bombas:
@@ -178,6 +180,9 @@ public sealed partial class BossNetanyahu : MonoBehaviour
                 case Ataque.Pisada:
                     yield return ExecutarQuandoPerto(ExecutarPisada(), distanciaParaPisada);
                     break;
+                case Ataque.GiroTralalero:
+                    yield return ExecutarQuandoPerto(ExecutarGiroTralalero(), raioDoGiro);
+                    break;
             }
         }
     }
@@ -192,10 +197,23 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         }
 
         bool podeInvocar = prefabMiniTralalero != null && minis.Count == 0 && Time.time >= proximaInvocacao;
-        if (podeInvocar && (!jaInvocou || Random.value < 0.5f))
+        if (podeInvocar && (!jaInvocou || (!PodeUsarBombaMassiva && Random.value < 0.35f)))
         {
             ataqueEscolhido = Ataque.ComandarMinis;
             yield return ExecutarQuandoPerto(ComandarMinis(), distanciaParaInvocar);
+        }
+        else if (PodeUsarBombaMassiva)
+        {
+            ataqueEscolhido = Ataque.BombaMassiva;
+            yield return ExecutarBombaMassiva();
+            estado = Estado.Descansando;
+            ataqueEscolhido = Ataque.Nenhum;
+            yield return new WaitForSeconds(recuperacao);
+        }
+        else if (modeloTralaleroDoGiro != null && Random.value < 0.45f)
+        {
+            ataqueEscolhido = Ataque.GiroTralalero;
+            yield return ExecutarQuandoPerto(ExecutarGiroTralalero(), raioDoGiro);
         }
         else
         {
@@ -804,6 +822,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         colisaoDoBoss.enabled = true;
         estado = barra == 2 ? Estado.Transicao : Estado.Descansando;
         float espera = barra == 2 ? duracaoDaTransicao : 0.9f;
+        proximaBombaMassiva = Time.time + espera;
         podeVoarApos = Time.time + espera + esperaAntesDoPrimeiroVoo;
         if (barra == 2)
             vida.GrantInvulnerability(espera);
@@ -826,6 +845,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
 
     private void LimparEfeitos()
     {
+        fimDoAvisoMassivo = 0f;
         if (efeitosDoAtaque != null)
         {
             efeitosDoAtaque.SetActive(false);
@@ -853,7 +873,11 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         LimparMinis();
     }
 
-    private void OnDestroy() => Destroy(materialDosAvisos);
+    private void OnDestroy()
+    {
+        Destroy(materialDosAvisos);
+        Destroy(materialDoVolumeMassivo);
+    }
 
     private void OnGUI()
     {
@@ -876,6 +900,8 @@ public sealed partial class BossNetanyahu : MonoBehaviour
             GUI.Box(new Rect(16f, 87f, 225f, 28f), "Início da fase 2");
         else if (estado == Estado.Atordoado)
             GUI.Box(new Rect(16f, 87f, 225f, 28f), "Atordoado");
+        else if (ataqueEscolhido == Ataque.BombaMassiva && fimDoAvisoMassivo > Time.time)
+            GUI.Box(new Rect(16f, 87f, 225f, 28f), $"Suba em um pilar   {Mathf.CeilToInt(fimDoAvisoMassivo - Time.time)} s");
         else if (etapaDoVoo == EtapaDoVoo.Cruzeiro || etapaDoVoo == EtapaDoVoo.Rasante)
             GUI.Box(new Rect(16f, 87f, 225f, 28f), $"Avião   Hashis: {hashisNoAviao}/2");
     }

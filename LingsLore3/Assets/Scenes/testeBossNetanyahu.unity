@@ -1429,6 +1429,16 @@ MonoBehaviour:
   velocidadeDoRasante: 42
   raioDoRasante: 2.2
   danoDoRasante: 24
+  preparacaoDaBombaMassiva: 4.3
+  alturaDaExplosaoMassiva: 9
+  danoDaBombaMassiva: 38
+  intervaloDaBombaMassiva: 16
+  modeloTralaleroDoGiro: {fileID: 919132149155446097, guid: 4fad7acd5f255f443a7a2584c73b6600, type: 3}
+  raioDoGiro: 9
+  alturaDoGiro: 4
+  avisoDoGiro: 1.25
+  duracaoDoGiro: 0.3
+  danoDoGiro: 24
   velocidadeInicialDaCorrida: 7
   velocidadeMaximaDaCorrida: 13
   aceleracaoDaCorrida: 5

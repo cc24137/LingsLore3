@@ -102,7 +102,10 @@ public class PlayerResources : MonoBehaviour
         Debug.Log("Ling tem " + currentHealth +" de vida");
     }
 
-    public bool TakeDamage(float amount, Vector3? sourcePosition)
+    public bool TakeDamage(float amount, Vector3? sourcePosition) =>
+        TakeDamage(amount, sourcePosition, ignorarInvulnerabilidadeDaEsquiva: false);
+
+    public bool TakeDamage(float amount, Vector3? sourcePosition, bool ignorarInvulnerabilidadeDaEsquiva)
     {
         if (IsDead || amount <= 0f || float.IsNaN(amount) ||
             float.IsInfinity(amount))
@@ -112,7 +115,7 @@ public class PlayerResources : MonoBehaviour
         if (Time.time < respawnInvulnerableUntil)
             return false;
 
-        if (motor != null && motor.IsInvulnerable)
+        if (!ignorarInvulnerabilidadeDaEsquiva && motor != null && motor.IsInvulnerable)
             return false;
 
         currentHealth = Mathf.Max(0f, currentHealth - amount);

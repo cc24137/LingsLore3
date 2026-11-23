@@ -26,10 +26,22 @@ public sealed class Bomba : MonoBehaviour
     private bool lancada;
 
     public float RaioDaExplosao => raioDaExplosao;
+    public float TempoAteDetonar => tempoDeVoo + pavio;
     public event System.Action<Vector3> Explodiu;
 
     public void Lancar(Vector3 destino, PlayerResources alvo, LayerMask obstaculos,
         ISet<PlayerResources> alvosDaSalva = null)
+    {
+        IniciarLancamento(destino, alvo, obstaculos, alvosDaSalva, mostrarAvisoLocal: true);
+    }
+
+    public void LancarComExplosaoPersonalizada(Vector3 destino)
+    {
+        IniciarLancamento(destino, null, default, null, mostrarAvisoLocal: false);
+    }
+
+    private void IniciarLancamento(Vector3 destino, PlayerResources alvo, LayerMask obstaculos,
+        ISet<PlayerResources> alvosDaSalva, bool mostrarAvisoLocal)
     {
         if (lancada)
             return;
@@ -42,13 +54,13 @@ public sealed class Bomba : MonoBehaviour
             return;
         }
 
-        StartCoroutine(VoarEExplodir(destino, alvo, obstaculos, alvosDaSalva));
+        StartCoroutine(VoarEExplodir(destino, alvo, obstaculos, alvosDaSalva, mostrarAvisoLocal));
     }
 
     private IEnumerator VoarEExplodir(Vector3 destino, PlayerResources alvo, LayerMask obstaculos,
-        ISet<PlayerResources> alvosDaSalva)
+        ISet<PlayerResources> alvosDaSalva, bool mostrarAvisoLocal)
     {
-        LineRenderer aviso = MarcarExplosao(destino);
+        LineRenderer aviso = mostrarAvisoLocal ? MarcarExplosao(destino) : null;
         Vector3 origem = transform.position;
         Vector3 pouso = destino + Vector3.up * alturaAoPousar;
         float inicio = Time.time;
@@ -63,8 +75,11 @@ public sealed class Bomba : MonoBehaviour
         yield return new WaitForSeconds(pavio);
 
         visual.enabled = false;
-        aviso.widthMultiplier = 0.22f;
-        Colorir(aviso, corDoImpacto);
+        if (aviso != null)
+        {
+            aviso.widthMultiplier = 0.22f;
+            Colorir(aviso, corDoImpacto);
+        }
         CausarDano(destino, alvo, obstaculos, alvosDaSalva);
         if (isActiveAndEnabled)
             Explodiu?.Invoke(destino);

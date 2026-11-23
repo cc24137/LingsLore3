@@ -106,9 +106,16 @@ public sealed partial class BossNetanyahu
                 yield return new WaitForSeconds(recuperacao);
             }
 
-            ataqueEscolhido = Ataque.BombaIncendiaria;
-            if (prefabBomba != null && prefabPocaDeFogo != null)
+            if (PodeUsarBombaMassiva)
+            {
+                ataqueEscolhido = Ataque.BombaMassiva;
+                yield return ExecutarBombaMassiva();
+            }
+            else if (prefabBomba != null && prefabPocaDeFogo != null)
+            {
+                ataqueEscolhido = Ataque.BombaIncendiaria;
                 yield return ArremessarBombas(incendiaria: true);
+            }
             yield return new WaitForSeconds(recuperacao);
 
             ataqueEscolhido = Ataque.Rasante;
