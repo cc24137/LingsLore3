@@ -82,6 +82,12 @@ public sealed class MiniTralalero : MonoBehaviour
         MudarEstado(Estado.Investindo);
     }
 
+    public void CancelarOrdem()
+    {
+        if (estado == Estado.Preparando)
+            MudarEstado(Estado.Perseguindo);
+    }
+
     private void FixedUpdate()
     {
         if (alvo == null || alvo.IsDead)

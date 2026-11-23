@@ -1088,6 +1088,10 @@ PrefabInstance:
       propertyPath: playerMotor
       value: 
       objectReference: {fileID: 28656683}
+    - target: {fileID: 349074279052454091, guid: 72dc671a2adcd4623bf7bedb836dffc2, type: 3}
+      propertyPath: minPitch
+      value: -58
+      objectReference: {fileID: 0}
     - target: {fileID: 3282035870114400524, guid: 72dc671a2adcd4623bf7bedb836dffc2, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1413,6 +1417,18 @@ MonoBehaviour:
   tempoAntesDaOrdem: 1.3
   avisoDaOrdem: 0.65
   intervaloEntreInvocacoes: 8
+  prefabAviao: {fileID: 150400004, guid: d19242e7b4cd4f44a5b80004697d89d8, type: 3}
+  esperaAntesDoPrimeiroVoo: 6
+  intervaloEntreVoos: 12
+  alturaDeVoo: 15.5
+  raioDaOrbita: 14.7
+  velocidadeDeVoo: 12
+  alturaMinimaDoGarfo: 10
+  prefabMetralhadora: {fileID: 150500005, guid: 589f3abaa98b4ea28b7438566b483e11, type: 3}
+  avisoDoRasante: 1.1
+  velocidadeDoRasante: 42
+  raioDoRasante: 2.2
+  danoDoRasante: 24
   velocidadeInicialDaCorrida: 7
   velocidadeMaximaDaCorrida: 13
   aceleracaoDaCorrida: 5

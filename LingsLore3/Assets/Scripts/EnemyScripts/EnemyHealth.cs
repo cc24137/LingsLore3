@@ -41,7 +41,7 @@ public class EnemyHealth : MonoBehaviour
         TryTakeDamage(amount, ataqueBasico);
     }
 
-    public bool TryTakeDamage(float amount, bool ataqueBasico = false)
+    public virtual bool TryTakeDamage(float amount, bool ataqueBasico = false)
     {
         if (IsDead || (somenteAtaqueBasico && !ataqueBasico) || amount <= 0f ||
             float.IsNaN(amount) || float.IsInfinity(amount) || Time.time < invulnerableUntil)

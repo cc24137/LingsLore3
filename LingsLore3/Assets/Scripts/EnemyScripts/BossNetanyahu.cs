@@ -4,10 +4,10 @@ using UnityEngine;
 
 [DisallowMultipleComponent]
 [RequireComponent(typeof(EnemyHealth), typeof(Rigidbody), typeof(CapsuleCollider))]
-public sealed class BossNetanyahu : MonoBehaviour
+public sealed partial class BossNetanyahu : MonoBehaviour
 {
-    private enum Estado { Descansando, Aproximando, Preparando, Atacando, Encerrado, Transicao }
-    private enum Ataque { Nenhum, Bombas, Combo, Investida, Pisada, BombaIncendiaria, ComandarMinis }
+    private enum Estado { Descansando, Aproximando, Preparando, Atacando, Encerrado, Transicao, Atordoado }
+    private enum Ataque { Nenhum, Bombas, Combo, Investida, Pisada, BombaIncendiaria, ComandarMinis, ModoAviao, Rasante, Rajada }
 
     [Header("Cena de teste")]
     [SerializeField] private PlayerResources ling;
@@ -125,6 +125,7 @@ public sealed class BossNetanyahu : MonoBehaviour
         vida.Died += AoDerrotarBoss;
         vida.HealthBarChanged += AoTrocarBarra;
         ling.Died += EncerrarLuta;
+        ConectarAcertosNoAviao();
         if (!LutaEncerrada || (!vida.IsDead && !ling.IsDead))
         {
             AjustarTamanho(vida.CurrentBar == 2 ? multiplicadorDeTamanhoNaFase2 : 1f);
@@ -138,6 +139,9 @@ public sealed class BossNetanyahu : MonoBehaviour
     {
         if (ignorandoColisaoComLing && !emInvestida && !SobrepostoAoLing())
             IgnorarColisaoComLing(false);
+
+        if (etapaDoVoo == EtapaDoVoo.Cruzeiro)
+            AtualizarOrbita();
     }
 
     private IEnumerator Combater(float espera)
@@ -181,6 +185,12 @@ public sealed class BossNetanyahu : MonoBehaviour
     private IEnumerator ExecutarRodadaDaFase2(float distanciaAntesDoRecuo)
     {
         minis.RemoveAll(mini => mini == null || !mini.EstaAtivo);
+        if (prefabAviao != null && Time.time >= podeVoarApos)
+        {
+            yield return ExecutarModoAviao();
+            yield break;
+        }
+
         bool podeInvocar = prefabMiniTralalero != null && minis.Count == 0 && Time.time >= proximaInvocacao;
         if (podeInvocar && (!jaInvocou || Random.value < 0.5f))
         {
@@ -204,7 +214,8 @@ public sealed class BossNetanyahu : MonoBehaviour
         }
 
         estado = Estado.Preparando;
-        corpo.rotation = Quaternion.LookRotation(DirecaoDoLing());
+        if (etapaDoVoo == EtapaDoVoo.NoChao)
+            corpo.rotation = Quaternion.LookRotation(DirecaoDoLing());
         CriarEfeitos("Aviso de invocação");
         foreach (Vector3 ponto in pontos)
             MarcarArea(ponto, 0.85f, Vector3.forward, 180f);
@@ -367,7 +378,12 @@ public sealed class BossNetanyahu : MonoBehaviour
         if (!PodeIniciarAtaque(distanciaParaBombas))
             yield break;
 
-        Vector3 origem = corpo.position + Vector3.up * (0.65f * transform.lossyScale.y);
+        yield return ArremessarBombas(incendiaria);
+    }
+
+    private IEnumerator ArremessarBombas(bool incendiaria)
+    {
+        Vector3 origem = aviao != null ? aviao.transform.position : corpo.position + Vector3.up * (0.65f * transform.lossyScale.y);
         Vector3 ateLing = VetorHorizontal(corpoDoLing.position - origem);
         float distancia = Mathf.Max(ateLing.magnitude, 0.01f);
         float abertura = Mathf.Asin(Mathf.Clamp(2.15f * prefabBomba.RaioDaExplosao / distancia, 0.28f, 0.85f)) * Mathf.Rad2Deg;
@@ -508,7 +524,7 @@ public sealed class BossNetanyahu : MonoBehaviour
 
         CriarEfeitos("Investida do boss");
         Vector3 inicioDaFaixa = new Vector3(origem.x, piso.bounds.max.y, origem.z);
-        LineRenderer faixa = MarcarTrajeto(inicioDaFaixa, frente, distancia);
+        LineRenderer faixa = MarcarTrajeto(inicioDaFaixa, frente, distancia, RaioDoBoss);
         yield return new WaitForSeconds(avisoDaInvestida);
 
         estado = Estado.Atacando;
@@ -718,13 +734,12 @@ public sealed class BossNetanyahu : MonoBehaviour
             linha.SetPosition(linha.positionCount - 1, centro);
     }
 
-    private LineRenderer MarcarTrajeto(Vector3 inicio, Vector3 frente, float distancia)
+    private LineRenderer MarcarTrajeto(Vector3 inicio, Vector3 frente, float distancia, float raio)
     {
         const int segmentosPorPonta = 12;
         LineRenderer linha = CriarLinha("Trajeto da investida", 2 * (segmentosPorPonta + 1));
         inicio.y += 0.05f;
         Vector3 fim = inicio + frente * distancia;
-        float raio = RaioDoBoss;
         for (int i = 0; i <= segmentosPorPonta; i++)
         {
             float angulo = Mathf.Lerp(90f, 270f, i / (float)segmentosPorPonta);
@@ -782,12 +797,14 @@ public sealed class BossNetanyahu : MonoBehaviour
 
         StopAllCoroutines();
         emInvestida = false;
+        LimparModoAviao(voltarAoChao: true);
         LimparEfeitos();
         LimparPocaDeFogo();
         LimparMinis();
         colisaoDoBoss.enabled = true;
         estado = barra == 2 ? Estado.Transicao : Estado.Descansando;
         float espera = barra == 2 ? duracaoDaTransicao : 0.9f;
+        podeVoarApos = Time.time + espera + esperaAntesDoPrimeiroVoo;
         if (barra == 2)
             vida.GrantInvulnerability(espera);
         else
@@ -801,6 +818,7 @@ public sealed class BossNetanyahu : MonoBehaviour
         ataqueEscolhido = Ataque.Nenhum;
         emInvestida = false;
         StopAllCoroutines();
+        LimparModoAviao(voltarAoChao: true);
         LimparEfeitos();
         LimparPocaDeFogo();
         LimparMinis();
@@ -825,9 +843,11 @@ public sealed class BossNetanyahu : MonoBehaviour
         }
         if (ling != null)
             ling.Died -= EncerrarLuta;
+        DesconectarAcertosNoAviao();
         emInvestida = false;
         IgnorarColisaoComLing(false);
         StopAllCoroutines();
+        LimparModoAviao(voltarAoChao: true);
         LimparEfeitos();
         LimparPocaDeFogo();
         LimparMinis();
@@ -854,5 +874,9 @@ public sealed class BossNetanyahu : MonoBehaviour
             GUI.Box(new Rect(16f, 87f, 225f, 28f), ling.IsDead ? "Ling caiu" : "Vitória");
         else if (estado == Estado.Transicao)
             GUI.Box(new Rect(16f, 87f, 225f, 28f), "Início da fase 2");
+        else if (estado == Estado.Atordoado)
+            GUI.Box(new Rect(16f, 87f, 225f, 28f), "Atordoado");
+        else if (etapaDoVoo == EtapaDoVoo.Cruzeiro || etapaDoVoo == EtapaDoVoo.Rasante)
+            GUI.Box(new Rect(16f, 87f, 225f, 28f), $"Avião   Hashis: {hashisNoAviao}/2");
     }
 }
