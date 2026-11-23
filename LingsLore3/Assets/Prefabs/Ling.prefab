@@ -124,7 +124,8 @@ Transform:
   - {fileID: 3075266797777085612}
   - {fileID: 8801109326435163005}
   - {fileID: 5104285036496242309}
-  m_Father: {fileID: 4179926326753591687}
+  - {fileID: 5930514618660703157}
+  m_Father: {fileID: 7389214128043741093}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &8082381591605667135
 Animator:
@@ -547,6 +548,69 @@ Transform:
   - {fileID: 2567864772281616571}
   m_Father: {fileID: 7187820936272000593}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &6554829947618235026
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7389214128043741093}
+  m_Layer: 6
+  m_Name: PivotInclinacaoCura
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7389214128043741093
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6554829947618235026}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 7187820936272000593}
+  m_Father: {fileID: 4179926326753591687}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &4820724610216195859
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5930514618660703157}
+  m_Layer: 6
+  m_Name: PivotBatataCura
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &5930514618660703157
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4820724610216195859}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.29, y: -0.29, z: 0.45}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7187820936272000593}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8005583530017208899
 GameObject:
   m_ObjectHideFlags: 0
@@ -568,6 +632,7 @@ GameObject:
   - component: {fileID: 1273842927237044294}
   - component: {fileID: 5565780530721533133}
   - component: {fileID: 4594158712362881732}
+  - component: {fileID: 4267931072346750802}
   m_Layer: 6
   m_Name: Ling
   m_TagString: Untagged
@@ -590,7 +655,7 @@ Transform:
   m_Children:
   - {fileID: 3123391585189815186}
   - {fileID: 1673793658632429951}
-  - {fileID: 7187820936272000593}
+  - {fileID: 7389214128043741093}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &3933682191390358831
@@ -681,6 +746,27 @@ MonoBehaviour:
   chargeDuration: 0.6
   followupChargeDuration: 0.25
   chargingMovementMultiplier: 0.2
+--- !u!114 &4267931072346750802
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8005583530017208899}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96a1a4806c7b4ab0a31de6b1fee70017, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::LingHealVisual
+  leanPivot: {fileID: 7389214128043741093}
+  itemPivot: {fileID: 5930514618660703157}
+  itemModel: {fileID: 919132149155446097, guid: c2fcd19616ee20044a9ea43c59f6200a, type: 3}
+  loweredPosition: {x: 0.29, y: -0.29, z: 0.45}
+  raisedPosition: {x: 0.06, y: -0.18, z: 0.61}
+  loweredRotation: {x: 0, y: -15, z: -8}
+  raisedRotation: {x: -63, y: 0, z: -10}
+  backwardTilt: 18
+  itemSize: 0.56
 --- !u!114 &8653704208097362760
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -756,6 +842,7 @@ MonoBehaviour:
   staminaRegenDelay: 0.75
   currentHealth: 0
   currentStamina: 0
+  healCharges: 4
   onDeath:
     m_PersistentCalls:
       m_Calls:

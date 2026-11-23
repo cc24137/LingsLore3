@@ -6,6 +6,10 @@ using UnityEngine.Events;
 [DefaultExecutionOrder(-90)]
 public class PlayerResources : MonoBehaviour
 {
+    private const int MaxHealCharges = 4;
+    private const float HealAmount = 30f;
+    private const float HealDuration = 1.5f;
+
     [Header("Vida")]
     [SerializeField, Min(1f)] private float maxHealth = 100f;
 
@@ -17,6 +21,7 @@ public class PlayerResources : MonoBehaviour
     [Header("Valores atuais - acompanhe durante o Play Mode")]
     [SerializeField] private float currentHealth;
     [SerializeField] private float currentStamina;
+    [SerializeField] private int healCharges;
 
     [Header("Eventos")]
     [SerializeField] private UnityEvent onDeath = new UnityEvent();
@@ -29,6 +34,7 @@ public class PlayerResources : MonoBehaviour
     private float lastStaminaUseTime = float.NegativeInfinity;
     private float respawnInvulnerableUntil = float.NegativeInfinity;
     private bool respawnDoTutorial;
+    private double healStartedAt = -1d;
 
     // Evento C# usado pelo ContadorCreditos para reiniciar a rodada atual.
     public event Action Died;
@@ -37,6 +43,9 @@ public class PlayerResources : MonoBehaviour
     public float MaxStamina => maxStamina;
     public float CurrentHealth => currentHealth;
     public float CurrentStamina => currentStamina;
+    public int HealCharges => healCharges;
+    public bool IsHealing => healStartedAt >= 0d;
+    internal float HealProgress => Mathf.Clamp01((float)((Time.timeAsDouble - healStartedAt) / HealDuration));
 
     public float HealthNormalized =>
         maxHealth > 0f ? Mathf.Clamp01(currentHealth / maxHealth) : 0f;
@@ -50,6 +59,20 @@ public class PlayerResources : MonoBehaviour
     {
         motor = GetComponent<PlayerMotor>();
         RestoreFullResources();
+    }
+
+    private void OnDisable()
+    {
+        CancelHealing();
+    }
+
+    private void Update()
+    {
+        if (!IsHealing || Time.timeAsDouble - healStartedAt < HealDuration)
+            return;
+
+        CancelHealing();
+        Heal(HealAmount);
     }
 
     private void FixedUpdate()
@@ -119,6 +142,7 @@ public class PlayerResources : MonoBehaviour
             return false;
 
         currentHealth = Mathf.Max(0f, currentHealth - amount);
+        CancelHealing();
         DamageFlash.PlayOn(this);
 
         if (IsDead)
@@ -148,6 +172,21 @@ public class PlayerResources : MonoBehaviour
         currentHealth = Mathf.Min(maxHealth, currentHealth + amount);
     }
 
+    internal void TryStartHealing()
+    {
+        if (!isActiveAndEnabled || IsDead || IsHealing ||
+            healCharges <= 0 || currentHealth >= maxHealth)
+            return;
+
+        healCharges--;
+        healStartedAt = Time.timeAsDouble;
+    }
+
+    internal void CancelHealing()
+    {
+        healStartedAt = -1d;
+    }
+
     public void RestoreFullResources()
     {
         if (TryGetComponent<DamageFlash>(out var flash))
@@ -155,6 +194,8 @@ public class PlayerResources : MonoBehaviour
 
         currentHealth = maxHealth;
         currentStamina = maxStamina;
+        healCharges = MaxHealCharges;
+        CancelHealing();
         lastStaminaUseTime = float.NegativeInfinity;
     }
 

@@ -48,6 +48,10 @@ public class PlayerMotor : MonoBehaviour
     [SerializeField, Min(0.05f)] private float followupChargeDuration = 0.25f;
     [SerializeField, Range(0f, 1f)] private float chargingMovementMultiplier = 0.2f;
 
+    private const float HealingMovementMultiplier = 0.3f;
+
+    private InputAction healAction;
+    private bool healRequested;
     private PlayerHashi hashi;
     private bool throwHashiRequested;
     private PlayerMelee melee;
@@ -90,6 +94,7 @@ public class PlayerMotor : MonoBehaviour
     public bool IsRising => !IsGrounded && body != null && body.linearVelocity.y > 0.1f;
     public bool IsFalling => !IsGrounded && !IsRising;
     public bool IsSprinting { get; private set; }
+    public bool IsHealing => resources != null && resources.IsHealing;
     public bool IsAttacking => melee != null && melee.IsActive;
     public bool IsCharging { get; private set; }
     public bool IsChargingDown => IsCharging && chargeIntent == ChargeIntent.Down;
@@ -103,12 +108,12 @@ public class PlayerMotor : MonoBehaviour
     public bool CanThrowHashi =>
         (attackLessonMode == AttackLessonMode.All ||
             attackLessonMode == AttackLessonMode.HashiOnly) &&
-        !IsDead && !IsKnockedBack && !IsDodging && !IsAttacking && !IsCharging &&
+        !IsDead && !IsKnockedBack && !IsDodging && !IsAttacking && !IsCharging && !IsHealing &&
         queuedChargedAttack == PlayerMelee.AttackType.None && !queuedLightAttack &&
         hashi != null && hashi.isActiveAndEnabled && hashi.CanFire;
 
     public bool CanStartAttack =>
-        !IsDead && !IsKnockedBack && !IsDodging && !IsAttacking &&
+        !IsDead && !IsKnockedBack && !IsDodging && !IsAttacking && !IsHealing &&
         melee != null && melee.enabled;
 
     public void SetBasicAttackOnly(bool active)
@@ -164,11 +169,11 @@ public class PlayerMotor : MonoBehaviour
     // As permissoes para as acoes ficam centralizadas aqui.
     public bool CanJump =>
         !IsDead && !IsKnockedBack && IsGrounded && !IsDodging &&
-        !IsAttacking && !IsCharging &&
+        !IsAttacking && !IsCharging && !IsHealing &&
         queuedChargedAttack == PlayerMelee.AttackType.None && jump != null && jump.enabled;
 
     public bool CanDodge =>
-        !IsDead && !IsKnockedBack && IsGrounded && !IsDodging && !IsAttacking &&
+        !IsDead && !IsKnockedBack && IsGrounded && !IsDodging && !IsAttacking && !IsHealing &&
         dodge != null && dodge.enabled &&
         resources != null && resources.CurrentStamina >= dodgeStaminaCost;
 
@@ -197,6 +202,8 @@ public class PlayerMotor : MonoBehaviour
         attackAction.action.Enable();
         if (throwHashiAction != null)
             throwHashiAction.action.Enable();
+        healAction = moveAction.action.actionMap.FindAction("Heal");
+        healAction?.Enable();
     }
 
     private void OnDisable()
@@ -212,6 +219,7 @@ public class PlayerMotor : MonoBehaviour
         attackAction.action.Disable();
         if (throwHashiAction != null)
             throwHashiAction.action.Disable();
+        healAction?.Disable();
 
         StopActions();
         IsGrounded = false;
@@ -247,6 +255,7 @@ public class PlayerMotor : MonoBehaviour
         {
             jumpRequested = false;
             dodgeRequested = false;
+            healRequested = false;
             throwHashiRequested = false;
             attackPressed = false;
             attackReleased |= attackAction.action.WasReleasedThisFrame();
@@ -265,6 +274,9 @@ public class PlayerMotor : MonoBehaviour
 
         if (jumpAction.action.WasPressedThisFrame())
             jumpRequested = true;
+
+        if (!IsHealing && healAction != null && healAction.WasPressedThisFrame())
+            healRequested = true;
 
         if (!sobreBotao && attackAction.action.WasPressedThisFrame())
             attackPressed = true;
@@ -304,6 +316,7 @@ public class PlayerMotor : MonoBehaviour
             IsSprinting = false;
             dodgeRequested = false;
             jumpRequested = false;
+            healRequested = false;
             throwHashiRequested = false;
             CancelCombat();
             dodge.Cancel();
@@ -347,6 +360,7 @@ public class PlayerMotor : MonoBehaviour
 
         if (IsDodging || dodge.IsLaunchingToPillarTop)
         {
+            healRequested = false;
             throwHashiRequested = false;
             ClearCombatInputRequests();
             jumpRequested = false;
@@ -367,6 +381,21 @@ public class PlayerMotor : MonoBehaviour
                 IsGrounded = false;
             if (terminouLancamento)
                 CaptureAirControlReference();
+            return;
+        }
+
+        if (healRequested && !MenuPausa.BloqueiaEntradaDeJogo && !IsAttacking && !IsCharging &&
+            !queuedLightAttack && queuedChargedAttack == PlayerMelee.AttackType.None)
+            resources.TryStartHealing();
+        healRequested = false;
+
+        if (IsHealing)
+        {
+            throwHashiRequested = false;
+            ClearCombatInputRequests();
+            jumpRequested = false;
+            jump.Cancel();
+            MoveNormally(direction, moveSpeed * HealingMovementMultiplier, true);
             return;
         }
 
@@ -768,6 +797,8 @@ public class PlayerMotor : MonoBehaviour
     private void StopActions()
     {
         ClearImpactMotion();
+        resources?.CancelHealing();
+        healRequested = false;
         throwHashiRequested = false;
         moveInput = Vector2.zero;
         jumpRequested = false;
