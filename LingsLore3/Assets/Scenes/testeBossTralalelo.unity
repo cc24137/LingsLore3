@@ -969,6 +969,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   maxHealth: 200
+  secondBarHealth: 0
   currentHealth: 150
   somenteAtaqueBasico: 0
   onDeath:
@@ -993,8 +994,18 @@ MonoBehaviour:
   tempoSubmerso: 1
   delayAntesDeEmergir: 0.8
   prefabMarcadorEmergencia: {fileID: 4992360360281387392, guid: 67b6c77265d139445957c5a9963524e5, type: 3}
+  distanciaParaAtaqueCauda: 3
+  duracaoAtaqueCauda: 2
+  tempoTravarAlvoCauda: 1
+  inicioDanoCauda: 1
+  fimDanoCauda: 1.9
+  velocidadeAvancoCauda: 2
+  distanciaAvancoCauda: 0.1
+  velocidadeRotacaoCauda: 720
+  descansoAposAtaqueCauda: 1.5
   danoFrente: 25
   danoBarbatana: 10
+  danoCauda: 25
   intervaloDanoBarbatana: 0.75
   aoCausarDano:
     m_PersistentCalls:
@@ -1581,12 +1592,20 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1807355545}
     - target: {fileID: 6071569347225823035, guid: 6c05e70ae1611a84797e1a85cd5e61b8, type: 3}
+      propertyPath: parte
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6071569347225823035, guid: 6c05e70ae1611a84797e1a85cd5e61b8, type: 3}
       propertyPath: inimigo
       value: 
       objectReference: {fileID: 1807355545}
     - target: {fileID: 6226770200441505517, guid: 6c05e70ae1611a84797e1a85cd5e61b8, type: 3}
       propertyPath: m_Enabled
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7139628189240601429, guid: 6c05e70ae1611a84797e1a85cd5e61b8, type: 3}
+      propertyPath: parte
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7139628189240601429, guid: 6c05e70ae1611a84797e1a85cd5e61b8, type: 3}
       propertyPath: inimigo

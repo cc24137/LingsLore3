@@ -3,7 +3,7 @@ using UnityEngine;
 [RequireComponent(typeof(Collider))]
 public class HitboxParte : MonoBehaviour
 {
-    public enum ParteCorpo { Frente, Barbatana, Outro }
+    public enum ParteCorpo { Frente, Barbatana, Cauda, Outro }
 
     [SerializeField] private Enemy inimigo;
     [SerializeField] private ParteCorpo parte;

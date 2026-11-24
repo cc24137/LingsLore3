@@ -46,18 +46,32 @@ public class Enemy : EnemyHealth
 
     [SerializeField] private GameObject prefabMarcadorEmergencia;
 
+    [Header("Ataque de cauda")]
+    [SerializeField, Min(0f)] private float distanciaParaAtaqueCauda = 3f;
+    [SerializeField, Min(0.01f)] private float duracaoAtaqueCauda = 1.6f;
+    [Tooltip("Segundos apos iniciar a animacao ate fixar a posicao do jogador.")]
+    [SerializeField, Min(0f)] private float tempoTravarAlvoCauda = 0.55f;
+    [Tooltip("Intervalo, em segundos desde o inicio da animacao, em que a cauda causa dano.")]
+    [SerializeField, Min(0f)] private float inicioDanoCauda = 0.9f;
+    [SerializeField, Min(0f)] private float fimDanoCauda = 1.35f;
+    [SerializeField, Min(0f)] private float velocidadeAvancoCauda = 2f;
+    [SerializeField, Min(0f)] private float distanciaAvancoCauda = 0.7f;
+    [SerializeField, Min(0f)] private float velocidadeRotacaoCauda = 720f;
+    [SerializeField, Min(0f)] private float descansoAposAtaqueCauda = 2f;
+
 
 
     [Header("Dano ao jogador")]
     [SerializeField, Min(0f)] private float danoFrente = 25f;
     [SerializeField, Min(0f)] private float danoBarbatana = 10f;
+    [SerializeField, Min(0f)] private float danoCauda = 25f;
     [SerializeField, Min(0.01f)] private float intervaloDanoBarbatana = 0.75f;
     [Tooltip("Conecte ao metodo que reduz a vida do jogador, usando o float dinamico.")]
     [SerializeField] private UnityEvent<float> aoCausarDano = new UnityEvent<float>();
 
 
 
-    private enum State { idle, walking, jumpAttack, groundAttack, givingCue }
+    private enum State { idle, walking, jumpAttack, groundAttack, givingCue, tailAttack }
     [Header("Inclinacao visual")]
 
     [SerializeField] private Transform pivotVisual;
@@ -76,6 +90,7 @@ public class Enemy : EnemyHealth
     private static readonly int IsIdle = Animator.StringToHash("isIdle");
     private static readonly int IsWalking = Animator.StringToHash("isWalking");
     private static readonly int IsGivingCue = Animator.StringToHash("isGivingCue");
+    private static readonly int IsTailAttacking = Animator.StringToHash("isTailAttacking");
 
 
     private Rigidbody body;
@@ -97,6 +112,11 @@ public class Enemy : EnemyHealth
     private Vector3 posicaoAntesDeSubmergir;
     private Vector3 posicaoDeEmergencia;
     private float fimDaEtapaAtaqueChao;
+    private float inicioAtaqueCauda;
+    private bool alvoCaudaTravado;
+    private bool caudaAcertouNesteAtaque;
+    private Vector3 direcaoFrenteCauda;
+    private Vector3 destinoAvancoCauda;
 
 
 
@@ -162,7 +182,12 @@ public class Enemy : EnemyHealth
                 break;
 
             case State.walking:
-                if (DistanciaHorizontal(jogadorPosition.position) >= distanciaParaAtaquePulo)
+                float distanciaJogador = DistanciaHorizontal(jogadorPosition.position);
+                if (distanciaJogador <= distanciaParaAtaqueCauda)
+                {
+                    SetTailAttack();
+                }
+                else if (distanciaJogador >= distanciaParaAtaquePulo)
                 {
                     SetAttack();
                     AtualizarCueState();
@@ -186,6 +211,10 @@ public class Enemy : EnemyHealth
             case State.groundAttack:
                 AtualizarAtaqueChao();
                 break;
+
+            case State.tailAttack:
+                AtualizarAtaqueCauda();
+                break;
         }
     }
 
@@ -198,7 +227,7 @@ public class Enemy : EnemyHealth
     private void EscolherProximoAtaque()
     {
         int a = Random.Range(0, 2);
-        if (a < 0)
+        if (a == 0)
         {
             proximoAtaque = State.jumpAttack;
         }
@@ -223,6 +252,73 @@ public class Enemy : EnemyHealth
             {
                 SetGroundAttack();
             }
+        }
+    }
+
+    private void SetTailAttack()
+    {
+        PararMovimento();
+        inicioAtaqueCauda = Time.time;
+        alvoCaudaTravado = false;
+        caudaAcertouNesteAtaque = false;
+        MudarEstado(State.tailAttack);
+    }
+
+    private void AtualizarAtaqueCauda()
+    {
+        float tempoDecorrido = Time.time - inicioAtaqueCauda;
+        if (tempoDecorrido >= duracaoAtaqueCauda)
+        {
+            PararMovimento();
+            fimDoDescanso = Time.time + descansoAposAtaqueCauda;
+            MudarEstado(State.idle);
+            return;
+        }
+
+        // O alvo e fixado depois da cue da propria animacao, sem seguir o jogador
+        // durante o golpe: ele ainda pode se esquivar apos esse instante.
+        if (!alvoCaudaTravado)
+        {
+            PararMovimento();
+            if (tempoDecorrido < tempoTravarAlvoCauda)
+                return;
+
+            Vector3 direcaoAoJogador = jogadorPosition.position - body.position;
+            direcaoAoJogador.y = 0f;
+            direcaoFrenteCauda = direcaoAoJogador.sqrMagnitude > 0.0001f
+                ? -direcaoAoJogador.normalized
+                : Vector3.ProjectOnPlane(body.rotation * Vector3.forward, Vector3.up).normalized;
+            destinoAvancoCauda = body.position + direcaoFrenteCauda * distanciaAvancoCauda;
+            alvoCaudaTravado = true;
+        }
+
+        // A frente do boss aponta para longe da posicao gravada do jogador.
+        Quaternion rotacaoAtual = body.rotation;
+        Vector3 frenteAtual = Vector3.ProjectOnPlane(rotacaoAtual * Vector3.forward, Vector3.up);
+        if (frenteAtual.sqrMagnitude > 0.0001f && direcaoFrenteCauda.sqrMagnitude > 0.0001f)
+        {
+            float diferencaY = Vector3.SignedAngle(frenteAtual, direcaoFrenteCauda, Vector3.up);
+            float passoY = Mathf.Clamp(diferencaY,
+                -velocidadeRotacaoCauda * Time.fixedDeltaTime,
+                velocidadeRotacaoCauda * Time.fixedDeltaTime);
+            body.MoveRotation(Quaternion.AngleAxis(passoY, Vector3.up) * rotacaoAtual);
+        }
+
+        // O avanco acompanha o golpe, sem atualizar a mira nem ultrapassar o limite.
+        if (tempoDecorrido >= inicioDanoCauda && tempoDecorrido < fimDanoCauda &&
+            distanciaAvancoCauda > 0f && velocidadeAvancoCauda > 0f && !body.isKinematic)
+        {
+            Vector3 restante = destinoAvancoCauda - body.position;
+            restante.y = 0f;
+            float passo = Mathf.Min(restante.magnitude, velocidadeAvancoCauda * Time.fixedDeltaTime);
+            Vector3 movimento = restante.sqrMagnitude > 0.0001f
+                ? restante.normalized * (passo / Time.fixedDeltaTime)
+                : Vector3.zero;
+            body.linearVelocity = new Vector3(movimento.x, body.linearVelocity.y, movimento.z);
+        }
+        else
+        {
+            PararMovimento();
         }
     }
 
@@ -502,10 +598,12 @@ private void AtualizarAnimacao(bool andando = true)
     bool preparando = estado == State.givingCue;
     bool movimentando = estado == State.jumpAttack || estado == State.groundAttack ||
         (estado == State.walking && andando);
+    bool atacandoCauda = estado == State.tailAttack;
 
-    animator.SetBool(IsIdle, !preparando && !movimentando);
+    animator.SetBool(IsIdle, !preparando && !movimentando && !atacandoCauda);
     animator.SetBool(IsWalking, movimentando);
     animator.SetBool(IsGivingCue, preparando);
+    animator.SetBool(IsTailAttacking, atacandoCauda);
 }
 
     // Mantem a assinatura usada pelo seu script de hitbox original.
@@ -537,6 +635,18 @@ private void AtualizarAnimacao(bool andando = true)
                 if (dano <= 0f)
                     return;
                 proximoDanoBarbatana = Time.time + intervaloDanoBarbatana;
+                break;
+
+            case HitboxParte.ParteCorpo.Cauda:
+                float tempoDecorrido = Time.time - inicioAtaqueCauda;
+                if (estado != State.tailAttack || !alvoCaudaTravado ||
+                    tempoDecorrido < inicioDanoCauda || tempoDecorrido >= fimDanoCauda ||
+                    caudaAcertouNesteAtaque)
+                    return;
+                dano = danoCauda;
+                if (dano <= 0f)
+                    return;
+                caudaAcertouNesteAtaque = true;
                 break;
 
             default:
@@ -587,5 +697,15 @@ private void AtualizarAnimacao(bool andando = true)
         velocidadeVerticalAtaqueChao = Mathf.Max(0.01f, velocidadeVerticalAtaqueChao);
         tempoSubmerso = Mathf.Max(0f, tempoSubmerso);
         delayAntesDeEmergir = Mathf.Max(0f, delayAntesDeEmergir);
+        distanciaParaAtaqueCauda = Mathf.Clamp(distanciaParaAtaqueCauda,
+            distanciaParada + 0.05f, distanciaParaAtaquePulo - 0.05f);
+        duracaoAtaqueCauda = Mathf.Max(0.01f, duracaoAtaqueCauda);
+        tempoTravarAlvoCauda = Mathf.Clamp(tempoTravarAlvoCauda, 0f, duracaoAtaqueCauda);
+        inicioDanoCauda = Mathf.Clamp(inicioDanoCauda, tempoTravarAlvoCauda, duracaoAtaqueCauda);
+        fimDanoCauda = Mathf.Clamp(fimDanoCauda, inicioDanoCauda, duracaoAtaqueCauda);
+        velocidadeAvancoCauda = Mathf.Max(0f, velocidadeAvancoCauda);
+        distanciaAvancoCauda = Mathf.Max(0f, distanciaAvancoCauda);
+        velocidadeRotacaoCauda = Mathf.Max(0f, velocidadeRotacaoCauda);
+        descansoAposAtaqueCauda = Mathf.Max(0f, descansoAposAtaqueCauda);
     }
 }
