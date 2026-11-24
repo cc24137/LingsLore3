@@ -1060,8 +1060,16 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 28656680}
     - target: {fileID: 349074279052454091, guid: 72dc671a2adcd4623bf7bedb836dffc2, type: 3}
+      propertyPath: distance
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 349074279052454091, guid: 72dc671a2adcd4623bf7bedb836dffc2, type: 3}
+      propertyPath: targetHeight
+      value: 2.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 349074279052454091, guid: 72dc671a2adcd4623bf7bedb836dffc2, type: 3}
       propertyPath: minPitch
-      value: -58
+      value: -65
       objectReference: {fileID: 0}
     - target: {fileID: 349074279052454091, guid: 72dc671a2adcd4623bf7bedb836dffc2, type: 3}
       propertyPath: lookAction

@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2026112204}
   - component: {fileID: 2026112206}
   m_Layer: 8
-  m_Name: Tung Tung Tung Sahur
+  m_Name: TungTungTungSahur
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -30,7 +30,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2026112211}
@@ -59,25 +59,6 @@ CapsuleCollider:
   m_Height: 3.68
   m_Direction: 1
   m_Center: {x: 0, y: 1.84, z: 0}
---- !u!114 &2026112204
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2026112201}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dd3e6bc6f120b8b439eb947a1c8c8ec9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
-  maxHealth: 160
-  secondBarHealth: 0
-  currentHealth: 160
-  somenteAtaqueBasico: 0
-  onDeath:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!54 &2026112205
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -105,6 +86,26 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 112
   m_CollisionDetection: 0
+--- !u!114 &2026112204
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2026112201}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd3e6bc6f120b8b439eb947a1c8c8ec9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
+  maxHealth: 280
+  secondBarHealth: 230
+  thirdBarHealth: 190
+  currentHealth: 280
+  somenteAtaqueBasico: 0
+  onDeath:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &2026112206
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -117,22 +118,49 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a52d7129afa3436db47bfe3a4fe9098b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossTungTungTungSahur
+  modelo: {fileID: 2026112212}
+  avisoDasLancas: 0.6
+  alcanceDasLancas: 22
+  danoDaLanca: 18
+  avisoDosMartelos: 1.05
+  danoDoMartelo: 26
+  multiplicadorDaLarguraDemonio: 2
+  multiplicadorDaVelocidadeDemonio: 2
   ling: {fileID: 0}
   piso: {fileID: 0}
   obstaculos:
     serializedVersion: 2
     m_Bits: 520
   shaderDosAvisos: {fileID: 4800000, guid: 650dd9526735d5b46b79224bc6e94025, type: 3}
+  prefabExplosao: {fileID: 1732138503, guid: 86cf5662995e497fb7db8bb6e8c722fe, type: 3}
   mostrarHudDeTeste: 0
-  velocidade: 3.5
-  distanciaParaGolpear: 2.65
-  alcanceDoGolpe: 3.4
-  semiAnguloDoGolpe: 55
+  velocidade: 6
+  distanciaParaGolpear: 5.8
+  alcanceDoGolpe: 6.8
+  semiAnguloDoGolpe: 98
   preparacao: 0.75
+  duracaoDaTacada: 0.24
   recuperacao: 1.15
-  danoDoGolpe: 16
-  alturaDoGolpe: 1.55
+  danoDoGolpe: 24
+  alturaDoGolpe: 2.4
+  raioDaExplosaoDaTacada: 7
+  danoDaExplosaoDaTacada: 20
+  tempoAteExplodirATacada: 0.55
+  alcanceDoGiro: 8
+  alcanceDoSalto: 20
+  raioDoImpacto: 6.5
+  alturaDoSalto: 11
+  avisoDoSalto: 0.55
+  intervaloEntreSaltos: 7
+  danoDoImpacto: 28
+  alturaDoImpacto: 1.75
+  recuperacaoDoSalto: 1.55
   estado: 0
+  raioDoMeteoro: 10
+  avisoDoMeteoro: 1.05
+  danoDoMeteoro: 60
+  alturaDaElevacaoDoMeteoro: 4.8
+  tempoDaElevacaoDoMeteoro: 1.15
 --- !u!1 &2026112210
 GameObject:
   m_ObjectHideFlags: 0

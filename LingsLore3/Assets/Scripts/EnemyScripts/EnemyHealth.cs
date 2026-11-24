@@ -6,6 +6,7 @@ public class EnemyHealth : MonoBehaviour
 {
     [SerializeField, Min(1f)] private float maxHealth = 200f;
     [SerializeField, Min(0f)] private float secondBarHealth;
+    [SerializeField, Min(0f)] private float thirdBarHealth;
     [SerializeField] private float currentHealth;
     [SerializeField] private bool somenteAtaqueBasico;
     [SerializeField] private UnityEvent onDeath = new UnityEvent();
@@ -14,12 +15,15 @@ public class EnemyHealth : MonoBehaviour
     public event System.Action<int> HealthBarChanged;
 
     private float invulnerableUntil;
-    private bool usingSecondBar;
-
     public bool IsDead => currentHealth <= 0f;
     public float CurrentHealth => currentHealth;
-    public int CurrentBar => usingSecondBar ? 2 : 1;
-    public float MaxHealth => usingSecondBar ? secondBarHealth : maxHealth;
+    public int CurrentBar { get; private set; } = 1;
+    public float MaxHealth => CurrentBar switch
+    {
+        2 => secondBarHealth,
+        3 => thirdBarHealth,
+        _ => maxHealth
+    };
 
     public void SetBasicAttackOnly(bool active)
     {
@@ -53,10 +57,10 @@ public class EnemyHealth : MonoBehaviour
 
         if (IsDead)
         {
-            if (!usingSecondBar && secondBarHealth > 0f)
+            if ((CurrentBar == 1 && secondBarHealth > 0f) || (CurrentBar == 2 && thirdBarHealth > 0f))
             {
-                usingSecondBar = true;
-                currentHealth = secondBarHealth;
+                CurrentBar++;
+                currentHealth = MaxHealth;
                 HealthBarChanged?.Invoke(CurrentBar);
             }
             else
@@ -80,8 +84,8 @@ public class EnemyHealth : MonoBehaviour
         if (!Application.isPlaying)
             return;
 
-        bool changedBar = usingSecondBar;
-        usingSecondBar = false;
+        bool changedBar = CurrentBar != 1;
+        CurrentBar = 1;
         currentHealth = maxHealth;
         invulnerableUntil = 0f;
         if (changedBar)

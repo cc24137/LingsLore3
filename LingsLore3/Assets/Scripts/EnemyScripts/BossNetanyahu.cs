@@ -64,6 +64,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
     [SerializeField, Range(0.1f, 1f)] private float fracaoAteBordaMaisDistante = 0.95f;
     [SerializeField, Min(0.1f)] private float velocidadeDaOnda = 18f;
     [SerializeField, Min(0.1f)] private float alturaDaOnda = 0.45f;
+    [SerializeField, Min(0.1f)] private float larguraDaOnda = 0.55f;
     [SerializeField, Min(0f)] private float danoDaPisada = 16f;
 
     [Header("Intervalo entre ataques")]
@@ -92,7 +93,6 @@ public sealed partial class BossNetanyahu : MonoBehaviour
     private bool ignorandoColisaoComLing;
 
     private const float FolgaDeColisao = 0.04f;
-    private const float LarguraDaOnda = 0.55f;
     private bool LutaEncerrada => estado == Estado.Encerrado;
     private float RaioDoBoss => colisaoDoBoss.radius * Mathf.Max(Mathf.Abs(transform.lossyScale.x), Mathf.Abs(transform.lossyScale.z));
     private float DistanciaDeParadaDoCombo => RaioDoBoss + colisaoDoLing.bounds.extents.x + 0.35f;
@@ -512,7 +512,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         {
             golpeDoCombo = i;
             bool ultimo = i == 2;
-            float alcance = alcanceDoCombo + (ultimo ? 0.45f : 0f);
+            float alcance = alcanceDoCombo * (ultimo ? 1.14f : 1f);
             float aviso = i == 0 ? avisoDoPrimeiroGolpe : avisoDoGolpe;
             float semiAngulo = ultimo ? 70f : 50f;
             frente = DirecaoDoLing();
@@ -627,7 +627,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         limiteDaOnda.enabled = false;
         LineRenderer onda = CriarLinha("Onda da pisada", 96);
         Colorir(onda, Vermelho);
-        onda.widthMultiplier = LarguraDaOnda;
+        onda.widthMultiplier = larguraDaOnda;
         bool atingiuLing = false;
         for (float raio = 0f; raio < alcance;)
         {
@@ -637,7 +637,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
 
             Bounds alvo = colisaoDoLing.bounds;
             float distancia = VetorHorizontal(alvo.center - centro).magnitude;
-            float margem = Mathf.Max(alvo.extents.x, alvo.extents.z) + LarguraDaOnda * 0.5f;
+            float margem = Mathf.Max(alvo.extents.x, alvo.extents.z) + larguraDaOnda * 0.5f;
             if (!atingiuLing && alvo.min.y <= centro.y + alturaDaOnda && alvo.max.y >= centro.y
                 && distancia >= raio - margem && distancia <= proximoRaio + margem
                 && VetorHorizontal(alvo.center - limites.center).sqrMagnitude <= raioDoPiso * raioDoPiso)
