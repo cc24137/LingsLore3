@@ -1,0 +1,29 @@
+{
+  "uid": "91ddd9079bd84019ba4a12e01d93a0d6",
+  "name": "Tung Tung Tung Sahur",
+  "author": "Eks.Art",
+  "source_url": "https://sketchfab.com/3d-models/tung-tung-tung-sahur-91ddd9079bd84019ba4a12e01d93a0d6",
+  "project": "https://github.com/seryi882/sketchfab-downloader-extension",
+  "format": "glb+gltf+osgjs",
+  "geometry_count": 1,
+  "skipped_geometries": [],
+  "textures_downloaded": 1,
+  "textures_skipped": false,
+  "pack_mode": "full",
+  "max_texture_edge": "original",
+  "textures_embedded_in_glb": 1,
+  "animation_count": 0,
+  "skeleton_count": 0,
+  "bone_count": 0,
+  "files": [
+    "Tung_Tung_Tung_Sahur.glb",
+    "model.gltf",
+    "model.bin",
+    "textures/shaded.png",
+    "file.osgjs",
+    "model_file.bin",
+    "model_file_wireframe.bin",
+    "README.txt"
+  ],
+  "note": "Open .glb (textures packed inside when enabled) or model.gltf. See README.txt."
+}

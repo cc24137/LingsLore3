@@ -1,0 +1,237 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "sketchfab-osgjs-converter"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        1
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "model.001_Material_0",
+      "mesh": 0
+    },
+    {
+      "name": "Sketchfab_model",
+      "children": [
+        0
+      ]
+    }
+  ],
+  "meshes": [
+    {
+      "name": "model.001_Material_0",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 1,
+            "TANGENT": 2,
+            "POSITION": 3,
+            "TEXCOORD_0": 4,
+            "TEXCOORD_1": 5
+          },
+          "material": 0,
+          "mode": 4,
+          "indices": 0
+        }
+      ]
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5125,
+      "count": 107454,
+      "type": "SCALAR",
+      "min": [
+        0
+      ],
+      "max": [
+        21025
+      ]
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 21026,
+      "type": "VEC3",
+      "min": [
+        -0.999997615814209,
+        -1,
+        -0.999997615814209
+      ],
+      "max": [
+        0.9999785423278809,
+        0.9999904632568359,
+        0.999997615814209
+      ]
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 21026,
+      "type": "VEC4",
+      "min": [
+        -0.9999785423278809,
+        -0.9998472929000854,
+        -0.999997615814209,
+        1
+      ],
+      "max": [
+        0.999997615814209,
+        0.999389111995697,
+        0.9999785423278809,
+        1
+      ]
+    },
+    {
+      "bufferView": 3,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 21026,
+      "type": "VEC3",
+      "min": [
+        -4.277471542358398,
+        -9.409432344398283e-9,
+        -3.3950464725494385
+      ],
+      "max": [
+        2.7585854530334473,
+        14.149323463439941,
+        4.139962673187256
+      ]
+    },
+    {
+      "bufferView": 4,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 21026,
+      "type": "VEC2",
+      "min": [
+        0.0006070000235922635,
+        0.0006070000235922635
+      ],
+      "max": [
+        0.9993929862976074,
+        0.9919883012771606
+      ]
+    },
+    {
+      "bufferView": 5,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 21026,
+      "type": "VEC2",
+      "min": [
+        0.08952309936285019,
+        -0.3328000009059906
+      ],
+      "max": [
+        0.910477340221405,
+        1.3253936767578125
+      ]
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 429816,
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 429816,
+      "byteLength": 252312,
+      "target": 34962,
+      "byteStride": 12
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 682128,
+      "byteLength": 336416,
+      "target": 34962,
+      "byteStride": 16
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1018544,
+      "byteLength": 252312,
+      "target": 34962,
+      "byteStride": 12
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1270856,
+      "byteLength": 168208,
+      "target": 34962,
+      "byteStride": 8
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1439064,
+      "byteLength": 168208,
+      "target": 34962,
+      "byteStride": 8
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 1607272,
+      "uri": "model.bin"
+    }
+  ],
+  "materials": [
+    {
+      "name": "Material",
+      "doubleSided": true,
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "metallicFactor": 0,
+        "roughnessFactor": 0.8211145618000169,
+        "baseColorTexture": {
+          "index": 0,
+          "texCoord": 0
+        }
+      },
+      "extras": {
+        "via": "viewer-uid"
+      },
+      "alphaMode": "OPAQUE"
+    }
+  ],
+  "textures": [
+    {
+      "source": 0,
+      "sampler": 0
+    }
+  ],
+  "images": [
+    {
+      "uri": "textures/shaded.png",
+      "mimeType": "image/png",
+      "name": "shaded.png"
+    }
+  ],
+  "samplers": [
+    {
+      "magFilter": 9729,
+      "minFilter": 9729,
+      "wrapS": 10497,
+      "wrapT": 10497
+    }
+  ]
+}
