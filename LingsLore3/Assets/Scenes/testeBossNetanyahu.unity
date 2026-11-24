@@ -985,6 +985,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
   maxHealth: 220
   secondBarHealth: 220
+  thirdBarHealth: 240
   currentHealth: 220
   somenteAtaqueBasico: 0
   onDeath:
@@ -1032,7 +1033,7 @@ MonoBehaviour:
   preparacaoDaBombaMassiva: 4.3
   alturaDaExplosaoMassiva: 9
   danoDaBombaMassiva: 100
-  intervaloDaBombaMassiva: 16
+  intervaloDaBombaMassiva: 20
   modeloTralaleroDoGiro: {fileID: 919132149155446097, guid: 4fad7acd5f255f443a7a2584c73b6600, type: 3}
   raioDoGiro: 15
   alturaDoGiro: 6
@@ -1088,7 +1089,7 @@ MonoBehaviour:
   ataqueEscolhido: 0
   prefabAviao: {fileID: 150400004, guid: d19242e7b4cd4f44a5b80004697d89d8, type: 3}
   esperaAntesDoPrimeiroVoo: 6
-  intervaloEntreVoos: 12
+  intervaloEntreVoos: 40
   alturaDeVoo: 15.5
   raioDaOrbita: 14.7
   velocidadeDeVoo: 12
@@ -1098,6 +1099,10 @@ MonoBehaviour:
   velocidadeDoRasante: 42
   raioDoRasante: 2.2
   danoDoRasante: 24
+  prefabExplosaoRobo: {fileID: 1732138503, guid: 86cf5662995e497fb7db8bb6e8c722fe, type: 3}
+  prefabMiniNetanyahu: {fileID: 150300006, guid: 90518a1748994199ab6826f56c29f9b2, type: 3}
+  tempoParaRessurgir: 2.8
+  intervaloDoComboRobo: 20
 --- !u!1001 &2130316293
 PrefabInstance:
   m_ObjectHideFlags: 0

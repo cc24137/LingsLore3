@@ -8,7 +8,7 @@ public sealed partial class BossNetanyahu
     [SerializeField, Min(0.1f)] private float preparacaoDaBombaMassiva = 4.3f;
     [SerializeField, Min(0.1f)] private float alturaDaExplosaoMassiva = 9f;
     [SerializeField, Min(0f)] private float danoDaBombaMassiva = 38f;
-    [SerializeField, Min(0f)] private float intervaloDaBombaMassiva = 16f;
+    [SerializeField, Min(0f)] private float intervaloDaBombaMassiva = 20f;
 
     [Header("Giro com o Tralalero")]
     [SerializeField] private GameObject modeloTralaleroDoGiro;
@@ -63,6 +63,7 @@ public sealed partial class BossNetanyahu
         estado = Estado.Atacando;
         bomba.Explodiu += _ =>
         {
+            proximaBombaMassiva = Time.time + intervaloDaBombaMassiva;
             fimDoAvisoMassivo = 0f;
             MostrarImpacto(limite);
             MostrarImpacto(baseDoVolume);
@@ -127,14 +128,19 @@ public sealed partial class BossNetanyahu
             ling.TakeDamage(danoDaBombaMassiva, centro, ignorarInvulnerabilidadeDaEsquiva: true);
     }
 
-    private IEnumerator ExecutarGiroTralalero()
+    private IEnumerator ExecutarGiroTralalero(bool robotico = false, bool frontal = false)
     {
+        float raio = robotico ? (frontal ? RaioDaPancadaRobo : RaioDoGiroRobo) : raioDoGiro;
+        float vento = robotico ? (frontal ? 0.55f : 0.48f) : avisoDoGiro;
+        float duracao = robotico ? (frontal ? 0.26f : 0.36f) : duracaoDoGiro;
+        float dano = robotico ? (frontal ? 18f : 21f) : danoDoGiro;
         estado = Estado.Preparando;
         CriarEfeitos("Giro com o Tralalero");
         Vector3 centro = corpo.position;
         centro.y = piso.bounds.max.y;
-        LineRenderer aviso = MarcarArea(centro, raioDoGiro, Vector3.forward, 180f);
-        Quaternion orientacao = Quaternion.LookRotation(DirecaoDoLing());
+        Vector3 frente = DirecaoDoLing();
+        LineRenderer aviso = MarcarArea(centro, raio, frente, frontal ? 60f : 180f);
+        Quaternion orientacao = Quaternion.LookRotation(frente);
         var pivo = new GameObject("Pivô do giro").transform;
         pivo.SetParent(efeitosDoAtaque.transform, false);
         pivo.position = centro;
@@ -151,19 +157,19 @@ public sealed partial class BossNetanyahu
         Bounds limites = partes[0].bounds;
         for (int i = 1; i < partes.Length; i++)
             limites.Encapsulate(partes[i].bounds);
-        float fator = raioDoGiro * 0.86f / Mathf.Max(0.1f, limites.size.z);
+        float fator = raio * 0.86f / Mathf.Max(0.1f, limites.size.z);
         Vector3 escala = modelo.localScale * fator;
         Vector3 baseDoModelo = new Vector3(limites.center.x, limites.min.y, limites.center.z) - centro;
-        Vector3 posicao = new Vector3(0f, 0.12f, raioDoGiro * 0.55f) - baseDoModelo * fator;
+        Vector3 posicao = new Vector3(0f, robotico ? 0.7f : 0.12f, raio * 0.55f) - baseDoModelo * fator;
         pegadaDoTralalero = modelo.InverseTransformPoint(new Vector3(limites.center.x, limites.center.y, limites.min.z));
         tralaleroNasMaos = modelo;
 
-        const float anguloInicial = -72f;
+        float anguloInicial = frontal ? -60f : -72f;
         Quaternion poseInicial = corpo.rotation;
         Quaternion poseDePreparacao = orientacao * Quaternion.Euler(0f, anguloInicial, 0f);
-        for (float tempo = 0f; tempo < avisoDoGiro; tempo += Time.deltaTime)
+        for (float tempo = 0f; tempo < vento; tempo += Time.deltaTime)
         {
-            preparacaoVisualDoAtaque = Mathf.Clamp01(tempo / avisoDoGiro);
+            preparacaoVisualDoAtaque = Mathf.Clamp01(tempo / vento);
             float progresso = Mathf.SmoothStep(0f, 1f, preparacaoVisualDoAtaque);
             float saque = Mathf.Lerp(0.23f, 1f, progresso);
             modelo.localScale = escala * saque;
@@ -180,17 +186,19 @@ public sealed partial class BossNetanyahu
         estado = Estado.Atacando;
         bool contatoResolvido = false;
         float anterior = anguloInicial;
-        for (float tempo = 0f; tempo < duracaoDoGiro;)
+        for (float tempo = 0f; tempo < duracao;)
         {
             yield return passoFisico;
             tempo += Time.fixedDeltaTime;
-            float atual = anguloInicial + Mathf.Clamp01(tempo / duracaoDoGiro) * 360f;
+            float atual = anguloInicial + Mathf.Clamp01(tempo / duracao) * (frontal ? 120f : 360f);
             pivo.rotation = orientacao * Quaternion.Euler(0f, atual, 0f);
             corpo.rotation = pivo.rotation;
-            if (!contatoResolvido && LingNoGiro(centro, orientacao * Vector3.forward, anterior, atual))
+            if (!contatoResolvido && LingNoGiro(centro, frente, anterior, atual, raio, frontal) &&
+                (!robotico || !Physics.Linecast(centro + Vector3.up * 0.75f, colisaoDoLing.bounds.center,
+                    obstaculos, QueryTriggerInteraction.Ignore)))
             {
                 contatoResolvido = true;
-                ling.TakeDamage(danoDoGiro, centro);
+                ling.TakeDamage(dano, centro);
                 if (LutaEncerrada)
                     yield break;
             }
@@ -200,13 +208,13 @@ public sealed partial class BossNetanyahu
         LimparEfeitos();
     }
 
-    private bool LingNoGiro(Vector3 centro, Vector3 frente, float anterior, float atual)
+    private bool LingNoGiro(Vector3 centro, Vector3 frente, float anterior, float atual, float raio, bool frontal)
     {
         Bounds alvo = colisaoDoLing.bounds;
         Vector3 delta = VetorHorizontal(alvo.center - centro);
         float distancia = delta.magnitude;
         float raioDoJogador = Mathf.Max(alvo.extents.x, alvo.extents.z);
-        if (distancia > raioDoGiro + raioDoJogador || alvo.min.y >= centro.y + alturaDoGiro || alvo.max.y < centro.y)
+        if (distancia > raio + raioDoJogador || alvo.min.y >= centro.y + alturaDoGiro || alvo.max.y < centro.y)
             return false;
 
         float margemLateral = 1.15f + raioDoJogador;
@@ -215,6 +223,8 @@ public sealed partial class BossNetanyahu
 
         float margemAngular = Mathf.Asin(margemLateral / distancia) * Mathf.Rad2Deg;
         float anguloDoAlvo = Vector3.SignedAngle(frente, delta, Vector3.up);
+        if (frontal && Mathf.Abs(anguloDoAlvo) > 60f + margemAngular)
+            return false;
         float ateAlvo = Mathf.Repeat(anguloDoAlvo - anterior, 360f);
         return ateAlvo <= atual - anterior + margemAngular || ateAlvo >= 360f - margemAngular;
     }

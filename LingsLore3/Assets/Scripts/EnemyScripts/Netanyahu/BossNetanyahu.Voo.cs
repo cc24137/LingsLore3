@@ -8,7 +8,7 @@ public sealed partial class BossNetanyahu
     [Header("Modo avião")]
     [SerializeField] private AviaoBigYahu prefabAviao;
     [SerializeField, Min(0f)] private float esperaAntesDoPrimeiroVoo = 6f;
-    [SerializeField, Min(0f)] private float intervaloEntreVoos = 12f;
+    [SerializeField, Min(0f)] private float intervaloEntreVoos = 40f;
     [SerializeField, Min(0.1f)] private float alturaDeVoo = 15.5f;
     [SerializeField, Min(0.1f)] private float raioDaOrbita = 14.7f;
     [SerializeField, Min(0.1f)] private float velocidadeDeVoo = 12f;
@@ -99,49 +99,53 @@ public sealed partial class BossNetanyahu
 
         while (!LutaEncerrada)
         {
+            ataquesDisponiveis.Clear();
             if (prefabMetralhadora != null)
-            {
-                ataqueEscolhido = Ataque.Rajada;
-                yield return ExecutarRajada();
-                yield return new WaitForSeconds(recuperacao);
-            }
-
+                ataquesDisponiveis.Add(Ataque.Rajada);
             if (PodeUsarBombaMassiva)
+                ataquesDisponiveis.Add(Ataque.BombaMassiva);
+            if (prefabBomba != null && prefabPocaDeFogo != null)
+                ataquesDisponiveis.Add(Ataque.BombaIncendiaria);
+            ataquesDisponiveis.Add(Ataque.Rasante);
+            if (PodeInvocarMinis(prefabMiniTralalero))
+                ataquesDisponiveis.Add(Ataque.ComandarMinis);
+
+            ataqueEscolhido = SortearAtaque(ref ultimoAtaqueNoAr);
+            switch (ataqueEscolhido)
             {
-                ataqueEscolhido = Ataque.BombaMassiva;
-                yield return ExecutarBombaMassiva();
-            }
-            else if (prefabBomba != null && prefabPocaDeFogo != null)
-            {
-                ataqueEscolhido = Ataque.BombaIncendiaria;
-                yield return ArremessarBombas(incendiaria: true);
+                case Ataque.Rajada:
+                    yield return ExecutarRajada();
+                    break;
+                case Ataque.BombaMassiva:
+                    yield return ExecutarBombaMassiva();
+                    break;
+                case Ataque.BombaIncendiaria:
+                    yield return ArremessarBombas(incendiaria: true);
+                    break;
+                case Ataque.Rasante:
+                    yield return ExecutarRasante();
+                    break;
+                case Ataque.ComandarMinis:
+                    yield return ComandarMinis(prefabMiniTralalero);
+                    break;
             }
             yield return new WaitForSeconds(recuperacao);
-
-            ataqueEscolhido = Ataque.Rasante;
-            yield return ExecutarRasante();
-            yield return new WaitForSeconds(recuperacao);
-
-            minis.RemoveAll(mini => mini == null || !mini.EstaAtivo);
-            if (prefabMiniTralalero != null && minis.Count == 0 && Time.time >= proximaInvocacao)
-            {
-                ataqueEscolhido = Ataque.ComandarMinis;
-                yield return ComandarMinis();
-                yield return new WaitForSeconds(recuperacao);
-            }
         }
     }
 
-    private IEnumerator ExecutarRajada()
+    private IEnumerator ExecutarRajada(bool robotica = false)
     {
         estado = Estado.Preparando;
         CriarEfeitos("Rajada do Big Yahu");
         MetralhadoraBigYahu arma = Instantiate(prefabMetralhadora, efeitosDoAtaque.transform);
+        if (robotica)
+            arma.transform.localScale *= 1.45f;
         LayerMask barreiras = obstaculos.value | (1 << piso.gameObject.layer);
-        yield return arma.SacarEMirar(transform, ling, colisaoDoLing, barreiras);
+        Transform suporte = robotica && suporteDaArmaRobo != null ? suporteDaArmaRobo : transform;
+        yield return arma.SacarEMirar(suporte, ling, colisaoDoLing, barreiras, robotica && suporte != transform);
 
         estado = Estado.Atacando;
-        yield return arma.Disparar();
+        yield return arma.Disparar(robotica ? 17 : 0, robotica ? 6f : 0f);
         LimparEfeitos();
     }
 
@@ -297,6 +301,7 @@ public sealed partial class BossNetanyahu
         yield return passoFisico;
 
         LimparModoAviao(voltarAoChao: false);
+        podeVoarApos = Time.time + intervaloEntreVoos;
         corpo.position = destino;
         corpo.rotation = Quaternion.LookRotation(DirecaoDoLing());
         colisaoDoBoss.enabled = true;
@@ -306,7 +311,6 @@ public sealed partial class BossNetanyahu
         yield return new WaitForSeconds(DuracaoDoStun);
         LimparEspiralDoStun();
 
-        podeVoarApos = Time.time + intervaloEntreVoos;
         yield return Combater(0f);
     }
 
@@ -353,7 +357,10 @@ public sealed partial class BossNetanyahu
 
     private void LateUpdate()
     {
-        AtualizarAnimacao();
+        if (robo != null && robo.activeSelf)
+            AnimarRobo();
+        else
+            AtualizarAnimacao();
         AtualizarObjetosSegurados();
         AtualizarEspiralDoStun();
     }

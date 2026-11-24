@@ -101,6 +101,8 @@ public class Enemy : EnemyHealth
     private float proximoDanoBarbatana;
     private bool frenteAcertouNesteAtaque;
     private State proximoAtaque;
+    private State ultimoAtaqueSorteado;
+    private int repeticoesDoAtaque;
     private enum EtapaAtaqueChao { nenhuma, descendo, submerso, avisando, subindo }
     private EtapaAtaqueChao etapaAtaqueChao;
     private GameObject marcadorEmergencia;
@@ -147,6 +149,8 @@ public class Enemy : EnemyHealth
         frenteAcertouNesteAtaque = false;
         proximoDanoBarbatana = float.NegativeInfinity;
         fimDoDescanso = 0f;
+        ultimoAtaqueSorteado = State.idle;
+        repeticoesDoAtaque = 0;
         Died += AoMorrer;
         MudarEstado(State.walking);
     }
@@ -183,14 +187,16 @@ public class Enemy : EnemyHealth
 
             case State.walking:
                 float distanciaJogador = DistanciaHorizontal(jogadorPosition.position);
-                if (distanciaJogador <= distanciaParaAtaqueCauda)
+                bool pertoParaCauda = distanciaJogador <= distanciaParaAtaqueCauda;
+                if (pertoParaCauda || distanciaJogador >= distanciaParaAtaquePulo)
                 {
-                    SetTailAttack();
-                }
-                else if (distanciaJogador >= distanciaParaAtaquePulo)
-                {
-                    SetAttack();
-                    AtualizarCueState();
+                    if (SortearAtaque(pertoParaCauda) == State.tailAttack)
+                        SetTailAttack();
+                    else
+                    {
+                        SetAttack();
+                        AtualizarCueState();
+                    }
                 }
                 else
                 {
@@ -220,21 +226,28 @@ public class Enemy : EnemyHealth
 
     private void SetAttack()
     {
-        EscolherProximoAtaque();
         fimDaCue = Time.time + tempoDaAnimacaoCue;
         MudarEstado(State.givingCue);
     }
-    private void EscolherProximoAtaque()
+    private State SortearAtaque(bool pertoParaCauda)
     {
-        int a = Random.Range(0, 2);
-        if (a == 0)
+        State ataquePorDistancia = pertoParaCauda ? State.tailAttack : State.jumpAttack;
+        bool podeSubmergir = pivotVisual != null && colisorPrincipal != null && apoioPiso != null;
+        proximoAtaque = ataquePorDistancia;
+        if (podeSubmergir)
         {
-            proximoAtaque = State.jumpAttack;
+            float chanceDeSubmergir = ultimoAtaqueSorteado == State.groundAttack
+                ? (repeticoesDoAtaque >= 2 ? 0f : 0.20f)
+                : ultimoAtaqueSorteado == ataquePorDistancia
+                    ? (repeticoesDoAtaque >= 2 ? 1f : 0.80f)
+                    : 0.50f;
+            if (Random.value < chanceDeSubmergir || chanceDeSubmergir >= 1f)
+                proximoAtaque = State.groundAttack;
         }
-        else
-        {
-            proximoAtaque = State.groundAttack;
-        }
+
+        repeticoesDoAtaque = proximoAtaque == ultimoAtaqueSorteado ? repeticoesDoAtaque + 1 : 1;
+        ultimoAtaqueSorteado = proximoAtaque;
+        return proximoAtaque;
     }
 
     private void AtualizarCueState()

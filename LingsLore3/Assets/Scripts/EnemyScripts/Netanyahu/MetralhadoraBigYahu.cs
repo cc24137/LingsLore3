@@ -37,11 +37,14 @@ public sealed class MetralhadoraBigYahu : MonoBehaviour
     private float travaDaMira;
     private float fimDoClarao;
     private float proximoDano;
+    private bool montada;
 
-    public IEnumerator SacarEMirar(Transform atacante, PlayerResources jogador, Collider colisor, LayerMask barreiras)
+    public IEnumerator SacarEMirar(Transform atacante, PlayerResources jogador, Collider colisor, LayerMask barreiras,
+        bool fixada = false)
     {
         piloto = atacante;
         alvo = jogador;
+        montada = fixada;
         colisorDoAlvo = colisor;
         mascaraDosProjeteis = barreiras.value | (1 << colisor.gameObject.layer);
         pontoMirado = colisor.bounds.center;
@@ -53,10 +56,13 @@ public sealed class MetralhadoraBigYahu : MonoBehaviour
         linhaDaMira.enabled = false;
     }
 
-    public IEnumerator Disparar()
+    public IEnumerator Disparar(int disparosExtras = 0, float ajusteDaMiraPorSegundo = 0f)
     {
-        for (int i = 0; i < quantidadeDeDisparos; i++)
+        for (int i = 0; i < quantidadeDeDisparos + disparosExtras; i++)
         {
+            if (ajusteDaMiraPorSegundo > 0f)
+                pontoMirado = Vector3.MoveTowards(pontoMirado, colisorDoAlvo.bounds.center,
+                    ajusteDaMiraPorSegundo * intervaloEntreDisparos);
             AtualizarPosicaoDaArma();
             Vector3 origem = saidaDosProjeteis.position;
             Vector3 direcao = transform.forward;
@@ -91,7 +97,7 @@ public sealed class MetralhadoraBigYahu : MonoBehaviour
             pontoMirado = colisorDoAlvo.bounds.center;
 
         float saque = Mathf.SmoothStep(0f, 1f, (Time.time - inicioDoAviso) / 0.35f);
-        Vector3 deslocamento = Vector3.Lerp(PosicaoGuardada, PosicaoAoMirar, saque);
+        Vector3 deslocamento = montada ? Vector3.zero : Vector3.Lerp(PosicaoGuardada, PosicaoAoMirar, saque);
         Vector3 posicao = piloto.position + piloto.rotation * deslocamento;
         Vector3 direcao = pontoMirado - posicao;
         if (direcao.sqrMagnitude < 0.001f)

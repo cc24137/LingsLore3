@@ -7,7 +7,11 @@ using UnityEngine;
 public sealed partial class BossNetanyahu : MonoBehaviour
 {
     private enum Estado { Descansando, Aproximando, Preparando, Atacando, Encerrado, Transicao, Atordoado }
-    private enum Ataque { Nenhum, Bombas, Combo, Investida, Pisada, BombaIncendiaria, ComandarMinis, ModoAviao, Rasante, Rajada, GiroTralalero, BombaMassiva }
+    private enum Ataque
+    {
+        Nenhum, Bombas, Combo, Investida, Pisada, BombaIncendiaria, ComandarMinis, ModoAviao,
+        Rasante, Rajada, GiroTralalero, BombaMassiva, Laser, RajadaRobo, MinisRobo, ComboRobo
+    }
 
     [Header("Cena de teste")]
     [SerializeField] private PlayerResources ling;
@@ -88,7 +92,9 @@ public sealed partial class BossNetanyahu : MonoBehaviour
     private float alturaInicialDaBaseAoPivo;
     private float multiplicadorAtual = 1f;
     private float proximaInvocacao;
-    private bool jaInvocou;
+    private readonly List<Ataque> ataquesDisponiveis = new List<Ataque>(5);
+    private Ataque ultimoAtaqueNoChao;
+    private Ataque ultimoAtaqueNoAr;
     private bool emInvestida;
     private bool ignorandoColisaoComLing;
 
@@ -120,6 +126,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         float meiaAlturaDaCapsula = Mathf.Max(colisaoDoBoss.height * Mathf.Abs(escalaVertical) * 0.5f, RaioDoBoss);
         alturaInicialDaBaseAoPivo = meiaAlturaDaCapsula - colisaoDoBoss.center.y * escalaVertical;
         PrepararAnimacao();
+        PrepararRobo();
     }
 
     private void OnEnable()
@@ -130,7 +137,8 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         ConectarAcertosNoAviao();
         if (!LutaEncerrada || (!vida.IsDead && !ling.IsDead))
         {
-            AjustarTamanho(vida.CurrentBar == 2 ? multiplicadorDeTamanhoNaFase2 : 1f);
+            AjustarTamanho(vida.CurrentBar >= 2 ? multiplicadorDeTamanhoNaFase2 : 1f);
+            ExibirForma(vida.CurrentBar == 3);
             colisaoDoBoss.enabled = true;
             estado = Estado.Descansando;
             StartCoroutine(Combater(0.9f));
@@ -149,7 +157,9 @@ public sealed partial class BossNetanyahu : MonoBehaviour
     private IEnumerator Combater(float espera)
     {
         ataqueEscolhido = Ataque.Nenhum;
-        if (estado == Estado.Transicao)
+        if (estado == Estado.Transicao && vida.CurrentBar == 3)
+            yield return RenascerComoRobo();
+        else if (estado == Estado.Transicao)
             yield return CrescerNaTransicao(espera);
         else
             yield return new WaitForSeconds(espera);
@@ -158,15 +168,26 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         {
             float margemParaRecuo = tempoDeRecuo * velocidadeDeRecuo;
             float distanciaAntesDoRecuo = Mathf.Max(distanciaParaBombas - margemParaRecuo, distanciaParaBombas * 0.5f);
+            if (vida.CurrentBar == 3)
+            {
+                yield return ExecutarRodadaRobo();
+                continue;
+            }
             if (vida.CurrentBar == 2)
             {
                 yield return ExecutarRodadaDaFase2(distanciaAntesDoRecuo);
                 continue;
             }
 
-            ataqueEscolhido = modeloTralaleroDoGiro != null && Random.value < 0.2f
-                ? Ataque.GiroTralalero
-                : (Ataque)Random.Range((int)Ataque.Bombas, (int)Ataque.Pisada + 1);
+            ataquesDisponiveis.Clear();
+            if (prefabBomba != null)
+                ataquesDisponiveis.Add(Ataque.Bombas);
+            ataquesDisponiveis.Add(Ataque.Combo);
+            ataquesDisponiveis.Add(Ataque.Investida);
+            ataquesDisponiveis.Add(Ataque.Pisada);
+            if (modeloTralaleroDoGiro != null)
+                ataquesDisponiveis.Add(Ataque.GiroTralalero);
+            ataqueEscolhido = SortearAtaque(ref ultimoAtaqueNoChao);
             switch (ataqueEscolhido)
             {
                 case Ataque.Bombas:
@@ -191,40 +212,63 @@ public sealed partial class BossNetanyahu : MonoBehaviour
 
     private IEnumerator ExecutarRodadaDaFase2(float distanciaAntesDoRecuo)
     {
-        minis.RemoveAll(mini => mini == null || !mini.EstaAtivo);
+        ataquesDisponiveis.Clear();
         if (prefabAviao != null && Time.time >= podeVoarApos)
-        {
-            yield return ExecutarModoAviao();
-            yield break;
-        }
+            ataquesDisponiveis.Add(Ataque.ModoAviao);
+        if (PodeInvocarMinis(prefabMiniTralalero))
+            ataquesDisponiveis.Add(Ataque.ComandarMinis);
+        if (PodeUsarBombaMassiva)
+            ataquesDisponiveis.Add(Ataque.BombaMassiva);
+        if (modeloTralaleroDoGiro != null)
+            ataquesDisponiveis.Add(Ataque.GiroTralalero);
+        if (prefabBomba != null && prefabPocaDeFogo != null)
+            ataquesDisponiveis.Add(Ataque.BombaIncendiaria);
+        if (ataquesDisponiveis.Count < 2)
+            ataquesDisponiveis.Add(Ataque.Pisada);
 
-        bool podeInvocar = prefabMiniTralalero != null && minis.Count == 0 && Time.time >= proximaInvocacao;
-        if (podeInvocar && (!jaInvocou || (!PodeUsarBombaMassiva && Random.value < 0.35f)))
+        ataqueEscolhido = SortearAtaque(ref ultimoAtaqueNoChao);
+        switch (ataqueEscolhido)
         {
-            ataqueEscolhido = Ataque.ComandarMinis;
-            yield return ExecutarQuandoPerto(ComandarMinis(), distanciaParaInvocar);
-        }
-        else if (PodeUsarBombaMassiva)
-        {
-            ataqueEscolhido = Ataque.BombaMassiva;
-            yield return ExecutarBombaMassiva();
-            estado = Estado.Descansando;
-            ataqueEscolhido = Ataque.Nenhum;
-            yield return new WaitForSeconds(recuperacao);
-        }
-        else if (modeloTralaleroDoGiro != null && Random.value < 0.45f)
-        {
-            ataqueEscolhido = Ataque.GiroTralalero;
-            yield return ExecutarQuandoPerto(ExecutarGiroTralalero(), raioDoGiro);
-        }
-        else
-        {
-            ataqueEscolhido = Ataque.BombaIncendiaria;
-            yield return ExecutarQuandoPerto(LancarBombas(incendiaria: true), distanciaAntesDoRecuo);
+            case Ataque.ModoAviao:
+                yield return ExecutarModoAviao();
+                break;
+            case Ataque.ComandarMinis:
+                yield return ExecutarQuandoPerto(ComandarMinis(prefabMiniTralalero), distanciaParaInvocar);
+                break;
+            case Ataque.BombaMassiva:
+                yield return ExecutarBombaMassiva();
+                estado = Estado.Descansando;
+                ataqueEscolhido = Ataque.Nenhum;
+                yield return new WaitForSeconds(recuperacao);
+                break;
+            case Ataque.GiroTralalero:
+                yield return ExecutarQuandoPerto(ExecutarGiroTralalero(), raioDoGiro);
+                break;
+            case Ataque.BombaIncendiaria:
+                yield return ExecutarQuandoPerto(LancarBombas(incendiaria: true), distanciaAntesDoRecuo);
+                break;
+            case Ataque.Pisada:
+                yield return ExecutarQuandoPerto(ExecutarPisada(), distanciaParaPisada);
+                break;
         }
     }
 
-    private IEnumerator ComandarMinis()
+    private Ataque SortearAtaque(ref Ataque ultimo)
+    {
+        if (ataquesDisponiveis.Count > 1)
+            ataquesDisponiveis.Remove(ultimo);
+
+        ultimo = ataquesDisponiveis[Random.Range(0, ataquesDisponiveis.Count)];
+        return ultimo;
+    }
+
+    private bool PodeInvocarMinis(MiniTralalero prefab)
+    {
+        minis.RemoveAll(mini => mini == null || !mini.EstaAtivo);
+        return prefab != null && minis.Count == 0 && Time.time >= proximaInvocacao;
+    }
+
+    private IEnumerator ComandarMinis(MiniTralalero prefab, bool roboticos = false)
     {
         List<Vector3> pontos = EscolherPontosDosMinis();
         if (pontos.Count == 0)
@@ -246,14 +290,15 @@ public sealed partial class BossNetanyahu : MonoBehaviour
 
         momentoDaInvocacaoVisual = Time.time;
         estado = Estado.Atacando;
-        jaInvocou = true;
         proximaInvocacao = Time.time + intervaloEntreInvocacoes;
         Bounds arena = piso.bounds;
         foreach (Vector3 ponto in pontos)
         {
             Vector3 direcao = VetorHorizontal(corpoDoLing.position - ponto);
             Quaternion rotacao = direcao.sqrMagnitude > 0.001f ? Quaternion.LookRotation(direcao) : corpo.rotation;
-            MiniTralalero mini = Instantiate(prefabMiniTralalero, ponto, rotacao);
+            MiniTralalero mini = Instantiate(prefab, ponto, rotacao);
+            if (roboticos)
+                MontarMiniRobo(mini.transform);
             minis.Add(mini);
             mini.Iniciar(ling, corpoDoLing, colisaoDoLing, obstaculos, arena, minis);
         }
@@ -483,7 +528,6 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         }
 
         minis.Clear();
-        jaInvocou = false;
         proximaInvocacao = 0f;
     }
 
@@ -857,18 +901,26 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         StopAllCoroutines();
         emInvestida = false;
         LimparModoAviao(voltarAoChao: true);
+        IgnorarColisaoComLing(false);
         LimparEfeitos();
         LimparPocaDeFogo();
         LimparMinis();
+        ApagarOlhoDoCombo();
+        ultimoAtaqueNoChao = Ataque.Nenhum;
+        ultimoAtaqueNoAr = Ataque.Nenhum;
         colisaoDoBoss.enabled = true;
-        estado = barra == 2 ? Estado.Transicao : Estado.Descansando;
-        float espera = barra == 2 ? duracaoDaTransicao : 0.9f;
+        estado = barra >= 2 ? Estado.Transicao : Estado.Descansando;
+        float espera = barra == 3 ? tempoParaRessurgir + 0.65f : barra == 2 ? duracaoDaTransicao : 0.9f;
         proximaBombaMassiva = Time.time + espera;
         podeVoarApos = Time.time + espera + esperaAntesDoPrimeiroVoo;
-        if (barra == 2)
+        proximoComboRobo = 0f;
+        if (barra >= 2)
             vida.GrantInvulnerability(espera);
         else
+        {
             AjustarTamanho(1f);
+            ExibirForma(false);
+        }
         StartCoroutine(Combater(espera));
     }
 
@@ -882,6 +934,8 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         LimparEfeitos();
         LimparPocaDeFogo();
         LimparMinis();
+        ApagarOlhoDoCombo();
+        ExibirForma(vida.CurrentBar == 3);
     }
 
     private void LimparEfeitos()
@@ -891,6 +945,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         tralaleroNasMaos = null;
         preparacaoVisualDoAtaque = 0f;
         momentoDaInvocacaoVisual = float.NegativeInfinity;
+        projeteisLaserAtivos = 0;
         if (efeitosDoAtaque != null)
         {
             efeitosDoAtaque.SetActive(false);
@@ -916,12 +971,14 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         LimparEfeitos();
         LimparPocaDeFogo();
         LimparMinis();
+        ApagarOlhoDoCombo();
     }
 
     private void OnDestroy()
     {
         Destroy(materialDosAvisos);
         Destroy(materialDoVolumeMassivo);
+        DestruirVisuaisDoRobo();
     }
 
     private void OnGUI()
@@ -934,7 +991,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         Color corAnterior = GUI.color;
         GUI.color = new Color(0.18f, 0.18f, 0.18f);
         GUI.DrawTexture(new Rect(25f, 43f, 207f, 7f), Texture2D.whiteTexture);
-        GUI.color = vida.CurrentBar == 2 ? Vermelho : Amarelo;
+        GUI.color = vida.CurrentBar == 3 ? new Color(0.22f, 0.83f, 1f) : vida.CurrentBar == 2 ? Vermelho : Amarelo;
         float proporcao = Mathf.Clamp01(vida.CurrentHealth / vida.MaxHealth);
         GUI.DrawTexture(new Rect(25f, 43f, 207f * proporcao, 7f), Texture2D.whiteTexture);
         GUI.color = corAnterior;
@@ -942,7 +999,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         if (LutaEncerrada)
             GUI.Box(new Rect(16f, 87f, 225f, 28f), ling.IsDead ? "Ling caiu" : "Vitória");
         else if (estado == Estado.Transicao)
-            GUI.Box(new Rect(16f, 87f, 225f, 28f), "Início da fase 2");
+            GUI.Box(new Rect(16f, 87f, 225f, 28f), vida.CurrentBar == 3 ? "Ressurgimento do robô" : "Início da fase 2");
         else if (estado == Estado.Atordoado)
             GUI.Box(new Rect(16f, 87f, 225f, 28f), "Atordoado");
         else if (ataqueEscolhido == Ataque.BombaMassiva && fimDoAvisoMassivo > Time.time)

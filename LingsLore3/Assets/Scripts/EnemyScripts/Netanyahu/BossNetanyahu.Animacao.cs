@@ -275,7 +275,7 @@ public sealed partial class BossNetanyahu
             }
         }
 
-        if (tralaleroNasMaos != null && TemDuasMaos)
+        if (tralaleroNasMaos != null && TemDuasMaos && (robo == null || !robo.activeSelf))
         {
             tralaleroNasMaos.parent.rotation = transform.rotation;
             Vector3 origemDaPegada = tralaleroNasMaos.TransformPoint(pegadaDoTralalero);
