@@ -159,6 +159,7 @@ public sealed partial class BossNetanyahu
 
     private void PosicionarAviao(Vector3 posicao, Quaternion rotacao, float embarque = 1f)
     {
+        embarqueVisual = embarque;
         aviao.transform.SetPositionAndRotation(posicao, rotacao);
         float assento = alturaInicialDaBaseAoPivo * multiplicadorAtual + aviao.Hitbox.size.y * 0.35f;
         Vector3 posicaoNoAssento = posicao + Vector3.up * assento;
@@ -347,10 +348,17 @@ public sealed partial class BossNetanyahu
         }
 
         cameraDaCena = Camera.main;
-        LateUpdate();
+        AtualizarEspiralDoStun();
     }
 
     private void LateUpdate()
+    {
+        AtualizarAnimacao();
+        AtualizarObjetosSegurados();
+        AtualizarEspiralDoStun();
+    }
+
+    private void AtualizarEspiralDoStun()
     {
         if (espiralDoStun == null)
             return;
@@ -386,6 +394,7 @@ public sealed partial class BossNetanyahu
         }
 
         etapaDoVoo = EtapaDoVoo.NoChao;
+        embarqueVisual = 0f;
         hashisNoAviao = 0;
         LimparEspiralDoStun();
     }

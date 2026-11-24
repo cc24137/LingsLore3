@@ -29,6 +29,10 @@ public sealed partial class BossNetanyahu
         estado = Estado.Preparando;
         Bounds arena = piso.bounds;
         var centro = new Vector3(arena.center.x, arena.max.y, arena.center.z);
+        Vector3 ateCentro = VetorHorizontal(centro - corpo.position);
+        if (etapaDoVoo == EtapaDoVoo.NoChao && ateCentro.sqrMagnitude > 0.001f)
+            corpo.rotation = Quaternion.LookRotation(ateCentro);
+
         float raio = RaioDoPiso(arena);
         float inicio = Time.time;
         float duracaoDoAviso = preparacaoDaBombaMassiva + prefabBomba.TempoAteDetonar;
@@ -44,13 +48,18 @@ public sealed partial class BossNetanyahu
 
         Bomba bomba = Instantiate(prefabBomba, PosicaoDaBombaMassiva(), Quaternion.identity, efeitosDoAtaque.transform);
         bomba.transform.localScale *= 5f;
+        bombaNaMao = bomba;
         while (Time.time < inicio + preparacaoDaBombaMassiva)
         {
-            bomba.transform.position = PosicaoDaBombaMassiva();
+            preparacaoVisualDoAtaque = (Time.time - inicio) / preparacaoDaBombaMassiva;
+            if (!TemDuasMaos)
+                bomba.transform.position = PosicaoDaBombaMassiva();
             AtualizarMarcacaoMassiva(contagem, centro, raio, inicio, duracaoDoAviso);
             yield return null;
         }
 
+        preparacaoVisualDoAtaque = 1f;
+        bombaNaMao = null;
         estado = Estado.Atacando;
         bomba.Explodiu += _ =>
         {
@@ -146,13 +155,16 @@ public sealed partial class BossNetanyahu
         Vector3 escala = modelo.localScale * fator;
         Vector3 baseDoModelo = new Vector3(limites.center.x, limites.min.y, limites.center.z) - centro;
         Vector3 posicao = new Vector3(0f, 0.12f, raioDoGiro * 0.55f) - baseDoModelo * fator;
+        pegadaDoTralalero = modelo.InverseTransformPoint(new Vector3(limites.center.x, limites.center.y, limites.min.z));
+        tralaleroNasMaos = modelo;
 
         const float anguloInicial = -72f;
         Quaternion poseInicial = corpo.rotation;
         Quaternion poseDePreparacao = orientacao * Quaternion.Euler(0f, anguloInicial, 0f);
         for (float tempo = 0f; tempo < avisoDoGiro; tempo += Time.deltaTime)
         {
-            float progresso = Mathf.SmoothStep(0f, 1f, tempo / avisoDoGiro);
+            preparacaoVisualDoAtaque = Mathf.Clamp01(tempo / avisoDoGiro);
+            float progresso = Mathf.SmoothStep(0f, 1f, preparacaoVisualDoAtaque);
             float saque = Mathf.Lerp(0.23f, 1f, progresso);
             modelo.localScale = escala * saque;
             modelo.localPosition = posicao * saque;
@@ -161,6 +173,7 @@ public sealed partial class BossNetanyahu
             yield return null;
         }
 
+        preparacaoVisualDoAtaque = 1f;
         modelo.localScale = escala;
         modelo.localPosition = posicao;
         MostrarImpacto(aviso);

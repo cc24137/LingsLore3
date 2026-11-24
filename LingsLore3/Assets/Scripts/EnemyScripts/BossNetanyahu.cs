@@ -119,6 +119,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         float escalaVertical = transform.lossyScale.y;
         float meiaAlturaDaCapsula = Mathf.Max(colisaoDoBoss.height * Mathf.Abs(escalaVertical) * 0.5f, RaioDoBoss);
         alturaInicialDaBaseAoPivo = meiaAlturaDaCapsula - colisaoDoBoss.center.y * escalaVertical;
+        PrepararAnimacao();
     }
 
     private void OnEnable()
@@ -239,9 +240,11 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         foreach (Vector3 ponto in pontos)
             MarcarArea(ponto, 0.85f, Vector3.forward, 180f);
 
+        momentoDaInvocacaoVisual = Time.time + avisoDaInvocacao;
         yield return new WaitForSeconds(avisoDaInvocacao);
         LimparEfeitos();
 
+        momentoDaInvocacaoVisual = Time.time;
         estado = Estado.Atacando;
         jaInvocou = true;
         proximaInvocacao = Time.time + intervaloEntreInvocacoes;
@@ -402,14 +405,32 @@ public sealed partial class BossNetanyahu : MonoBehaviour
 
     private IEnumerator ArremessarBombas(bool incendiaria)
     {
+        const float duracaoDoArremesso = 0.34f;
+        estado = Estado.Preparando;
+        if (aviao == null)
+            corpo.rotation = Quaternion.LookRotation(DirecaoDoLing());
+
+        CriarEfeitos("Bombas do boss");
         Vector3 origem = aviao != null ? aviao.transform.position : corpo.position + Vector3.up * (0.65f * transform.lossyScale.y);
+        var bombas = new Bomba[incendiaria ? 1 : 3];
+        bombaNaMao = bombas[0] = Instantiate(prefabBomba, origem, Quaternion.identity, efeitosDoAtaque.transform);
+        float inicio = Time.time;
+        for (float tempo = 0f; tempo < duracaoDoArremesso; tempo = Time.time - inicio)
+        {
+            preparacaoVisualDoAtaque = tempo / duracaoDoArremesso;
+            yield return null;
+        }
+
+        preparacaoVisualDoAtaque = 1f;
+        origem = aviao != null ? aviao.transform.position : corpo.position + Vector3.up * (0.65f * transform.lossyScale.y);
+        Vector3 soltura = maoDireita != null ? bombaNaMao.transform.position : origem;
+        bombaNaMao.transform.position = soltura;
+        bombaNaMao = null;
         Vector3 ateLing = VetorHorizontal(corpoDoLing.position - origem);
         float distancia = Mathf.Max(ateLing.magnitude, 0.01f);
         float abertura = Mathf.Asin(Mathf.Clamp(2.15f * prefabBomba.RaioDaExplosao / distancia, 0.28f, 0.85f)) * Mathf.Rad2Deg;
-        var bombas = new Bomba[incendiaria ? 1 : 3];
         var alvosDaSalva = incendiaria ? null : new HashSet<PlayerResources>();
         estado = Estado.Atacando;
-        CriarEfeitos("Bombas do boss");
 
         for (int i = 0; i < bombas.Length; i++)
         {
@@ -417,7 +438,8 @@ public sealed partial class BossNetanyahu : MonoBehaviour
             Vector3 deslocamento = Quaternion.Euler(0f, angulo, 0f) * ateLing;
             Vector3 destino = LimitarAoPiso(origem + deslocamento, 0f);
             destino.y = piso.bounds.max.y;
-            bombas[i] = Instantiate(prefabBomba, origem, Quaternion.identity, efeitosDoAtaque.transform);
+            if (i > 0)
+                bombas[i] = Instantiate(prefabBomba, soltura, Quaternion.identity, efeitosDoAtaque.transform);
             if (incendiaria)
                 bombas[i].Explodiu += CriarPocaDeFogo;
             bombas[i].Lancar(destino, ling, obstaculos, alvosDaSalva);
@@ -467,6 +489,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
 
     private IEnumerator ExecutarCombo()
     {
+        golpeDoCombo = -1;
         estado = Estado.Atacando;
         Vector3 frente = DirecaoDoLing();
         float distanciaAoLing = VetorHorizontal(corpoDoLing.position - corpo.position).magnitude;
@@ -487,6 +510,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         yield return passoFisico;
         for (int i = 0; i < 3; i++)
         {
+            golpeDoCombo = i;
             bool ultimo = i == 2;
             float alcance = alcanceDoCombo + (ultimo ? 0.45f : 0f);
             float aviso = i == 0 ? avisoDoPrimeiroGolpe : avisoDoGolpe;
@@ -863,6 +887,10 @@ public sealed partial class BossNetanyahu : MonoBehaviour
     private void LimparEfeitos()
     {
         fimDoAvisoMassivo = 0f;
+        bombaNaMao = null;
+        tralaleroNasMaos = null;
+        preparacaoVisualDoAtaque = 0f;
+        momentoDaInvocacaoVisual = float.NegativeInfinity;
         if (efeitosDoAtaque != null)
         {
             efeitosDoAtaque.SetActive(false);
