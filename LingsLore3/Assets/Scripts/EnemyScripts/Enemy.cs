@@ -266,6 +266,8 @@ public class Enemy : EnemyHealth
 
     private void AtualizarAtaqueCauda()
     {
+        const bool girarPelaDireita = true; // Troque para false para girar pela esquerda.
+
         float tempoDecorrido = Time.time - inicioAtaqueCauda;
         if (tempoDecorrido >= duracaoAtaqueCauda)
         {
@@ -275,8 +277,6 @@ public class Enemy : EnemyHealth
             return;
         }
 
-        // O alvo e fixado depois da cue da propria animacao, sem seguir o jogador
-        // durante o golpe: ele ainda pode se esquivar apos esse instante.
         if (!alvoCaudaTravado)
         {
             PararMovimento();
@@ -285,36 +285,62 @@ public class Enemy : EnemyHealth
 
             Vector3 direcaoAoJogador = jogadorPosition.position - body.position;
             direcaoAoJogador.y = 0f;
+
             direcaoFrenteCauda = direcaoAoJogador.sqrMagnitude > 0.0001f
                 ? -direcaoAoJogador.normalized
-                : Vector3.ProjectOnPlane(body.rotation * Vector3.forward, Vector3.up).normalized;
-            destinoAvancoCauda = body.position + direcaoFrenteCauda * distanciaAvancoCauda;
+                : Vector3.ProjectOnPlane(
+                    body.rotation * Vector3.forward, Vector3.up).normalized;
+
+            destinoAvancoCauda =
+                body.position + direcaoFrenteCauda * distanciaAvancoCauda;
             alvoCaudaTravado = true;
         }
 
-        // A frente do boss aponta para longe da posicao gravada do jogador.
         Quaternion rotacaoAtual = body.rotation;
-        Vector3 frenteAtual = Vector3.ProjectOnPlane(rotacaoAtual * Vector3.forward, Vector3.up);
-        if (frenteAtual.sqrMagnitude > 0.0001f && direcaoFrenteCauda.sqrMagnitude > 0.0001f)
+        Vector3 frenteAtual = Vector3.ProjectOnPlane(
+            rotacaoAtual * Vector3.forward, Vector3.up);
+
+        if (frenteAtual.sqrMagnitude > 0.0001f &&
+            direcaoFrenteCauda.sqrMagnitude > 0.0001f &&
+            Vector3.Angle(frenteAtual, direcaoFrenteCauda) > 0.5f)
         {
-            float diferencaY = Vector3.SignedAngle(frenteAtual, direcaoFrenteCauda, Vector3.up);
-            float passoY = Mathf.Clamp(diferencaY,
-                -velocidadeRotacaoCauda * Time.fixedDeltaTime,
+            float diferencaY = Vector3.SignedAngle(
+                frenteAtual, direcaoFrenteCauda, Vector3.up);
+
+            // Repeat permite percorrer o lado escolhido mesmo quando ele
+            // representa o caminho mais longo até a direção desejada.
+            float anguloRestante = girarPelaDireita
+                ? Mathf.Repeat(diferencaY, 360f)
+                : Mathf.Repeat(-diferencaY, 360f);
+
+            float passo = Mathf.Min(
+                anguloRestante,
                 velocidadeRotacaoCauda * Time.fixedDeltaTime);
-            body.MoveRotation(Quaternion.AngleAxis(passoY, Vector3.up) * rotacaoAtual);
+
+            body.MoveRotation(
+                Quaternion.AngleAxis(girarPelaDireita ? passo : -passo, Vector3.up)
+                * rotacaoAtual);
         }
 
-        // O avanco acompanha o golpe, sem atualizar a mira nem ultrapassar o limite.
-        if (tempoDecorrido >= inicioDanoCauda && tempoDecorrido < fimDanoCauda &&
-            distanciaAvancoCauda > 0f && velocidadeAvancoCauda > 0f && !body.isKinematic)
+        if (tempoDecorrido >= inicioDanoCauda &&
+            tempoDecorrido < fimDanoCauda &&
+            distanciaAvancoCauda > 0f &&
+            velocidadeAvancoCauda > 0f &&
+            !body.isKinematic)
         {
             Vector3 restante = destinoAvancoCauda - body.position;
             restante.y = 0f;
-            float passo = Mathf.Min(restante.magnitude, velocidadeAvancoCauda * Time.fixedDeltaTime);
+
+            float passo = Mathf.Min(
+                restante.magnitude,
+                velocidadeAvancoCauda * Time.fixedDeltaTime);
+
             Vector3 movimento = restante.sqrMagnitude > 0.0001f
                 ? restante.normalized * (passo / Time.fixedDeltaTime)
                 : Vector3.zero;
-            body.linearVelocity = new Vector3(movimento.x, body.linearVelocity.y, movimento.z);
+
+            body.linearVelocity = new Vector3(
+                movimento.x, body.linearVelocity.y, movimento.z);
         }
         else
         {
