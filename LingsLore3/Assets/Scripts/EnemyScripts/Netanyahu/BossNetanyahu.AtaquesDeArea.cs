@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -133,7 +134,7 @@ public sealed partial class BossNetanyahu
         float raio = robotico ? (frontal ? RaioDaPancadaRobo : RaioDoGiroRobo) : raioDoGiro;
         float vento = robotico ? (frontal ? 0.55f : 0.48f) : avisoDoGiro;
         float duracao = robotico ? (frontal ? 0.26f : 0.36f) : duracaoDoGiro;
-        float dano = robotico ? (frontal ? 18f : 21f) : danoDoGiro;
+        float dano = robotico ? (frontal ? 18f : 21f) * MultiplicadorDeDanoRobo : danoDoGiro;
         estado = Estado.Preparando;
         CriarEfeitos("Giro com o Tralalero");
         Vector3 centro = corpo.position;
@@ -185,6 +186,7 @@ public sealed partial class BossNetanyahu
         MostrarImpacto(aviso);
         estado = Estado.Atacando;
         bool contatoResolvido = false;
+        var pilaresAtingidos = new HashSet<PillarHealth>();
         float anterior = anguloInicial;
         for (float tempo = 0f; tempo < duracao;)
         {
@@ -193,7 +195,7 @@ public sealed partial class BossNetanyahu
             float atual = anguloInicial + Mathf.Clamp01(tempo / duracao) * (frontal ? 120f : 360f);
             pivo.rotation = orientacao * Quaternion.Euler(0f, atual, 0f);
             corpo.rotation = pivo.rotation;
-            if (!contatoResolvido && LingNoGiro(centro, frente, anterior, atual, raio, frontal) &&
+            if (!contatoResolvido && AlvoNoGiro(colisaoDoLing.bounds, centro, frente, anterior, atual, raio, frontal) &&
                 (!robotico || !Physics.Linecast(centro + Vector3.up * 0.75f, colisaoDoLing.bounds.center,
                     obstaculos, QueryTriggerInteraction.Ignore)))
             {
@@ -202,22 +204,30 @@ public sealed partial class BossNetanyahu
                 if (LutaEncerrada)
                     yield break;
             }
+            foreach (PillarHealth pilar in PillarHealth.ActivePillars)
+            {
+                if (pilar.CanBeHit && !pilaresAtingidos.Contains(pilar) &&
+                    AlvoNoGiro(pilar.Shaft.bounds, centro, frente, anterior, atual, raio, frontal) &&
+                    pilar.TryGetAreaHit(centro, raio, alturaDoGiro, robotico ? obstaculos : default, out Vector3 ponto) &&
+                    pilar.TakeDamage(dano, ponto))
+                    pilaresAtingidos.Add(pilar);
+            }
             anterior = atual;
         }
 
         LimparEfeitos();
     }
 
-    private bool LingNoGiro(Vector3 centro, Vector3 frente, float anterior, float atual, float raio, bool frontal)
+    private bool AlvoNoGiro(Bounds alvo, Vector3 centro, Vector3 frente, float anterior, float atual,
+        float raio, bool frontal)
     {
-        Bounds alvo = colisaoDoLing.bounds;
         Vector3 delta = VetorHorizontal(alvo.center - centro);
         float distancia = delta.magnitude;
-        float raioDoJogador = Mathf.Max(alvo.extents.x, alvo.extents.z);
-        if (distancia > raio + raioDoJogador || alvo.min.y >= centro.y + alturaDoGiro || alvo.max.y < centro.y)
+        float raioDoAlvo = Mathf.Max(alvo.extents.x, alvo.extents.z);
+        if (distancia > raio + raioDoAlvo || alvo.min.y >= centro.y + alturaDoGiro || alvo.max.y < centro.y)
             return false;
 
-        float margemLateral = 1.15f + raioDoJogador;
+        float margemLateral = 1.15f + raioDoAlvo;
         if (distancia <= margemLateral)
             return true;
 

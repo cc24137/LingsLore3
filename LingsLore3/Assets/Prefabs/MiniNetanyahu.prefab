@@ -121,6 +121,6 @@ MonoBehaviour:
   velocidadeDaInvestida: 12
   duracaoDaInvestida: 0.55
   tempoDeVida: 13
-  danoDeContato: 5
-  danoDaInvestida: 9
+  danoDeContato: 7.5
+  danoDaInvestida: 13.5
   intervaloDoDano: 1

@@ -30,18 +30,18 @@ public sealed class Bomba : MonoBehaviour
     public event System.Action<Vector3> Explodiu;
 
     public void Lancar(Vector3 destino, PlayerResources alvo, LayerMask obstaculos,
-        ISet<PlayerResources> alvosDaSalva = null)
+        ISet<PlayerResources> alvosDaSalva = null, HashSet<PillarHealth> pilaresDaSalva = null)
     {
-        IniciarLancamento(destino, alvo, obstaculos, alvosDaSalva, mostrarAvisoLocal: true);
+        IniciarLancamento(destino, alvo, obstaculos, alvosDaSalva, pilaresDaSalva, mostrarAvisoLocal: true);
     }
 
     public void LancarComExplosaoPersonalizada(Vector3 destino)
     {
-        IniciarLancamento(destino, null, default, null, mostrarAvisoLocal: false);
+        IniciarLancamento(destino, null, default, null, null, mostrarAvisoLocal: false);
     }
 
     private void IniciarLancamento(Vector3 destino, PlayerResources alvo, LayerMask obstaculos,
-        ISet<PlayerResources> alvosDaSalva, bool mostrarAvisoLocal)
+        ISet<PlayerResources> alvosDaSalva, HashSet<PillarHealth> pilaresDaSalva, bool mostrarAvisoLocal)
     {
         if (lancada)
             return;
@@ -54,11 +54,11 @@ public sealed class Bomba : MonoBehaviour
             return;
         }
 
-        StartCoroutine(VoarEExplodir(destino, alvo, obstaculos, alvosDaSalva, mostrarAvisoLocal));
+        StartCoroutine(VoarEExplodir(destino, alvo, obstaculos, alvosDaSalva, pilaresDaSalva, mostrarAvisoLocal));
     }
 
     private IEnumerator VoarEExplodir(Vector3 destino, PlayerResources alvo, LayerMask obstaculos,
-        ISet<PlayerResources> alvosDaSalva, bool mostrarAvisoLocal)
+        ISet<PlayerResources> alvosDaSalva, HashSet<PillarHealth> pilaresDaSalva, bool mostrarAvisoLocal)
     {
         LineRenderer aviso = mostrarAvisoLocal ? MarcarExplosao(destino) : null;
         Vector3 origem = transform.position;
@@ -81,6 +81,8 @@ public sealed class Bomba : MonoBehaviour
             Colorir(aviso, corDoImpacto);
         }
         CausarDano(destino, alvo, obstaculos, alvosDaSalva);
+        if (mostrarAvisoLocal)
+            PillarHealth.HitArea(destino, raioDaExplosao, 1.5f, dano, obstaculos, pilaresDaSalva);
         if (isActiveAndEnabled)
             Explodiu?.Invoke(destino);
 

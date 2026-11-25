@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -5,6 +6,8 @@ using UnityEngine.Rendering;
 [RequireComponent(typeof(EnemyHealth), typeof(Rigidbody), typeof(CapsuleCollider))]
 public sealed partial class BossTungTungTungSahur : MonoBehaviour
 {
+    private readonly HashSet<PillarHealth> pilaresAtingidosNaTacada = new HashSet<PillarHealth>();
+
     private enum Estado
     {
         Aproximando, PreparandoTacada, Tacando, RecuperandoDaTacada,
@@ -161,6 +164,7 @@ public sealed partial class BossTungTungTungSahur : MonoBehaviour
             case Estado.PreparandoTacada when Time.fixedTime >= fimDoEstado:
                 MarcarImpacto();
                 anguloAnteriorDaTacada = TacadaGiratoria ? 0f : semiAnguloDoGolpe;
+                pilaresAtingidosNaTacada.Clear();
                 tacadaJaResolveuContato = false;
                 EntrarNoEstado(Estado.Tacando, TacadaGiratoria ? 0.55f : duracaoDaTacada);
                 AtualizarTacada();
@@ -357,6 +361,7 @@ public sealed partial class BossTungTungTungSahur : MonoBehaviour
                     ReproduzirExplosao(pousoDoSalto, raioDoImpacto, Amarelo, 0.65f);
                     if (LingNaArea(pousoDoSalto, raioDoImpacto, alturaDoImpacto, out _))
                         ling.TakeDamage(danoDoImpacto, pousoDoSalto);
+                    PillarHealth.HitArea(pousoDoSalto, raioDoImpacto, alturaDoImpacto, danoDoImpacto, obstaculos);
                 }
                 break;
         }
@@ -407,25 +412,23 @@ public sealed partial class BossTungTungTungSahur : MonoBehaviour
 
         if (!tacadaJaResolveuContato && LingNaArea(centroDoGolpe, AlcanceAtivoDaTacada, alturaDoGolpe, out Vector3 delta))
         {
-            float anguloDoLing = Vector3.SignedAngle(frenteDoGolpe, delta, Vector3.up);
-            float margem = Mathf.Asin(Mathf.Clamp01(colisorDoLing.radius / Mathf.Max(0.01f, delta.magnitude))) *
-                Mathf.Rad2Deg;
-            bool atingiu;
-            if (TacadaGiratoria)
-            {
-                float distanciaAngular = Mathf.Repeat(anguloAnteriorDaTacada - anguloDoLing, 360f);
-                atingiu = distanciaAngular <= anguloAnteriorDaTacada - angulo + margem || distanciaAngular >= 360f - margem;
-            }
-            else
-            {
-                atingiu = Mathf.Abs(anguloDoLing) <= semiAnguloDoGolpe &&
-                    anguloDoLing >= angulo - margem && anguloDoLing <= anguloAnteriorDaTacada + margem;
-            }
-
-            if (atingiu)
+            if (TacadaPassouPeloAlvo(delta, colisorDoLing.radius, angulo))
             {
                 tacadaJaResolveuContato = true;
                 ling.TakeDamage(danoDoGolpe, centroDoGolpe);
+            }
+        }
+
+        foreach (PillarHealth pilar in PillarHealth.ActivePillars)
+        {
+            if (!pilaresAtingidosNaTacada.Contains(pilar) &&
+                pilar.TryGetAreaHit(centroDoGolpe, AlcanceAtivoDaTacada, alturaDoGolpe, obstaculos, out Vector3 ponto))
+            {
+                Bounds coluna = pilar.Shaft.bounds;
+                float raioDoPilar = Mathf.Max(coluna.extents.x, coluna.extents.z);
+                if (TacadaPassouPeloAlvo(Horizontal(coluna.center - centroDoGolpe), raioDoPilar, angulo) &&
+                    pilar.TakeDamage(danoDoGolpe, ponto))
+                    pilaresAtingidosNaTacada.Add(pilar);
             }
         }
 
@@ -446,11 +449,26 @@ public sealed partial class BossTungTungTungSahur : MonoBehaviour
             FinalizarAtaque(Estado.RecuperandoDaTacada, recuperacao);
     }
 
+    private bool TacadaPassouPeloAlvo(Vector3 delta, float raioDoAlvo, float angulo)
+    {
+        float anguloDoAlvo = Vector3.SignedAngle(frenteDoGolpe, delta, Vector3.up);
+        float margem = Mathf.Asin(Mathf.Clamp01(raioDoAlvo / Mathf.Max(0.01f, delta.magnitude))) * Mathf.Rad2Deg;
+        if (TacadaGiratoria)
+        {
+            float distanciaAngular = Mathf.Repeat(anguloAnteriorDaTacada - anguloDoAlvo, 360f);
+            return distanciaAngular <= anguloAnteriorDaTacada - angulo + margem || distanciaAngular >= 360f - margem;
+        }
+
+        return Mathf.Abs(anguloDoAlvo) <= semiAnguloDoGolpe &&
+            anguloDoAlvo >= angulo - margem && anguloDoAlvo <= anguloAnteriorDaTacada + margem;
+    }
+
     private void ExplodirTacada()
     {
         ReproduzirExplosao(centroDaExplosaoDaTacada, raioDaExplosaoDaTacada, Carmesim);
         if (LingNaArea(centroDaExplosaoDaTacada, raioDaExplosaoDaTacada, 1.8f, out _))
             ling.TakeDamage(danoDaExplosaoDaTacada, centroDaExplosaoDaTacada);
+        PillarHealth.HitArea(centroDaExplosaoDaTacada, raioDaExplosaoDaTacada, 1.8f, danoDaExplosaoDaTacada, obstaculos);
         FinalizarAtaque(Estado.RecuperandoDaTacada, recuperacao);
     }
 

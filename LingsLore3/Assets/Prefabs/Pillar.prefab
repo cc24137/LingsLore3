@@ -173,7 +173,9 @@ GameObject:
   - component: {fileID: 881269882608770161}
   - component: {fileID: 9062615605881013481}
   - component: {fileID: 8043618717366268874}
-  m_Layer: 0
+  - component: {fileID: 2072826157660664712}
+  - component: {fileID: 2072826157660664713}
+  m_Layer: 3
   m_Name: Pillar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -278,6 +280,36 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
+--- !u!114 &2072826157660664712
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6472842805089863700}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 429807779af3480e9fdbb58e858af4d2, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::PillarHealth
+  maxHealth: 300
+  minimumBrightness: 0.28
+  currentHealth: 300
+--- !u!114 &2072826157660664713
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6472842805089863700}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1eacaefc5e684e6596ef9fafa3f6c72e, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::HitImpactVfx
+  effectPrefab: {fileID: 447409866740539227, guid: 3b9b26e9698b75f4888d2b78cadd0711, type: 3}
+  scale: 0.85
+  lifetime: 2
 --- !u!1 &2072826157660664709
 GameObject:
   m_ObjectHideFlags: 0

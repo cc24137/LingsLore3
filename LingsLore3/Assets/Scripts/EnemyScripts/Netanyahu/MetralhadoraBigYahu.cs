@@ -56,8 +56,10 @@ public sealed class MetralhadoraBigYahu : MonoBehaviour
         linhaDaMira.enabled = false;
     }
 
-    public IEnumerator Disparar(int disparosExtras = 0, float ajusteDaMiraPorSegundo = 0f)
+    public IEnumerator Disparar(int disparosExtras = 0, float ajusteDaMiraPorSegundo = 0f,
+        float multiplicadorDeDano = 1f)
     {
+        float dano = danoDoProjetil * multiplicadorDeDano;
         for (int i = 0; i < quantidadeDeDisparos + disparosExtras; i++)
         {
             if (ajusteDaMiraPorSegundo > 0f)
@@ -72,7 +74,7 @@ public sealed class MetralhadoraBigYahu : MonoBehaviour
             fimDoClarao = Time.time + 0.045f;
             clarao.SetActive(true);
             projeteisEmVoo++;
-            StartCoroutine(MoverProjetil(origem, direcao));
+            StartCoroutine(MoverProjetil(origem, direcao, dano));
             yield return new WaitForSeconds(intervaloEntreDisparos);
         }
 
@@ -111,13 +113,13 @@ public sealed class MetralhadoraBigYahu : MonoBehaviour
         }
     }
 
-    private IEnumerator MoverProjetil(Vector3 posicao, Vector3 direcao)
+    private IEnumerator MoverProjetil(Vector3 posicao, Vector3 direcao, float dano)
     {
         const float raio = 0.10f;
         const float comprimentoDoRastro = 0.95f;
         if ((colisorDoAlvo.ClosestPoint(posicao) - posicao).sqrMagnitude <= raio * raio)
         {
-            TentarCausarDano(posicao);
+            TentarCausarDano(posicao, dano);
             projeteisEmVoo--;
             yield break;
         }
@@ -138,7 +140,9 @@ public sealed class MetralhadoraBigYahu : MonoBehaviour
                 rastro.SetPosition(1, ponta - direcao * Mathf.Min(comprimentoDoRastro, percorrido + acerto.distance));
 
                 if (acerto.collider == colisorDoAlvo)
-                    TentarCausarDano(posicao);
+                    TentarCausarDano(posicao, dano);
+                else
+                    PillarHealth.HitCollider(acerto.collider, dano, acerto.point);
                 yield return null;
                 break;
             }
@@ -153,9 +157,9 @@ public sealed class MetralhadoraBigYahu : MonoBehaviour
         Destroy(rastro.gameObject);
     }
 
-    private void TentarCausarDano(Vector3 origem)
+    private void TentarCausarDano(Vector3 origem, float dano)
     {
-        if (Time.time >= proximoDano && alvo.TakeDamage(danoDoProjetil, origem))
+        if (Time.time >= proximoDano && alvo.TakeDamage(dano, origem))
             proximoDano = Time.time + intervaloDoDano;
     }
 

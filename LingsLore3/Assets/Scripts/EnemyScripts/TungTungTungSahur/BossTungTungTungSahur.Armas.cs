@@ -175,12 +175,15 @@ public sealed partial class BossTungTungTungSahur
             if (progresso < 1f)
                 return;
 
+            var pilaresAtingidos = new HashSet<PillarHealth>();
             foreach (ArmaInvocada arma in armas)
             {
-                if (!LingNaArea(arma.Destino, RaioDoMartelo, 2.8f, out _))
-                    continue;
-                ling.TakeDamage(danoDoMartelo, arma.Destino);
-                break;
+                if (!contatoDaInvocacaoResolvido && LingNaArea(arma.Destino, RaioDoMartelo, 2.8f, out _))
+                {
+                    contatoDaInvocacaoResolvido = true;
+                    ling.TakeDamage(danoDoMartelo, arma.Destino);
+                }
+                PillarHealth.HitArea(arma.Destino, RaioDoMartelo, 2.8f, danoDoMartelo, obstaculos, pilaresAtingidos);
             }
             LimparArmas();
         }
@@ -216,6 +219,9 @@ public sealed partial class BossTungTungTungSahur
             }
 
             bool continua = passo < livre - 0.001f;
+            if (!continua && Physics.SphereCast(inicio, largura, arma.Frente, out RaycastHit acerto,
+                passo + 0.02f, obstaculos, QueryTriggerInteraction.Ignore))
+                PillarHealth.HitCollider(acerto.collider, danoDaLanca, acerto.point);
             arma.Avanco = continua ? arma.Avanco + passo : arma.Percurso;
             Vector3 posicao = inicio + arma.Frente * passo;
             arma.Visual.position = posicao;

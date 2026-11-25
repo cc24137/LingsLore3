@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public sealed partial class BossNetanyahu
@@ -145,7 +146,8 @@ public sealed partial class BossNetanyahu
         yield return arma.SacarEMirar(suporte, ling, colisaoDoLing, barreiras, robotica && suporte != transform);
 
         estado = Estado.Atacando;
-        yield return arma.Disparar(robotica ? 17 : 0, robotica ? 6f : 0f);
+        float multiplicadorDeDano = robotica ? MultiplicadorDeDanoRobo : 1f;
+        yield return arma.Disparar(robotica ? 17 : 0, robotica ? 6f : 0f, multiplicadorDeDano);
         LimparEfeitos();
     }
 
@@ -204,15 +206,16 @@ public sealed partial class BossNetanyahu
         estado = Estado.Atacando;
         MostrarImpacto(faixa);
         bool acertou = false;
+        var pilaresAtingidos = new HashSet<PillarHealth>();
         Vector3 atual = entrada;
         while ((saida - atual).sqrMagnitude > 0.0001f)
         {
             yield return passoFisico;
             Vector3 seguinte = Vector3.MoveTowards(atual, saida, velocidadeDoRasante * Time.fixedDeltaTime);
+            Vector3 centroDoDano = atual + Vector3.down * 0.35f;
+            Vector3 volume = new Vector3(raioDoRasante, 0.8f, 0.65f);
             if (!acertou)
             {
-                Vector3 centroDoDano = atual + Vector3.down * 0.35f;
-                Vector3 volume = new Vector3(raioDoRasante, 0.8f, 0.65f);
                 bool acertouLing = Physics.BoxCast(centroDoDano, volume, frente, rotacao,
                     Vector3.Distance(atual, seguinte), 1 << ling.gameObject.layer, QueryTriggerInteraction.Ignore);
                 Bounds alvo = colisaoDoLing.bounds;
@@ -226,6 +229,13 @@ public sealed partial class BossNetanyahu
                 if (LutaEncerrada)
                     yield break;
             }
+
+            float passo = Vector3.Distance(atual, seguinte);
+            Vector3 centroVarrido = centroDoDano + frente * (passo * 0.5f);
+            volume.z += passo * 0.5f;
+            foreach (Collider col in Physics.OverlapBox(centroVarrido, volume, rotacao, obstaculos,
+                QueryTriggerInteraction.Ignore))
+                PillarHealth.HitCollider(col, danoDoRasante, col.ClosestPoint(centroVarrido), pilaresAtingidos);
 
             PosicionarAviao(seguinte, rotacao);
             atual = seguinte;

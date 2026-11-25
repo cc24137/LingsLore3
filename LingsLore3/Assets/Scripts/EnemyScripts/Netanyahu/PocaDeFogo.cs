@@ -29,6 +29,7 @@ public sealed class PocaDeFogo : MonoBehaviour
         Vector3 centro = transform.position;
         float inicio = Time.time;
         float proximoDano = inicio + intervaloDoDano;
+        float proximoDanoNosPilares = proximoDano;
         while (Time.time < inicio + duracao)
         {
             float pulso = 0.5f + Mathf.Sin((Time.time - inicio) * 9f) * 0.5f;
@@ -40,6 +41,12 @@ public sealed class PocaDeFogo : MonoBehaviour
             {
                 proximoDano = Time.time + intervaloDoDano;
                 alvo.TakeDamage(danoPorPulso, centro);
+            }
+
+            if (Time.time >= proximoDanoNosPilares)
+            {
+                proximoDanoNosPilares = Time.time + intervaloDoDano;
+                PillarHealth.HitArea(centro, raio, alturaDoFogo, danoPorPulso);
             }
 
             yield return passoFisico;

@@ -119,6 +119,7 @@ public sealed partial class BossTungTungTungSahur
         ReproduzirExplosao(pousoDoSalto, RaioDoMeteoro, CorDoMeteoro, 2.3f);
         if (LingNaArea(pousoDoSalto, RaioDoMeteoro, 3.1f, out _))
             ling.TakeDamage(danoDoMeteoro, pousoDoSalto);
+        PillarHealth.HitArea(pousoDoSalto, RaioDoMeteoro, 3.1f, danoDoMeteoro, obstaculos);
     }
 
     private void PrepararRastroDoMeteoro()

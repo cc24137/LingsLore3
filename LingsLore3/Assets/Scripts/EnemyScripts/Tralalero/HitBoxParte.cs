@@ -8,8 +8,11 @@ public class HitboxParte : MonoBehaviour
     [SerializeField] private Enemy inimigo;
     [SerializeField] private ParteCorpo parte;
 
+    private Collider hitbox;
+
     private void Awake()
     {
+        hitbox = GetComponent<Collider>();
         if (inimigo == null)
             inimigo = GetComponentInParent<Enemy>();
         if (inimigo == null)
@@ -31,6 +34,27 @@ public class HitboxParte : MonoBehaviour
     {
         // Permite dano de contato e detecta a frente mesmo se o jogador ja estava nela.
         AvisarInimigo(outro);
+    }
+
+    private void FixedUpdate()
+    {
+        if (inimigo == null || !inimigo.HitboxAtiva(parte) || !hitbox.enabled)
+            return;
+
+        // Testa os pilares mesmo quando suas camadas nao geram eventos de trigger entre si.
+        foreach (PillarHealth pilar in PillarHealth.ActivePillars)
+        {
+            if (!pilar.CanBeHit || !hitbox.bounds.Intersects(pilar.Shaft.bounds))
+                continue;
+
+            Collider coluna = pilar.Shaft;
+            if (Physics.ComputePenetration(coluna, coluna.transform.position, coluna.transform.rotation,
+                hitbox, hitbox.transform.position, hitbox.transform.rotation, out _, out _))
+            {
+                Vector3 ponto = coluna.ClosestPoint(hitbox.bounds.center);
+                inimigo.AtingirPilar(parte, pilar, ponto);
+            }
+        }
     }
 
     private void AvisarInimigo(Collider outro)

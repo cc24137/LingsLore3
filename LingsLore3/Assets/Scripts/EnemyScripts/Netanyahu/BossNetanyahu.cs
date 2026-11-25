@@ -479,6 +479,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         float distancia = Mathf.Max(ateLing.magnitude, 0.01f);
         float abertura = Mathf.Asin(Mathf.Clamp(2.15f * prefabBomba.RaioDaExplosao / distancia, 0.28f, 0.85f)) * Mathf.Rad2Deg;
         var alvosDaSalva = incendiaria ? null : new HashSet<PlayerResources>();
+        var pilaresDaSalva = incendiaria ? null : new HashSet<PillarHealth>();
         estado = Estado.Atacando;
 
         for (int i = 0; i < bombas.Length; i++)
@@ -491,7 +492,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
                 bombas[i] = Instantiate(prefabBomba, soltura, Quaternion.identity, efeitosDoAtaque.transform);
             if (incendiaria)
                 bombas[i].Explodiu += CriarPocaDeFogo;
-            bombas[i].Lancar(destino, ling, obstaculos, alvosDaSalva);
+            bombas[i].Lancar(destino, ling, obstaculos, alvosDaSalva, pilaresDaSalva);
         }
 
         foreach (Bomba bomba in bombas)
@@ -574,7 +575,14 @@ public sealed partial class BossNetanyahu : MonoBehaviour
             yield return new WaitForSeconds(aviso + (ultimo ? 0.2f : 0f));
             estado = Estado.Atacando;
             MostrarImpacto(marcador);
-            TentarAtingirLing(origem, alcance, frente, semiAngulo, ultimo ? danoDoUltimoGolpe : danoDoGolpe);
+            float dano = ultimo ? danoDoUltimoGolpe : danoDoGolpe;
+            TentarAtingirLing(origem, alcance, frente, semiAngulo, dano);
+            foreach (PillarHealth pilar in PillarHealth.ActivePillars)
+            {
+                if (pilar.TryGetAreaHit(origem, alcance, 1.5f, obstaculos, out Vector3 ponto) &&
+                    Vector3.Angle(frente, VetorHorizontal(ponto - origem)) <= semiAngulo)
+                    pilar.TakeDamage(dano, ponto);
+            }
             yield return new WaitForSeconds(0.16f);
             LimparEfeitos();
         }
@@ -624,6 +632,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         emInvestida = true;
         IgnorarColisaoComLing(true);
         bool passouPeloLing = false;
+        var pilaresAtingidos = new HashSet<PillarHealth>();
         for (float avancou = 0f; avancou < distancia;)
         {
             yield return passoFisico;
@@ -636,6 +645,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
                     yield break;
             }
 
+            AtingirPilaresNaInvestida(frente, proximo - avancou, raioDaInvestida, pilaresAtingidos);
             corpo.MovePosition(origem + frente * proximo);
             avancou = proximo;
         }
@@ -643,6 +653,17 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         yield return passoFisico;
         emInvestida = false;
         LimparEfeitos();
+    }
+
+    private void AtingirPilaresNaInvestida(Vector3 frente, float distancia, float raio,
+        HashSet<PillarHealth> pilaresAtingidos)
+    {
+        ObterExtremosDaCapsula(corpo.position, raio, out Vector3 inferior, out Vector3 superior);
+        foreach (Collider col in Physics.OverlapCapsule(inferior, superior, raio, obstaculos, QueryTriggerInteraction.Ignore))
+            PillarHealth.HitCollider(col, danoDaInvestida, col.ClosestPoint(corpo.position), pilaresAtingidos);
+        foreach (RaycastHit hit in Physics.CapsuleCastAll(inferior, superior, raio, frente,
+            distancia, obstaculos, QueryTriggerInteraction.Ignore))
+            PillarHealth.HitCollider(hit.collider, danoDaInvestida, hit.point, pilaresAtingidos);
     }
 
     private bool InvestidaAtingeLing(Vector3 frente, float distancia, float raio)
@@ -677,6 +698,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         Colorir(onda, Vermelho);
         onda.widthMultiplier = larguraDaOnda;
         bool atingiuLing = false;
+        var pilaresAtingidos = new HashSet<PillarHealth>();
         for (float raio = 0f; raio < alcance;)
         {
             yield return passoFisico;
@@ -693,6 +715,15 @@ public sealed partial class BossNetanyahu : MonoBehaviour
                 atingiuLing = ling.TakeDamage(danoDaPisada, centro);
                 if (LutaEncerrada)
                     yield break;
+            }
+
+            foreach (PillarHealth pilar in PillarHealth.ActivePillars)
+            {
+                if (!pilaresAtingidos.Contains(pilar) && pilar.TryGetAreaHit(centro,
+                    proximoRaio + larguraDaOnda * 0.5f, alturaDaOnda, default, out Vector3 ponto) &&
+                    VetorHorizontal(ponto - limites.center).sqrMagnitude <= raioDoPiso * raioDoPiso &&
+                    pilar.TakeDamage(danoDaPisada, ponto))
+                    pilaresAtingidos.Add(pilar);
             }
 
             raio = proximoRaio;

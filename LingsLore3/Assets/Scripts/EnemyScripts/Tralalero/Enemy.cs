@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Events;
@@ -100,6 +101,9 @@ public class Enemy : EnemyHealth
     private float fimDaCue;
     private float proximoDanoBarbatana;
     private bool frenteAcertouNesteAtaque;
+    private readonly HashSet<PillarHealth> pilaresAtingidosPelaFrente = new HashSet<PillarHealth>();
+    private readonly HashSet<PillarHealth> pilaresAtingidosPelaCauda = new HashSet<PillarHealth>();
+    private readonly Dictionary<PillarHealth, float> proximoDanoNosPilares = new Dictionary<PillarHealth, float>();
     private State proximoAtaque;
     private State ultimoAtaqueSorteado;
     private int repeticoesDoAtaque;
@@ -147,6 +151,7 @@ public class Enemy : EnemyHealth
     private void OnEnable()
     {
         frenteAcertouNesteAtaque = false;
+        pilaresAtingidosPelaFrente.Clear();
         proximoDanoBarbatana = float.NegativeInfinity;
         fimDoDescanso = 0f;
         ultimoAtaqueSorteado = State.idle;
@@ -274,6 +279,7 @@ public class Enemy : EnemyHealth
         inicioAtaqueCauda = Time.time;
         alvoCaudaTravado = false;
         caudaAcertouNesteAtaque = false;
+        pilaresAtingidosPelaCauda.Clear();
         MudarEstado(State.tailAttack);
     }
 
@@ -385,6 +391,7 @@ public class Enemy : EnemyHealth
         );
         jumpAttackCoordinate.y = body.position.y;
         frenteAcertouNesteAtaque = false;
+        pilaresAtingidosPelaFrente.Clear();
         fimDoAtaque = Time.time + duracaoMaximaAtaque;
     }
 
@@ -412,6 +419,7 @@ public class Enemy : EnemyHealth
         }
 
         frenteAcertouNesteAtaque = false;
+        pilaresAtingidosPelaFrente.Clear();
 
         posicaoAntesDeSubmergir = body.position;
         colisorPrincipalEstavaAtivo = colisorPrincipal.enabled;
@@ -648,16 +656,14 @@ private void AtualizarAnimacao(bool andando = true)
     // Mantem a assinatura usada pelo seu script de hitbox original.
     public void JogadorEntrouNaHitbox(HitboxParte.ParteCorpo parte)
     {
-        if (!isActiveAndEnabled || IsDead || jogadorPosition == null ||
-            !jogadorPosition.gameObject.activeInHierarchy)
+        if (jogadorPosition == null || !jogadorPosition.gameObject.activeInHierarchy || !HitboxAtiva(parte))
             return;
 
         float dano;
         switch (parte)
         {
             case HitboxParte.ParteCorpo.Frente:
-            //Debug.Log()
-                if ((estado != State.jumpAttack && estado != State.groundAttack) || frenteAcertouNesteAtaque)
+                if (frenteAcertouNesteAtaque)
                     return;
                 dano = danoFrente;
                 if (dano <= 0f)
@@ -666,8 +672,6 @@ private void AtualizarAnimacao(bool andando = true)
                 break;
 
             case HitboxParte.ParteCorpo.Barbatana:
-                if (estado == State.groundAttack)
-                    return;
                 if (Time.time < proximoDanoBarbatana)
                     return;
                 dano = danoBarbatana;
@@ -677,10 +681,7 @@ private void AtualizarAnimacao(bool andando = true)
                 break;
 
             case HitboxParte.ParteCorpo.Cauda:
-                float tempoDecorrido = Time.time - inicioAtaqueCauda;
-                if (estado != State.tailAttack || !alvoCaudaTravado ||
-                    tempoDecorrido < inicioDanoCauda || tempoDecorrido >= fimDanoCauda ||
-                    caudaAcertouNesteAtaque)
+                if (caudaAcertouNesteAtaque)
                     return;
                 dano = danoCauda;
                 if (dano <= 0f)
@@ -705,6 +706,42 @@ private void AtualizarAnimacao(bool andando = true)
         if (outro.transform != jogadorPosition && !outro.transform.IsChildOf(jogadorPosition))
             return;
         JogadorEntrouNaHitbox(parte);
+    }
+
+    internal bool HitboxAtiva(HitboxParte.ParteCorpo parte)
+    {
+        if (!isActiveAndEnabled || IsDead)
+            return false;
+
+        float tempoCauda = Time.time - inicioAtaqueCauda;
+        return parte switch
+        {
+            HitboxParte.ParteCorpo.Frente => estado == State.jumpAttack || estado == State.groundAttack,
+            HitboxParte.ParteCorpo.Barbatana => estado != State.groundAttack,
+            HitboxParte.ParteCorpo.Cauda => estado == State.tailAttack && alvoCaudaTravado &&
+                tempoCauda >= inicioDanoCauda && tempoCauda < fimDanoCauda,
+            _ => false
+        };
+    }
+
+    internal void AtingirPilar(HitboxParte.ParteCorpo parte, PillarHealth pilar, Vector3 ponto)
+    {
+        switch (parte)
+        {
+            case HitboxParte.ParteCorpo.Frente:
+                if (!pilaresAtingidosPelaFrente.Contains(pilar) && pilar.TakeDamage(danoFrente, ponto))
+                    pilaresAtingidosPelaFrente.Add(pilar);
+                break;
+            case HitboxParte.ParteCorpo.Cauda:
+                if (!pilaresAtingidosPelaCauda.Contains(pilar) && pilar.TakeDamage(danoCauda, ponto))
+                    pilaresAtingidosPelaCauda.Add(pilar);
+                break;
+            case HitboxParte.ParteCorpo.Barbatana:
+                if ((!proximoDanoNosPilares.TryGetValue(pilar, out float proximo) || Time.time >= proximo) &&
+                    pilar.TakeDamage(danoBarbatana, ponto))
+                    proximoDanoNosPilares[pilar] = Time.time + intervaloDanoBarbatana;
+                break;
+        }
     }
 
     private void AoMorrer(EnemyHealth inimigo)

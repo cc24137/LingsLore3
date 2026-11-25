@@ -9,6 +9,7 @@ public sealed partial class BossNetanyahu
     [SerializeField, Min(1f)] private float tempoParaRessurgir = 2.8f;
     [SerializeField, Min(0f)] private float intervaloDoComboRobo = 20f;
 
+    private const float MultiplicadorDeDanoRobo = 1.5f;
     private const float RaioDaPancadaRobo = 8.6f;
     private const float RaioDoGiroRobo = 10f;
     private const float DuracaoDoStunRobo = 4f;
@@ -147,6 +148,7 @@ public sealed partial class BossNetanyahu
         primeiraMira.enabled = false;
         estado = Estado.Atacando;
 
+        float dano = (rapida ? 8f : 12f) * MultiplicadorDeDanoRobo;
         float proximoDano = float.NegativeInfinity;
         for (int i = 0; i < quantidade; i++)
         {
@@ -157,7 +159,7 @@ public sealed partial class BossNetanyahu
             if (direcao == Vector3.zero)
                 direcao = transform.forward;
 
-            StartCoroutine(MoverMissilLaser(origem, direcao, cor, rapida, avisoPorMissil, TentarDano));
+            StartCoroutine(MoverMissilLaser(origem, direcao, cor, rapida, avisoPorMissil, dano, TentarDano));
             yield return new WaitForSeconds(intervalo);
         }
 
@@ -167,14 +169,14 @@ public sealed partial class BossNetanyahu
 
         void TentarDano(Vector3 origem)
         {
-            if (Time.time >= proximoDano && ling.TakeDamage(rapida ? 8f : 12f, origem))
+            if (Time.time >= proximoDano && ling.TakeDamage(dano, origem))
                 proximoDano = Time.time + (rapida ? 0.23f : 0.30f);
         }
     }
 
     private Vector3 OrigemDoLaser(int lado) => transform.TransformPoint(new Vector3(lado * 0.48f, 0.22f, 0.44f));
 
-    private IEnumerator MoverMissilLaser(Vector3 posicao, Vector3 direcao, Color cor, bool rapida, float aviso,
+    private IEnumerator MoverMissilLaser(Vector3 posicao, Vector3 direcao, Color cor, bool rapida, float aviso, float dano,
         System.Action<Vector3> tentarDano)
     {
         projeteisLaserAtivos++;
@@ -218,6 +220,8 @@ public sealed partial class BossNetanyahu
 
             if (noLing || acerto.collider == colisaoDoLing)
                 tentarDano(origem);
+            else
+                PillarHealth.HitCollider(acerto.collider, dano, acerto.point);
             if (LutaEncerrada)
                 yield break;
             yield return null;
