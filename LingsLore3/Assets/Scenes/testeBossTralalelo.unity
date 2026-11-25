@@ -191,10 +191,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SequenciaChefesArena
   chefes:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 104477857}
+  nomesDosChefes:
+  - Tralalero
   jogador: {fileID: 28656684}
   fimDeJogo: {fileID: 337561535}
   intervaloEntreChefes: 0.75
@@ -1355,6 +1354,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 14877ee8a8bd4a941aa0e4b8e380a4a5, type: 3}
+--- !u!114 &104477857 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7728082970839460024, guid: 14877ee8a8bd4a941aa0e4b8e380a4a5, type: 3}
+  m_PrefabInstance: {fileID: 4185887864213953049}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f49edc542de240a428db65bb588acea0, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Enemy
 --- !u!1001 &8789802962302815298
 PrefabInstance:
   m_ObjectHideFlags: 0
