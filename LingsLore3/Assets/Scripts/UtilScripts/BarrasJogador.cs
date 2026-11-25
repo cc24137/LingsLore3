@@ -7,6 +7,8 @@ public class BarrasJogador : MonoBehaviour
     [SerializeField] private Slider barraVida;
     [SerializeField] private Slider barraStamina;
 
+    internal PlayerResources Jogador => jogador;
+
     private void Start()
     {
         if (jogador == null || barraVida == null || barraStamina == null)

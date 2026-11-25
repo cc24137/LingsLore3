@@ -33,7 +33,8 @@ public class PlayerHashi : MonoBehaviour
     private float nextShotTime;
     private float nextReloadTime = -1f;
     private bool tutorialAimIndicatorVisible;
-    private bool aimIndicatorVisible;
+    private bool usesHudReticle;
+    private PlayerResources resources;
     private GameObject aimIndicatorRoot;
     private LineRenderer aimLine;
     private Transform aimMarker;
@@ -47,11 +48,20 @@ public class PlayerHashi : MonoBehaviour
     public int MaxAmmo => 2;
     public float HitBounceHeight => hitBounceHeight;
 
+    internal Camera AimCamera => aimCamera;
+    internal bool ShowsAimIndicator =>
+        isActiveAndEnabled && ready && aimCamera != null &&
+        !MenuPausa.BloqueiaEntradaDeJogo && (resources == null || !resources.IsDead) &&
+        (tutorialAimIndicatorVisible || (Keyboard.current != null && Keyboard.current.qKey.isPressed));
+
+    internal void UseHudReticle(bool useHud) => usesHudReticle = useHud;
+
     public bool CanFire =>
         ready && CurrentAmmo > 0 && Time.time >= nextShotTime;
 
     private void Awake()
     {
+        resources = GetComponent<PlayerResources>();
         if (projectilePrefab == null || firePoint == null || aimCamera == null ||
             backHashis == null || backHashis.Length != 2 ||
             backHashis[0] == null || backHashis[1] == null ||
@@ -85,14 +95,7 @@ public class PlayerHashi : MonoBehaviour
 
     private void Update()
     {
-        if (MenuPausa.BloqueiaEntradaDeJogo)
-            return;
-
-        bool aimAssistHeld = Keyboard.current != null &&
-            Keyboard.current.qKey.isPressed;
-        SetAimIndicatorState(tutorialAimIndicatorVisible || aimAssistHeld);
-
-        if (!ready || CurrentAmmo >= MaxAmmo || nextReloadTime < 0f)
+        if (MenuPausa.BloqueiaEntradaDeJogo || !ready || CurrentAmmo >= MaxAmmo || nextReloadTime < 0f)
             return;
 
         // Recupera uma municao a cada reloadTime segundos.
@@ -109,7 +112,15 @@ public class PlayerHashi : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (!aimIndicatorVisible || !ready || aimLine == null || aimMarker == null)
+        bool showPreview = ShowsAimIndicator && (!usesHudReticle || tutorialAimIndicatorVisible);
+        if (showPreview && aimIndicatorRoot == null)
+            CreateAimIndicator();
+
+        if (aimIndicatorRoot == null)
+            return;
+
+        aimIndicatorRoot.SetActive(showPreview);
+        if (!showPreview)
             return;
 
         CalculateAim(transform, out Vector3 target, out Vector3 direction, out _);
@@ -121,7 +132,7 @@ public class PlayerHashi : MonoBehaviour
 
     private void OnGUI()
     {
-        if (!aimIndicatorVisible || !ready || aimCamera == null)
+        if (usesHudReticle || !ShowsAimIndicator)
             return;
 
         Rect viewport = aimCamera.pixelRect;
@@ -148,28 +159,7 @@ public class PlayerHashi : MonoBehaviour
             armLength, thickness), Texture2D.whiteTexture);
     }
 
-    public void SetAimIndicatorVisible(bool visible)
-    {
-        tutorialAimIndicatorVisible = visible;
-        bool aimAssistHeld = Keyboard.current != null &&
-            Keyboard.current.qKey.isPressed;
-        SetAimIndicatorState(tutorialAimIndicatorVisible || aimAssistHeld);
-    }
-
-    private void SetAimIndicatorState(bool visible)
-    {
-        if (aimIndicatorVisible == visible)
-            return;
-
-        aimIndicatorVisible = visible;
-        if (visible && ready)
-            CreateAimIndicator();
-
-        if (aimLine != null)
-            aimLine.enabled = visible;
-        if (aimMarker != null)
-            aimMarker.gameObject.SetActive(visible);
-    }
+    public void SetAimIndicatorVisible(bool visible) => tutorialAimIndicatorVisible = visible;
 
     public bool Fire(Transform owner)
     {
@@ -305,8 +295,12 @@ public class PlayerHashi : MonoBehaviour
             markerRenderer.sharedMaterial = aimIndicatorMaterial;
 
         aimMarker = marker.transform;
-        aimLine.enabled = aimIndicatorVisible;
-        marker.SetActive(aimIndicatorVisible);
+    }
+
+    private void OnDisable()
+    {
+        if (aimIndicatorRoot != null)
+            aimIndicatorRoot.SetActive(false);
     }
 
     private void RelayEnemyHit(EnemyHealth enemy)

@@ -16,6 +16,7 @@ public sealed class SequenciaChefesArena : MonoBehaviour
     }
 
     [SerializeField] private EnemyHealth[] chefes;
+    [SerializeField] private string[] nomesDosChefes;
     [SerializeField] private PlayerResources jogador;
     [SerializeField] private FimDeJogo fimDeJogo;
     [SerializeField, Min(0f)] private float intervaloEntreChefes = 0.75f;
@@ -30,6 +31,22 @@ public sealed class SequenciaChefesArena : MonoBehaviour
     private bool retomando;
 
     private bool TemAcessos => acessos != null && acessos.Length > 0;
+
+    internal EnemyHealth ChefeAtual => chefeAtual;
+
+    internal string NomeDoChefeAtual
+    {
+        get
+        {
+            if (chefeAtual == null)
+                return string.Empty;
+
+            string nome = nomesDosChefes != null && etapaAtual < nomesDosChefes.Length
+                ? nomesDosChefes[etapaAtual]
+                : null;
+            return string.IsNullOrWhiteSpace(nome) ? chefeAtual.gameObject.name : nome;
+        }
+    }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void LimparRetentativa()

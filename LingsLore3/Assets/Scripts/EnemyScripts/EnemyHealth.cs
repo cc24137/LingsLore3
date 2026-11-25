@@ -18,6 +18,7 @@ public class EnemyHealth : MonoBehaviour
     public bool IsDead => currentHealth <= 0f;
     public float CurrentHealth => currentHealth;
     public int CurrentBar { get; private set; } = 1;
+    public int BarCount => secondBarHealth <= 0f ? 1 : (thirdBarHealth > 0f ? 3 : 2);
     public float MaxHealth => CurrentBar switch
     {
         2 => secondBarHealth,
