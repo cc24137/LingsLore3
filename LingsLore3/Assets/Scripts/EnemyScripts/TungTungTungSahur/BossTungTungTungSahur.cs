@@ -59,6 +59,8 @@ public sealed partial class BossTungTungTungSahur : MonoBehaviour
     private const float TempoDeSubida = 0.36f;
     private const float TempoDeTravessia = 0.38f;
     private const float TempoDeQueda = 0.26f;
+    private const float DuracaoDoGiroAngelical = 0.29f;
+    private const float AvisoExtraDoGiroAngelical = 0.18f;
     private const float EsperaExtraParaSaltarDePerto = 1.5f;
     private static readonly int CorBase = Shader.PropertyToID("_BaseColor");
     private static readonly Color Amarelo = new Color(1f, 0.72f, 0.12f);
@@ -167,7 +169,8 @@ public sealed partial class BossTungTungTungSahur : MonoBehaviour
                 anguloAnteriorDaTacada = TacadaGiratoria ? 0f : semiAnguloDoGolpe;
                 pilaresAtingidosNaTacada.Clear();
                 tacadaJaResolveuContato = false;
-                EntrarNoEstado(Estado.Tacando, TacadaGiratoria ? 0.55f : duracaoDaTacada);
+                EntrarNoEstado(Estado.Tacando, BalanceamentoDificuldade.Atual.Duracao(
+                    TacadaGiratoria ? DuracaoDoGiroAngelical : duracaoDaTacada));
                 AtualizarTacada();
                 break;
             case Estado.Tacando:
@@ -229,8 +232,11 @@ public sealed partial class BossTungTungTungSahur : MonoBehaviour
             centroDoGolpe = centro;
             frenteDoGolpe = frente;
             corpo.rotation = Quaternion.LookRotation(frente);
-            EntrarNoEstado(Estado.PreparandoTacada, preparacao);
+            float avisoDaTacada = preparacao + (TacadaGiratoria ? AvisoExtraDoGiroAngelical : 0f);
+            EntrarNoEstado(Estado.PreparandoTacada, BalanceamentoDificuldade.Atual.Aviso(avisoDaTacada));
             MarcarArea(centro, AlcanceAtivoDaTacada, frente, TacadaGiratoria ? 180f : semiAnguloDoGolpe);
+            if (TacadaGiratoria)
+                aviso.widthMultiplier = 0.24f;
             return;
         }
 
@@ -298,7 +304,7 @@ public sealed partial class BossTungTungTungSahur : MonoBehaviour
         alturaDoTrajeto = origem.y + alturaDoSalto;
         corpo.rotation = Quaternion.LookRotation(frente);
         proximoSalto = Time.fixedTime + intervaloEntreSaltos;
-        EntrarNoEstado(Estado.PreparandoSalto, avisoDoSalto);
+        EntrarNoEstado(Estado.PreparandoSalto, BalanceamentoDificuldade.Atual.Aviso(avisoDoSalto));
         MarcarArea(alvo, raioDoImpacto, frente, 180f);
         return true;
     }
@@ -345,13 +351,13 @@ public sealed partial class BossTungTungTungSahur : MonoBehaviour
             case Estado.Subindo:
                 posicao.y = Mathf.Lerp(saidaDoSalto.y, alturaDoTrajeto, 1f - (1f - t) * (1f - t));
                 if (t >= 1f)
-                    EntrarNoEstado(Estado.Cruzando, TempoDeTravessia);
+                    EntrarNoEstado(Estado.Cruzando, BalanceamentoDificuldade.Atual.Duracao(TempoDeTravessia));
                 break;
             case Estado.Cruzando:
                 posicao = Vector3.Lerp(saidaDoSalto, pousoDoSalto, Mathf.SmoothStep(0f, 1f, t));
                 posicao.y = alturaDoTrajeto;
                 if (t >= 1f)
-                    EntrarNoEstado(Estado.Caindo, TempoDeQueda);
+                    EntrarNoEstado(Estado.Caindo, BalanceamentoDificuldade.Atual.Duracao(TempoDeQueda));
                 break;
             case Estado.Caindo:
                 posicao = pousoDoSalto;
@@ -362,7 +368,7 @@ public sealed partial class BossTungTungTungSahur : MonoBehaviour
                     MarcarImpacto();
                     ReproduzirExplosao(pousoDoSalto, raioDoImpacto, Amarelo, 0.65f);
                     if (LingNaArea(pousoDoSalto, raioDoImpacto, alturaDoImpacto, out _))
-                        ling.TakeDamage(danoDoImpacto, pousoDoSalto);
+                        ling.TakeBossDamage(danoDoImpacto, pousoDoSalto);
                     PillarHealth.HitArea(pousoDoSalto, raioDoImpacto, alturaDoImpacto, danoDoImpacto, obstaculos);
                 }
                 break;
@@ -417,7 +423,7 @@ public sealed partial class BossTungTungTungSahur : MonoBehaviour
             if (TacadaPassouPeloAlvo(delta, colisorDoLing.radius, angulo))
             {
                 tacadaJaResolveuContato = true;
-                ling.TakeDamage(danoDoGolpe, centroDoGolpe);
+                ling.TakeBossDamage(danoDoGolpe, centroDoGolpe);
             }
         }
 
@@ -445,7 +451,7 @@ public sealed partial class BossTungTungTungSahur : MonoBehaviour
             MarcarArea(centroDaExplosaoDaTacada, raioDaExplosaoDaTacada, frenteDoGolpe, 180f);
             materialDoAviso.SetColor(CorBase, Carmesim);
             aviso.widthMultiplier = 0.22f;
-            EntrarNoEstado(Estado.EsperandoExplosaoDaTacada, tempoAteExplodirATacada);
+            EntrarNoEstado(Estado.EsperandoExplosaoDaTacada, BalanceamentoDificuldade.Atual.Aviso(tempoAteExplodirATacada, 0.85f));
         }
         else
             FinalizarAtaque(Estado.RecuperandoDaTacada, recuperacao);
@@ -470,7 +476,7 @@ public sealed partial class BossTungTungTungSahur : MonoBehaviour
         EfeitosSonoros.Tocar(Som.Fogo, centroDaExplosaoDaTacada);
         ReproduzirExplosao(centroDaExplosaoDaTacada, raioDaExplosaoDaTacada, Carmesim);
         if (LingNaArea(centroDaExplosaoDaTacada, raioDaExplosaoDaTacada, 1.8f, out _))
-            ling.TakeDamage(danoDaExplosaoDaTacada, centroDaExplosaoDaTacada);
+            ling.TakeBossDamage(danoDaExplosaoDaTacada, centroDaExplosaoDaTacada);
         PillarHealth.HitArea(centroDaExplosaoDaTacada, raioDaExplosaoDaTacada, 1.8f, danoDaExplosaoDaTacada, obstaculos);
         FinalizarAtaque(Estado.RecuperandoDaTacada, recuperacao);
     }
@@ -504,7 +510,7 @@ public sealed partial class BossTungTungTungSahur : MonoBehaviour
     private void FinalizarAtaque(Estado recuperando, float descanso)
     {
         aviso.enabled = false;
-        EntrarNoEstado(recuperando, descanso);
+        EntrarNoEstado(recuperando, BalanceamentoDificuldade.Atual.Descanso(descanso, Mathf.Min(descanso, 0.75f)));
     }
 
     private bool SobrepostoAoLing() => Physics.ComputePenetration(colisor, corpo.position, corpo.rotation,

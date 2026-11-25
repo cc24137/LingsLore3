@@ -49,10 +49,11 @@ public sealed class MetralhadoraBigYahu : MonoBehaviour
         mascaraDosProjeteis = barreiras.value | (1 << colisor.gameObject.layer);
         pontoMirado = colisor.bounds.center;
         inicioDoAviso = Time.time;
-        travaDaMira = inicioDoAviso + tempoDeAviso * 0.65f;
+        float aviso = BalanceamentoDificuldade.Atual.Aviso(tempoDeAviso, 0.65f);
+        travaDaMira = inicioDoAviso + aviso - Mathf.Max(0.28f, aviso * 0.35f);
         linhaDaMira = CriarLinha("Mira da rajada", 0.045f, CorDaMira);
         AtualizarPosicaoDaArma();
-        yield return new WaitForSeconds(tempoDeAviso);
+        yield return new WaitForSeconds(aviso);
         linhaDaMira.enabled = false;
     }
 
@@ -132,7 +133,7 @@ public sealed class MetralhadoraBigYahu : MonoBehaviour
         while (percorrido < alcanceDoProjetil)
         {
             yield return passoFisico;
-            float passo = Mathf.Min(velocidadeDoProjetil * Time.fixedDeltaTime, alcanceDoProjetil - percorrido);
+            float passo = Mathf.Min(BalanceamentoDificuldade.Atual.Velocidade(velocidadeDoProjetil) * Time.fixedDeltaTime, alcanceDoProjetil - percorrido);
             if (Physics.SphereCast(posicao, raio, direcao, out RaycastHit acerto, passo,
                 mascaraDosProjeteis, QueryTriggerInteraction.Ignore))
             {
@@ -160,7 +161,7 @@ public sealed class MetralhadoraBigYahu : MonoBehaviour
 
     private void TentarCausarDano(Vector3 origem, float dano)
     {
-        if (Time.time >= proximoDano && alvo.TakeDamage(dano, origem))
+        if (Time.time >= proximoDano && alvo.TakeBossDamage(dano, origem))
             proximoDano = Time.time + intervaloDoDano;
     }
 

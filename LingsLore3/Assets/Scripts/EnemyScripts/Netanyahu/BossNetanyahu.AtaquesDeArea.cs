@@ -11,8 +11,10 @@ public sealed partial class BossNetanyahu
     [SerializeField, Min(0f)] private float danoDaBombaMassiva = 38f;
     [SerializeField, Min(0f)] private float intervaloDaBombaMassiva = 20f;
 
-    [Header("Giro com o Tralalero")]
+    [Header("Giro com o modelo")]
     [SerializeField] private GameObject modeloTralaleroDoGiro;
+    [SerializeField] private Mesh malhaTungDoGiro;
+    [SerializeField] private Material materialTungDoGiro;
     [SerializeField, Min(0.1f)] private float raioDoGiro = 9f;
     [SerializeField, Min(0.1f)] private float alturaDoGiro = 4f;
     [SerializeField, Min(0.1f)] private float avisoDoGiro = 0.85f;
@@ -24,6 +26,7 @@ public sealed partial class BossNetanyahu
     private Material materialDoVolumeMassivo;
 
     private bool PodeUsarBombaMassiva => prefabBomba != null && Time.time >= proximaBombaMassiva;
+    private bool PodeGirarComTung => malhaTungDoGiro != null && materialTungDoGiro != null;
 
     private IEnumerator ExecutarBombaMassiva()
     {
@@ -36,7 +39,9 @@ public sealed partial class BossNetanyahu
 
         float raio = RaioDoPiso(arena);
         float inicio = Time.time;
-        float duracaoDoAviso = preparacaoDaBombaMassiva + prefabBomba.TempoAteDetonar;
+        // Atravessar a arena e subir em um pilar precisa de tempo em todas as dificuldades.
+        float preparacao = BalanceamentoDificuldade.Atual.Aviso(preparacaoDaBombaMassiva, preparacaoDaBombaMassiva);
+        float duracaoDoAviso = preparacao + prefabBomba.TempoAteDetonar;
         fimDoAvisoMassivo = inicio + duracaoDoAviso;
         proximaBombaMassiva = fimDoAvisoMassivo + intervaloDaBombaMassiva;
 
@@ -50,9 +55,9 @@ public sealed partial class BossNetanyahu
         Bomba bomba = Instantiate(prefabBomba, PosicaoDaBombaMassiva(), Quaternion.identity, efeitosDoAtaque.transform);
         bomba.transform.localScale *= 5f;
         bombaNaMao = bomba;
-        while (Time.time < inicio + preparacaoDaBombaMassiva)
+        while (Time.time < inicio + preparacao)
         {
-            preparacaoVisualDoAtaque = (Time.time - inicio) / preparacaoDaBombaMassiva;
+            preparacaoVisualDoAtaque = (Time.time - inicio) / preparacao;
             if (!TemDuasMaos)
                 bomba.transform.position = PosicaoDaBombaMassiva();
             AtualizarMarcacaoMassiva(contagem, centro, raio, inicio, duracaoDoAviso);
@@ -124,19 +129,33 @@ public sealed partial class BossNetanyahu
     private void AplicarExplosaoMassiva(Vector3 centro, float raio)
     {
         Bounds alvo = colisaoDoLing.bounds;
-        if (VetorHorizontal(alvo.center - centro).sqrMagnitude <= raio * raio &&
-            alvo.min.y < centro.y + alturaDaExplosaoMassiva && alvo.max.y >= centro.y)
-            ling.TakeDamage(danoDaBombaMassiva, centro, ignorarInvulnerabilidadeDaEsquiva: true);
+        float alturaSegura = centro.y + alturaDaExplosaoMassiva;
+        if (VetorHorizontal(alvo.center - centro).sqrMagnitude > raio * raio ||
+            alvo.min.y >= alturaSegura || alvo.max.y < centro.y)
+            return;
+
+        // Sem um pilar de abrigo na arena, a contagem também permite rolar no impacto.
+        bool temAbrigo = false;
+        foreach (PillarHealth pilar in PillarHealth.ActivePillars)
+        {
+            if (!pilar.CanBeHit || pilar.Shaft.bounds.max.y < alturaSegura ||
+                VetorHorizontal(pilar.Shaft.bounds.center - centro).sqrMagnitude > raio * raio)
+                continue;
+
+            temAbrigo = true;
+            break;
+        }
+        ling.TakeBossDamage(danoDaBombaMassiva, centro, ignorarInvulnerabilidadeDaEsquiva: temAbrigo);
     }
 
-    private IEnumerator ExecutarGiroTralalero(bool robotico = false, bool frontal = false)
+    private IEnumerator ExecutarGiroComModelo(bool robotico = false, bool frontal = false)
     {
         float raio = robotico ? (frontal ? RaioDaPancadaRobo : RaioDoGiroRobo) : raioDoGiro;
-        float vento = robotico ? (frontal ? 0.55f : 0.48f) : avisoDoGiro;
-        float duracao = robotico ? (frontal ? 0.26f : 0.36f) : duracaoDoGiro;
+        float vento = BalanceamentoDificuldade.Atual.Aviso(robotico ? (frontal ? 0.55f : 0.48f) : avisoDoGiro);
+        float duracao = BalanceamentoDificuldade.Atual.Duracao(robotico ? (frontal ? 0.26f : 0.36f) : duracaoDoGiro);
         float dano = robotico ? (frontal ? 18f : 21f) * MultiplicadorDeDanoRobo : danoDoGiro;
         estado = Estado.Preparando;
-        CriarEfeitos("Giro com o Tralalero");
+        CriarEfeitos(robotico ? "Giro com o Tung Tung Tung Sahur" : "Giro com o Tralalero");
         Vector3 centro = corpo.position;
         centro.y = piso.bounds.max.y;
         Vector3 frente = DirecaoDoLing();
@@ -145,25 +164,55 @@ public sealed partial class BossNetanyahu
         var pivo = new GameObject("Pivô do giro").transform;
         pivo.SetParent(efeitosDoAtaque.transform, false);
         pivo.position = centro;
-        Transform modelo = Instantiate(modeloTralaleroDoGiro, pivo, false).transform;
-        modelo.localPosition = Vector3.zero;
-        modelo.localRotation = Quaternion.identity;
-        Renderer[] partes = modelo.GetComponentsInChildren<Renderer>();
-        if (partes.Length == 0)
+        Transform modelo;
+        if (robotico)
         {
-            LimparEfeitos();
-            yield break;
+            var visual = new GameObject("Tung Tung Tung Sahur");
+            modelo = visual.transform;
+            modelo.SetParent(pivo, false);
+            visual.AddComponent<MeshFilter>().sharedMesh = malhaTungDoGiro;
+            visual.AddComponent<MeshRenderer>().sharedMaterial = materialTungDoGiro;
         }
+        else
+        {
+            modelo = Instantiate(modeloTralaleroDoGiro, pivo, false).transform;
+        }
+        modelo.localPosition = Vector3.zero;
+        Vector3 escala;
+        Vector3 posicao;
+        Vector3 pontoDeApoio = Vector3.zero;
+        if (robotico)
+        {
+            // A altura da malha passa a apontar para fora, com os pés no apoio do robô.
+            modelo.localRotation = Quaternion.LookRotation(Vector3.up, Vector3.forward);
+            Bounds limites = malhaTungDoGiro.bounds;
+            Vector3 pes = new Vector3(limites.center.x, limites.min.y, limites.center.z);
+            float distanciaDoApoio = RaioDoBoss + 0.15f;
+            float comprimento = Mathf.Max(0.1f, raio - distanciaDoApoio);
+            escala = Vector3.one * (comprimento / Mathf.Max(0.1f, limites.size.y));
+            pontoDeApoio = new Vector3(0f, corpo.position.y - centro.y - 0.18f * transform.lossyScale.y, distanciaDoApoio);
+            posicao = pontoDeApoio - modelo.localRotation * Vector3.Scale(pes, escala);
+        }
+        else
+        {
+            modelo.localRotation = Quaternion.identity;
+            Renderer[] partes = modelo.GetComponentsInChildren<Renderer>();
+            if (partes.Length == 0)
+            {
+                LimparEfeitos();
+                yield break;
+            }
 
-        Bounds limites = partes[0].bounds;
-        for (int i = 1; i < partes.Length; i++)
-            limites.Encapsulate(partes[i].bounds);
-        float fator = raio * 0.86f / Mathf.Max(0.1f, limites.size.z);
-        Vector3 escala = modelo.localScale * fator;
-        Vector3 baseDoModelo = new Vector3(limites.center.x, limites.min.y, limites.center.z) - centro;
-        Vector3 posicao = new Vector3(0f, robotico ? 0.7f : 0.12f, raio * 0.55f) - baseDoModelo * fator;
-        pegadaDoTralalero = modelo.InverseTransformPoint(new Vector3(limites.center.x, limites.center.y, limites.min.z));
-        tralaleroNasMaos = modelo;
+            Bounds limites = partes[0].bounds;
+            for (int i = 1; i < partes.Length; i++)
+                limites.Encapsulate(partes[i].bounds);
+            float fator = raio * 0.86f / Mathf.Max(0.1f, limites.size.z);
+            escala = modelo.localScale * fator;
+            Vector3 baseDoModelo = new Vector3(limites.center.x, limites.min.y, limites.center.z) - centro;
+            posicao = new Vector3(0f, 0.12f, raio * 0.55f) - baseDoModelo * fator;
+            pegadaDoTralalero = modelo.InverseTransformPoint(new Vector3(limites.center.x, limites.center.y, limites.min.z));
+            tralaleroNasMaos = modelo;
+        }
 
         float anguloInicial = frontal ? -60f : -72f;
         Quaternion poseInicial = corpo.rotation;
@@ -174,7 +223,7 @@ public sealed partial class BossNetanyahu
             float progresso = Mathf.SmoothStep(0f, 1f, preparacaoVisualDoAtaque);
             float saque = Mathf.Lerp(0.23f, 1f, progresso);
             modelo.localScale = escala * saque;
-            modelo.localPosition = posicao * saque;
+            modelo.localPosition = Vector3.Lerp(pontoDeApoio, posicao, saque);
             corpo.rotation = Quaternion.Slerp(poseInicial, poseDePreparacao, progresso);
             pivo.rotation = corpo.rotation;
             yield return null;
@@ -201,7 +250,7 @@ public sealed partial class BossNetanyahu
                     obstaculos, QueryTriggerInteraction.Ignore)))
             {
                 contatoResolvido = true;
-                ling.TakeDamage(dano, centro);
+                ling.TakeBossDamage(dano, centro);
                 if (LutaEncerrada)
                     yield break;
             }

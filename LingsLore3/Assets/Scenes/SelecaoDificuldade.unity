@@ -996,7 +996,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Um \xFAnico descuido \xE9 fatal. Boa sorte, voc\xEA vai precisar."
+  m_text: "Chefes mais r\xE1pidos e resistentes. Vida e curas n\xE3o s\xE3o restauradas entre as lutas."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 985e8991e4960f049ae0799350741e86, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 985e8991e4960f049ae0799350741e86, type: 2}
@@ -1420,7 +1420,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: MÉDIO
+  m_text: NORMAL
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 2d420883c3636ec498d56d83f337c64f, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 1147e2f9599c4818b64bf7804343ab3d, type: 2}

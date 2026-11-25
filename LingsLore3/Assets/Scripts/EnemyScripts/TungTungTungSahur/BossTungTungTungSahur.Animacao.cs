@@ -84,13 +84,16 @@ public sealed partial class BossTungTungTungSahur
         switch (estado)
         {
             case Estado.PreparandoTacada:
-                float preparacaoDoBraco = Mathf.SmoothStep(0f, 1f, progresso);
-                pose = Quaternion.Slerp(Quaternion.identity, PoseDaTacada(TacadaGiratoria ? 0f : semiAnguloDoGolpe),
+                float preparacaoDoBraco = Mathf.SmoothStep(0f, 1f, TacadaGiratoria ? progresso / 0.28f : progresso);
+                pose = Quaternion.Slerp(Quaternion.identity,
+                    TacadaGiratoria ? PoseDaTacada(0f, -62f) : PoseDaTacada(semiAnguloDoGolpe),
                     preparacaoDoBraco);
                 inclinacao = -7f * preparacaoDoBraco;
                 break;
             case Estado.Tacando:
-                pose = PoseDaTacada(TacadaGiratoria ? 0f : Mathf.Lerp(semiAnguloDoGolpe, -semiAnguloDoGolpe, progresso));
+                pose = TacadaGiratoria
+                    ? PoseDaTacada(0f, Mathf.SmoothStep(-62f, 18f, progresso / 0.24f))
+                    : PoseDaTacada(Mathf.Lerp(semiAnguloDoGolpe, -semiAnguloDoGolpe, progresso));
                 inclinacao = Mathf.Lerp(-7f, 9f, progresso);
                 break;
             case Estado.EsperandoExplosaoDaTacada:
@@ -143,10 +146,10 @@ public sealed partial class BossTungTungTungSahur
         modelo.transform.localRotation = Quaternion.Euler(inclinacao, 0f, 0f);
     }
 
-    private static Quaternion PoseDaTacada(float angulo)
+    private static Quaternion PoseDaTacada(float angulo, float inclinacao = 18f)
     {
         Vector3 direcaoDoTaco = PontaDoTaco - CaboDoTaco;
-        Vector3 destino = Quaternion.Euler(18f, angulo, 0f) * Vector3.forward;
+        Vector3 destino = Quaternion.Euler(inclinacao, angulo, 0f) * Vector3.forward;
         return Quaternion.FromToRotation(direcaoDoTaco, destino);
     }
 

@@ -75,7 +75,7 @@ public sealed partial class BossTungTungTungSahur
                 PrepararRastroDoMeteoro();
                 if (vida.CurrentBar == 2)
                     EfeitosSonoros.Tocar(Som.Fogo, pousoDoSalto);
-                EntrarNoEstado(Estado.CaindoMeteoro, TempoDeQuedaDoMeteoro);
+                EntrarNoEstado(Estado.CaindoMeteoro, BalanceamentoDificuldade.Atual.Duracao(TempoDeQuedaDoMeteoro));
                 break;
             case Estado.CaindoMeteoro:
                 AtualizarQuedaDoMeteoro(t);
@@ -97,7 +97,7 @@ public sealed partial class BossTungTungTungSahur
         MarcarArea(pousoDoSalto, RaioDoMeteoro, frente, 180f);
         aviso.widthMultiplier = 0.22f;
         materialDoAviso.SetColor(CorBase, CorDoMeteoro);
-        EntrarNoEstado(Estado.MirandoMeteoro, avisoDoMeteoro);
+        EntrarNoEstado(Estado.MirandoMeteoro, BalanceamentoDificuldade.Atual.Aviso(avisoDoMeteoro, 0.72f));
     }
 
     private void AtualizarQuedaDoMeteoro(float t)
@@ -121,7 +121,7 @@ public sealed partial class BossTungTungTungSahur
         EntrarNoEstado(Estado.Impacto, 0.42f);
         ReproduzirExplosao(pousoDoSalto, RaioDoMeteoro, CorDoMeteoro, 2.3f);
         if (LingNaArea(pousoDoSalto, RaioDoMeteoro, 3.1f, out _))
-            ling.TakeDamage(danoDoMeteoro, pousoDoSalto);
+            ling.TakeBossDamage(danoDoMeteoro, pousoDoSalto);
         PillarHealth.HitArea(pousoDoSalto, RaioDoMeteoro, 3.1f, danoDoMeteoro, obstaculos);
     }
 

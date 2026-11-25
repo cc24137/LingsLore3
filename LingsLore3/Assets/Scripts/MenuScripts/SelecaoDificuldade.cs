@@ -12,7 +12,10 @@ public enum Dificuldade
 public class SelecaoDificuldade : MonoBehaviour
 {
     public static Dificuldade DificuldadeEscolhida { get; private set; }
-        = Dificuldade.Facil;
+        = Dificuldade.Medio;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void InicializarDificuldade() => DificuldadeEscolhida = Dificuldade.Medio;
 
     private bool carregandoCena;
     private DestaqueCardDificuldade cardComFoco;
@@ -64,7 +67,7 @@ public class SelecaoDificuldade : MonoBehaviour
 
     public void SelecionarDificuldade(int indice)
     {
-        if (carregandoCena)
+        if (carregandoCena || indice < (int)Dificuldade.Facil || indice > (int)Dificuldade.Impossivel)
             return;
 
         carregandoCena = true;

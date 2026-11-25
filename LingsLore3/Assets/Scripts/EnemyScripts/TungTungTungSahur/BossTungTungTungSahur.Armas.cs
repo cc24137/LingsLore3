@@ -46,7 +46,7 @@ public sealed partial class BossTungTungTungSahur
     private MaterialPropertyBlock propriedadesDoAvisoDaArma;
     private bool ArmasGuiadas => vida.CurrentBar == 3;
     private float LarguraAtivaDaLanca => LarguraDaLanca * (vida.CurrentBar == 2 ? multiplicadorDaLarguraDemonio : 1f);
-    private float VelocidadeAtivaDaLanca => VelocidadeDaLanca * (vida.CurrentBar == 2 ? multiplicadorDaVelocidadeDemonio : 1f);
+    private float VelocidadeAtivaDaLanca => BalanceamentoDificuldade.Atual.Velocidade(VelocidadeDaLanca) * (vida.CurrentBar == 2 ? multiplicadorDaVelocidadeDemonio : 1f);
 
     private bool TentarInvocarArmas(Bounds arena, Vector3 centro, Vector3 frente, float distancia)
     {
@@ -82,7 +82,7 @@ public sealed partial class BossTungTungTungSahur
         contatoDaInvocacaoResolvido = false;
         invocarMartelosNaProxima = !martelos;
         proximaInvocacao = Time.fixedTime + (vida.CurrentBar == 3 ? 5.8f : 8.5f);
-        EntrarNoEstado(Estado.PreparandoArmas, martelos ? avisoDosMartelos : avisoDasLancas);
+        EntrarNoEstado(Estado.PreparandoArmas, BalanceamentoDificuldade.Atual.Aviso(martelos ? avisoDosMartelos : avisoDasLancas, 0.60f));
         EfeitosSonoros.Tocar(Som.TungTung, corpo.position);
         return true;
     }
@@ -166,7 +166,7 @@ public sealed partial class BossTungTungTungSahur
                 ColorirAvisoDaArma(arma.Aviso, !martelos && ArmasGuiadas ? Dourado : Vermelho);
             if (martelos)
                 EfeitosSonoros.Tocar(Som.SomSagrado, armas[0].Destino);
-            EntrarNoEstado(Estado.LancandoArmas, martelos ? TempoDeQuedaDoMartelo :
+            EntrarNoEstado(Estado.LancandoArmas, martelos ? BalanceamentoDificuldade.Atual.Duracao(TempoDeQuedaDoMartelo) :
                 alcanceDasLancas / VelocidadeAtivaDaLanca);
             return;
         }
@@ -184,7 +184,7 @@ public sealed partial class BossTungTungTungSahur
                 if (!contatoDaInvocacaoResolvido && LingNaArea(arma.Destino, RaioDoMartelo, 2.8f, out _))
                 {
                     contatoDaInvocacaoResolvido = true;
-                    ling.TakeDamage(danoDoMartelo, arma.Destino);
+                    ling.TakeBossDamage(danoDoMartelo, arma.Destino);
                 }
                 PillarHealth.HitArea(arma.Destino, RaioDoMartelo, 2.8f, danoDoMartelo, obstaculos, pilaresAtingidos);
             }
@@ -218,7 +218,7 @@ public sealed partial class BossTungTungTungSahur
             if (passo > 0f && !contatoDaInvocacaoResolvido && LancaAtingiuLing(inicio, arma.Frente, passo, largura))
             {
                 contatoDaInvocacaoResolvido = true;
-                ling.TakeDamage(danoDaLanca, inicio);
+                ling.TakeBossDamage(danoDaLanca, inicio);
             }
 
             bool continua = passo < livre - 0.001f;

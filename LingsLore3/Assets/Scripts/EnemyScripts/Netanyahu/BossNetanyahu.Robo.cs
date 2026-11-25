@@ -3,7 +3,7 @@ using UnityEngine;
 
 public sealed partial class BossNetanyahu
 {
-    [Header("Terceira fase")]
+    [Header("Segunda fase - robô")]
     [SerializeField] private ExplosaoVfx prefabExplosaoRobo;
     [SerializeField] private MiniTralalero prefabMiniNetanyahu;
     [SerializeField, Min(1f)] private float tempoParaRessurgir = 2.8f;
@@ -52,7 +52,7 @@ public sealed partial class BossNetanyahu
 
     private IEnumerator ExecutarRodadaRobo()
     {
-        if (modeloTralaleroDoGiro != null && vida.CurrentHealth <= vida.MaxHealth * 0.5f && Time.time >= proximoComboRobo)
+        if (PodeGirarComTung && vida.CurrentHealth <= vida.MaxHealth * 0.5f && Time.time >= proximoComboRobo)
         {
             ataqueEscolhido = Ataque.ComboRobo;
             ultimoAtaqueNoChao = ataqueEscolhido;
@@ -66,6 +66,8 @@ public sealed partial class BossNetanyahu
             ataquesDisponiveis.Add(Ataque.RajadaRobo);
         if (PodeInvocarMinis(prefabMiniNetanyahu))
             ataquesDisponiveis.Add(Ataque.MinisRobo);
+        if (PodeGirarComTung)
+            ataquesDisponiveis.Add(Ataque.GiroTung);
         ataqueEscolhido = SortearAtaque(ref ultimoAtaqueNoChao);
         switch (ataqueEscolhido)
         {
@@ -78,6 +80,9 @@ public sealed partial class BossNetanyahu
             case Ataque.MinisRobo:
                 yield return ExecutarQuandoPerto(ComandarMinis(prefabMiniNetanyahu, roboticos: true), distanciaParaInvocar);
                 break;
+            case Ataque.GiroTung:
+                yield return ExecutarQuandoPerto(ExecutarGiroComModelo(robotico: true), RaioDoGiroRobo);
+                break;
         }
     }
 
@@ -86,19 +91,21 @@ public sealed partial class BossNetanyahu
         estado = Estado.Preparando;
         corpo.rotation = Quaternion.LookRotation(DirecaoDoLing());
         AcenderOlhoDoCombo();
-        yield return new WaitForSeconds(1.05f);
+        yield return new WaitForSeconds(BalanceamentoDificuldade.Atual.Aviso(1.05f));
         ApagarOlhoDoCombo();
 
         yield return AproximarParaComboRobo(RaioDaPancadaRobo, 1f);
-        yield return ExecutarGiroTralalero(robotico: true, frontal: true);
+        yield return ExecutarGiroComModelo(robotico: true, frontal: true);
         if (LutaEncerrada)
             yield break;
 
+        yield return new WaitForSeconds(0.45f);
         yield return DispararSalvaLaser(rapida: true);
         for (int i = 0; i < 2 && !LutaEncerrada; i++)
         {
+            yield return new WaitForSeconds(0.45f);
             yield return AproximarParaComboRobo(RaioDoGiroRobo, 0.78f);
-            yield return ExecutarGiroTralalero(robotico: true);
+            yield return ExecutarGiroComModelo(robotico: true);
         }
         if (LutaEncerrada)
             yield break;
@@ -138,14 +145,14 @@ public sealed partial class BossNetanyahu
         Color cor = rapida ? CorLaserDoCombo : CorLaser;
         int quantidade = rapida ? 8 : 5;
         float intervalo = rapida ? 0.08f : 0.24f;
-        float avisoPorMissil = rapida ? 0.15f : 0.26f;
+        float avisoPorMissil = BalanceamentoDificuldade.Atual.Aviso(rapida ? 0.15f : 0.26f, rapida ? 0.15f : 0.22f);
         var primeiraMira = CriarLinha("Carga dos mísseis", 2);
         primeiraMira.loop = false;
         ConfigurarVisual(primeiraMira, cor);
         corpo.rotation = Quaternion.LookRotation(DirecaoDoLing());
         primeiraMira.SetPosition(0, OrigemDoLaser(-1));
         primeiraMira.SetPosition(1, colisaoDoLing.bounds.center);
-        yield return new WaitForSeconds(rapida ? 0.43f : 0.75f);
+        yield return new WaitForSeconds(BalanceamentoDificuldade.Atual.Aviso(rapida ? 0.43f : 0.75f));
         primeiraMira.enabled = false;
         estado = Estado.Atacando;
 
@@ -170,7 +177,7 @@ public sealed partial class BossNetanyahu
 
         void TentarDano(Vector3 origem)
         {
-            if (Time.time >= proximoDano && ling.TakeDamage(dano, origem))
+            if (Time.time >= proximoDano && ling.TakeBossDamage(dano, origem))
                 proximoDano = Time.time + (rapida ? 0.23f : 0.30f);
         }
     }
@@ -202,7 +209,7 @@ public sealed partial class BossNetanyahu
         linha.SetPosition(0, posicao);
         linha.SetPosition(1, posicao);
         float raio = rapida ? 0.16f : 0.22f;
-        float velocidade = rapida ? 51f : 32f;
+        float velocidade = BalanceamentoDificuldade.Atual.Velocidade(rapida ? 51f : 32f);
         int mascara = barreiras | (1 << ling.gameObject.layer);
         float percorrido = 0f;
         while (percorrido < alcance && !LutaEncerrada)

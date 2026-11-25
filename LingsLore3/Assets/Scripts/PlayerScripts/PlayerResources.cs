@@ -6,7 +6,7 @@ using UnityEngine.Events;
 [DefaultExecutionOrder(-90)]
 public class PlayerResources : MonoBehaviour
 {
-    private const int MaxHealCharges = 4;
+    private const float HealRechargeInterval = 15f;
     private const float HealAmount = 30f;
     private const float HealDuration = 1.5f;
 
@@ -36,6 +36,9 @@ public class PlayerResources : MonoBehaviour
     private bool respawnDoTutorial;
     private bool iniciou;
     private double healStartedAt = -1d;
+    private double nextHealChargeAt;
+    private float staminaDaEsquiva;
+    private static int MaxHealCharges => BalanceamentoDificuldade.Facil ? 5 : 4;
 
     // Evento C# usado pelo ContadorCreditos para reiniciar a rodada atual.
     public event Action Died;
@@ -75,6 +78,13 @@ public class PlayerResources : MonoBehaviour
 
     private void Update()
     {
+        if (BalanceamentoDificuldade.Facil && !IsDead && healCharges < MaxHealCharges &&
+            Time.timeAsDouble >= nextHealChargeAt)
+        {
+            healCharges++;
+            nextHealChargeAt += HealRechargeInterval;
+        }
+
         if (!IsHealing || Time.timeAsDouble - healStartedAt < HealDuration)
             return;
 
@@ -124,6 +134,37 @@ public class PlayerResources : MonoBehaviour
 
         currentStamina = Mathf.Max(0f, currentStamina - amount);
         lastStaminaUseTime = Time.time;
+    }
+
+    internal bool TrySpendDodgeStamina(float amount)
+    {
+        if (!TrySpendStamina(amount))
+            return false;
+
+        staminaDaEsquiva = amount;
+        return true;
+    }
+
+    internal bool EvitouDanoDeChefe()
+    {
+        if (motor == null || !motor.IsInvulnerable)
+            return false;
+
+        if (BalanceamentoDificuldade.Impossivel && staminaDaEsquiva > 0f)
+        {
+            currentStamina = Mathf.Min(maxStamina, currentStamina + staminaDaEsquiva);
+            staminaDaEsquiva = 0f;
+        }
+
+        return true;
+    }
+
+    internal bool TakeBossDamage(float amount, Vector3 sourcePosition, bool ignorarInvulnerabilidadeDaEsquiva = false)
+    {
+        if (!ignorarInvulnerabilidadeDaEsquiva && EvitouDanoDeChefe())
+            return false;
+
+        return TakeDamage(amount * BalanceamentoDificuldade.Atual.Dano, sourcePosition, ignorarInvulnerabilidadeDaEsquiva);
     }
 
     public void TakeDamage(float amount)
@@ -187,6 +228,9 @@ public class PlayerResources : MonoBehaviour
             healCharges <= 0 || currentHealth >= maxHealth)
             return;
 
+        if (healCharges == MaxHealCharges)
+            nextHealChargeAt = Time.timeAsDouble + HealRechargeInterval;
+
         healCharges--;
         healStartedAt = Time.timeAsDouble;
         EfeitosSonoros.Tocar(Som.Cura);
@@ -197,16 +241,23 @@ public class PlayerResources : MonoBehaviour
         healStartedAt = -1d;
     }
 
+    internal void RestoreHealthAndHealCharges()
+    {
+        currentHealth = maxHealth;
+        healCharges = MaxHealCharges;
+        nextHealChargeAt = 0d;
+        CancelHealing();
+    }
+
     public void RestoreFullResources()
     {
         if (TryGetComponent<DamageFlash>(out var flash))
             flash.Clear();
 
         bool reapareceu = iniciou && IsDead;
-        currentHealth = maxHealth;
+        RestoreHealthAndHealCharges();
         currentStamina = maxStamina;
-        healCharges = MaxHealCharges;
-        CancelHealing();
+        staminaDaEsquiva = 0f;
         lastStaminaUseTime = float.NegativeInfinity;
         if (reapareceu)
             EfeitosSonoros.Tocar(Som.AparecimentoDoLing);

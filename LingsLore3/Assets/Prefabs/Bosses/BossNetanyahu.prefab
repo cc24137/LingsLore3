@@ -71,14 +71,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd3e6bc6f120b8b439eb947a1c8c8ec9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
-  maxHealth: 220
-  secondBarHealth: 220
-  thirdBarHealth: 240
+  maxHealth: 600
+  secondBarHealth: 600
+  thirdBarHealth: 0
   nomesDasFases:
   - Nenjamin Betanyahu
-  - Big Yahu
   - Yahu Droide
-  currentHealth: 220
+  currentHealth: 600
   somenteAtaqueBasico: 0
   onDeath:
     m_PersistentCalls:
@@ -127,6 +126,8 @@ MonoBehaviour:
   danoDaBombaMassiva: 100
   intervaloDaBombaMassiva: 20
   modeloTralaleroDoGiro: {fileID: 919132149155446097, guid: 4fad7acd5f255f443a7a2584c73b6600, type: 3}
+  malhaTungDoGiro: {fileID: 4300000, guid: 311a9c4866084f70baa54ffce9580441, type: 2}
+  materialTungDoGiro: {fileID: 2100000, guid: 486ea52dc0bd4742bcb6ba4d54a12d4f, type: 2}
   raioDoGiro: 15
   alturaDoGiro: 6
   avisoDoGiro: 0.85
@@ -145,10 +146,10 @@ MonoBehaviour:
   velocidadeDeRecuo: 3
   prefabPocaDeFogo: {fileID: 150200005, guid: 465ba080a9b94ad8a937d64c43e1bf15, type: 3}
   duracaoDaTransicao: 1.4
-  multiplicadorDeTamanhoNaFase2: 1.15
+  multiplicadorDeTamanhoEnfurecido: 1.2
   prefabMiniTralalero: {fileID: 150300006, guid: fc10f31b471044179ec693d3c5de2c60, type: 3}
-  quantidadeDeMinis: 4
-  distanciaParaInvocar: 20
+  quantidadeDeMinis: 5
+  distanciaParaInvocar: 15
   raioDaInvocacao: 4.25
   avisoDaInvocacao: 0.75
   tempoAntesDaOrdem: 1.3
@@ -165,7 +166,7 @@ MonoBehaviour:
   avisoDoGolpe: 0.3
   danoDoGolpe: 8
   danoDoUltimoGolpe: 15
-  distanciaParaInvestida: 17
+  distanciaParaInvestida: 15
   avisoDaInvestida: 0.65
   multiplicadorDeLarguraDaInvestida: 1.5
   velocidadeDaInvestida: 32
@@ -173,7 +174,7 @@ MonoBehaviour:
   distanciaParaPisada: 8
   avisoDaPisada: 0.7
   fracaoAteBordaMaisDistante: 0.95
-  velocidadeDaOnda: 18
+  velocidadeDaOnda: 20
   alturaDaOnda: 0.45
   larguraDaOnda: 1.1
   danoDaPisada: 16

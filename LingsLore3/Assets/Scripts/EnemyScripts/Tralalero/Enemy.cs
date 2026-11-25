@@ -97,6 +97,10 @@ public class Enemy : EnemyHealth
     private Rigidbody body;
     private Vector3 jumpAttackCoordinate;
     private float fimDoAtaque;
+    private float velocidadeDaAnimacao = 1f;
+    private float EscalaDoTempoDaCauda => inicioDanoCauda > 0f
+        ? BalanceamentoDificuldade.Atual.Aviso(inicioDanoCauda, 0.45f) / inicioDanoCauda
+        : 1f;
     private bool tocouSomDaCauda;
     private float fimDoDescanso;
     private float fimDaCue;
@@ -140,6 +144,9 @@ public class Enemy : EnemyHealth
         colisorPrincipal = GetComponent<Collider>();
         if (animator == null)
             animator = GetComponentInChildren<Animator>(true);
+
+        if (animator != null)
+            velocidadeDaAnimacao = animator.speed;
 
         if (jogadorPosition == null)
             Debug.LogWarning("Enemy: arraste o objeto principal do jogador para Jogador Position.", this);
@@ -232,7 +239,7 @@ public class Enemy : EnemyHealth
 
     private void SetAttack()
     {
-        fimDaCue = Time.time + tempoDaAnimacaoCue;
+        fimDaCue = Time.time + BalanceamentoDificuldade.Atual.Aviso(tempoDaAnimacaoCue);
         MudarEstado(State.givingCue);
     }
     private State SortearAtaque(bool pertoParaCauda)
@@ -289,11 +296,11 @@ public class Enemy : EnemyHealth
     {
         const bool girarPelaDireita = true; // Troque para false para girar pela esquerda.
 
-        float tempoDecorrido = Time.time - inicioAtaqueCauda;
+        float tempoDecorrido = (Time.time - inicioAtaqueCauda) / EscalaDoTempoDaCauda;
         if (tempoDecorrido >= duracaoAtaqueCauda)
         {
             PararMovimento();
-            fimDoDescanso = Time.time + descansoAposAtaqueCauda;
+            fimDoDescanso = Time.time + BalanceamentoDificuldade.Atual.Descanso(descansoAposAtaqueCauda);
             MudarEstado(State.idle);
             return;
         }
@@ -342,7 +349,7 @@ public class Enemy : EnemyHealth
 
             float passo = Mathf.Min(
                 anguloRestante,
-                velocidadeRotacaoCauda * Time.fixedDeltaTime);
+                velocidadeRotacaoCauda * Time.fixedDeltaTime / EscalaDoTempoDaCauda);
 
             body.MoveRotation(
                 Quaternion.AngleAxis(girarPelaDireita ? passo : -passo, Vector3.up)
@@ -360,7 +367,7 @@ public class Enemy : EnemyHealth
 
             float passo = Mathf.Min(
                 restante.magnitude,
-                velocidadeAvancoCauda * Time.fixedDeltaTime);
+                velocidadeAvancoCauda * Time.fixedDeltaTime / EscalaDoTempoDaCauda);
 
             Vector3 movimento = restante.sqrMagnitude > 0.0001f
                 ? restante.normalized * (passo / Time.fixedDeltaTime)
@@ -409,12 +416,12 @@ public class Enemy : EnemyHealth
         if (Time.time >= fimDoAtaque ||
             DistanciaHorizontal(jumpAttackCoordinate) <= distanciaChegadaAtaque + 0.01f)
         {
-            fimDoDescanso = Time.time + delayAfterAttack;
+            fimDoDescanso = Time.time + BalanceamentoDificuldade.Atual.Descanso(delayAfterAttack);
             MudarEstado(State.idle);
             return;
         }
 
-        MoverAte(jumpAttackCoordinate, velocidadeAtaquePulo, distanciaChegadaAtaque);
+        MoverAte(jumpAttackCoordinate, BalanceamentoDificuldade.Atual.Velocidade(velocidadeAtaquePulo), distanciaChegadaAtaque);
         AtualizarAnimacao();
     }
 
@@ -422,7 +429,7 @@ public class Enemy : EnemyHealth
     {
         if (pivotVisual == null || colisorPrincipal == null || apoioPiso == null)
         {
-            fimDoDescanso = Time.time + delayAfterAttack;
+            fimDoDescanso = Time.time + BalanceamentoDificuldade.Atual.Descanso(delayAfterAttack);
             MudarEstado(State.idle);
             return;
         }
@@ -453,9 +460,9 @@ public class Enemy : EnemyHealth
             case EtapaAtaqueChao.descendo:
                 destino = posicaoAntesDeSubmergir - Vector3.up * profundidadeAtaqueChao;
                 body.MovePosition(Vector3.MoveTowards(body.position, destino,
-                    velocidadeVerticalAtaqueChao * Time.fixedDeltaTime));
+                    BalanceamentoDificuldade.Atual.Velocidade(velocidadeVerticalAtaqueChao) * Time.fixedDeltaTime));
                 if (Vector3.Distance(body.position, destino) <=
-                    velocidadeVerticalAtaqueChao * Time.fixedDeltaTime + 0.001f)
+                    BalanceamentoDificuldade.Atual.Velocidade(velocidadeVerticalAtaqueChao) * Time.fixedDeltaTime + 0.001f)
                 {
                     etapaAtaqueChao = EtapaAtaqueChao.submerso;
                     fimDaEtapaAtaqueChao = Time.time + tempoSubmerso;
@@ -484,12 +491,12 @@ public class Enemy : EnemyHealth
                         );
                         marcadorEmergencia
                             .GetComponent<MarcadorEmergencia>()
-                            .Iniciar(delayAntesDeEmergir);
+                            .Iniciar(BalanceamentoDificuldade.Atual.Aviso(delayAntesDeEmergir, 0.65f));
                     }
 
                     body.MovePosition(posicaoDeEmergencia - Vector3.up * profundidadeAtaqueChao);
                     etapaAtaqueChao = EtapaAtaqueChao.avisando;
-                    fimDaEtapaAtaqueChao = Time.time + delayAntesDeEmergir;
+                    fimDaEtapaAtaqueChao = Time.time + BalanceamentoDificuldade.Atual.Aviso(delayAntesDeEmergir, 0.65f);
                 }
                 break;
 
@@ -509,13 +516,13 @@ public class Enemy : EnemyHealth
             case EtapaAtaqueChao.subindo:
                 destino = posicaoDeEmergencia;
                 body.MovePosition(Vector3.MoveTowards(body.position, destino,
-                    velocidadeVerticalAtaqueChao * Time.fixedDeltaTime));
+                    BalanceamentoDificuldade.Atual.Velocidade(velocidadeVerticalAtaqueChao) * Time.fixedDeltaTime));
                 if (Vector3.Distance(body.position, destino) <=
-                    velocidadeVerticalAtaqueChao * Time.fixedDeltaTime + 0.001f)
+                    BalanceamentoDificuldade.Atual.Velocidade(velocidadeVerticalAtaqueChao) * Time.fixedDeltaTime + 0.001f)
                 {
                     body.position = destino;
                     FinalizarAtaqueChao(false);
-                    fimDoDescanso = Time.time + delayAfterAttack;
+                    fimDoDescanso = Time.time + BalanceamentoDificuldade.Atual.Descanso(delayAfterAttack);
                     MudarEstado(State.idle);
                 }
                 break;
@@ -551,7 +558,7 @@ public class Enemy : EnemyHealth
         {
             inclinacaoVisualZ = 0f;
 
-            fimDoDescanso = Time.time + delayAfterAttack;
+            fimDoDescanso = Time.time + BalanceamentoDificuldade.Atual.Descanso(delayAfterAttack);
             MudarEstado(State.idle);
             return;
         }
@@ -563,7 +570,7 @@ public class Enemy : EnemyHealth
 
         MoverAte(
             jumpAttackCoordinate,
-            velocidadeAtaquePulo,
+            BalanceamentoDificuldade.Atual.Velocidade(velocidadeAtaquePulo),
             distanciaChegadaAtaque
         );
 
@@ -657,6 +664,10 @@ private void AtualizarAnimacao(bool andando = true)
         (estado == State.walking && andando);
     bool atacandoCauda = estado == State.tailAttack;
 
+    float escala = atacandoCauda ? EscalaDoTempoDaCauda : preparando && tempoDaAnimacaoCue > 0f
+        ? BalanceamentoDificuldade.Atual.Aviso(tempoDaAnimacaoCue) / tempoDaAnimacaoCue
+        : 1f;
+    animator.speed = velocidadeDaAnimacao / escala;
     animator.SetBool(IsIdle, !preparando && !movimentando && !atacandoCauda);
     animator.SetBool(IsWalking, movimentando);
     animator.SetBool(IsGivingCue, preparando);
@@ -705,7 +716,11 @@ private void AtualizarAnimacao(bool andando = true)
 
 
         Debug.Log("Invocando o aoCausarDano");
-        aoCausarDano.Invoke(dano);
+        if (BalanceamentoDificuldade.Impossivel &&
+            jogadorPosition.GetComponentInParent<PlayerResources>() is PlayerResources recursos && recursos.EvitouDanoDeChefe())
+            return;
+
+        aoCausarDano.Invoke(dano * BalanceamentoDificuldade.Atual.Dano);
     }
 
     // O novo HitboxParte usa esta sobrecarga para filtrar o jogador correto.
@@ -723,7 +738,7 @@ private void AtualizarAnimacao(bool andando = true)
         if (!isActiveAndEnabled || IsDead)
             return false;
 
-        float tempoCauda = Time.time - inicioAtaqueCauda;
+        float tempoCauda = (Time.time - inicioAtaqueCauda) / EscalaDoTempoDaCauda;
         return parte switch
         {
             HitboxParte.ParteCorpo.Frente => estado == State.jumpAttack || estado == State.groundAttack,
