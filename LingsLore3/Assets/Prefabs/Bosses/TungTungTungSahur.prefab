@@ -101,6 +101,10 @@ MonoBehaviour:
   maxHealth: 280
   secondBarHealth: 230
   thirdBarHealth: 190
+  nomesDasFases:
+  - Tung Tung Tung Sahur
+  - Evil Tung Tung Tung Sahur
+  - God Tung Tung
   currentHealth: 280
   somenteAtaqueBasico: 0
   onDeath:

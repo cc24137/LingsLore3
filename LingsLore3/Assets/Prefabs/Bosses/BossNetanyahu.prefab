@@ -74,6 +74,10 @@ MonoBehaviour:
   maxHealth: 220
   secondBarHealth: 220
   thirdBarHealth: 240
+  nomesDasFases:
+  - Nenjamin Betanyahu
+  - Big Yahu
+  - Yahu Droide
   currentHealth: 220
   somenteAtaqueBasico: 0
   onDeath:

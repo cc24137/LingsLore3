@@ -79,13 +79,13 @@ public sealed class HudCombate : MonoBehaviour
         if (chefe != chefeExibido)
         {
             chefeExibido = chefe;
-            nomeChefe.text = sequencia.NomeDoChefeAtual;
             faseExibida = 0;
         }
 
         if (faseExibida != chefe.CurrentBar)
         {
             faseExibida = chefe.CurrentBar;
+            nomeChefe.text = sequencia.NomeDoChefeAtual;
             painelFase.SetActive(chefe.BarCount > 1);
             faseChefe.SetText("FASE {0}/{1}", faseExibida, chefe.BarCount);
         }

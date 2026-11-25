@@ -193,7 +193,7 @@ MonoBehaviour:
   chefes:
   - {fileID: 104477857}
   nomesDosChefes:
-  - Tralalero
+  - Tralalero Tralala
   jogador: {fileID: 28656684}
   fimDeJogo: {fileID: 337561535}
   intervaloEntreChefes: 0.75
