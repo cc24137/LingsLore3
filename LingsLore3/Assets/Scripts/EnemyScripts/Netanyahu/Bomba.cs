@@ -29,6 +29,12 @@ public sealed class Bomba : MonoBehaviour
     public float TempoAteDetonar => tempoDeVoo + pavio;
     public event System.Action<Vector3> Explodiu;
 
+    internal void Redimensionar(float fatorVisual, float fatorDoRaio)
+    {
+        transform.localScale *= fatorVisual;
+        raioDaExplosao *= fatorDoRaio;
+    }
+
     public void Lancar(Vector3 destino, PlayerResources alvo, LayerMask obstaculos,
         ISet<PlayerResources> alvosDaSalva = null, HashSet<PillarHealth> pilaresDaSalva = null)
     {
@@ -105,7 +111,7 @@ public sealed class Bomba : MonoBehaviour
             || Physics.Linecast(origem, ponto, obstaculos, QueryTriggerInteraction.Ignore))
             return;
 
-        if (alvo.TakeDamage(dano, centro))
+        if (alvo.TakeBossDamage(dano, centro))
             alvosDaSalva?.Add(alvo);
     }
 

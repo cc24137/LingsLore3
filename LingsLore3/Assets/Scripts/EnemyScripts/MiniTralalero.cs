@@ -164,7 +164,7 @@ public sealed class MiniTralalero : MonoBehaviour
             return;
 
         float dano = estado == Estado.Investindo ? danoDaInvestida : danoDeContato;
-        if (alvo.TakeDamage(dano, corpo.position))
+        if (alvo.TakeBossDamage(dano, corpo.position))
             proximoDano = Time.time + intervaloDoDano;
     }
 

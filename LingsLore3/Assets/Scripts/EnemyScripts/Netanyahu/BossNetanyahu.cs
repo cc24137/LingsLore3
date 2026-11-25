@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [DisallowMultipleComponent]
 [RequireComponent(typeof(EnemyHealth), typeof(Rigidbody), typeof(CapsuleCollider))]
@@ -10,7 +11,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
     private enum Ataque
     {
         Nenhum, Bombas, Combo, Investida, Pisada, BombaIncendiaria, ComandarMinis, ModoAviao,
-        Rasante, Rajada, GiroTralalero, BombaMassiva, Laser, RajadaRobo, MinisRobo, ComboRobo
+        Rasante, Rajada, GiroTralalero, BombaMassiva, Laser, RajadaRobo, MinisRobo, ComboRobo, GiroTung
     }
 
     [Header("Arena")]
@@ -26,10 +27,11 @@ public sealed partial class BossNetanyahu : MonoBehaviour
     [SerializeField, Min(0f)] private float tempoDeRecuo = 0.65f;
     [SerializeField, Min(0f)] private float velocidadeDeRecuo = 3f;
 
-    [Header("Segunda fase")]
+    [Header("Fase humana - a partir de 50% de vida")]
     [SerializeField] private PocaDeFogo prefabPocaDeFogo;
     [SerializeField, Min(0f)] private float duracaoDaTransicao = 1.4f;
-    [SerializeField, Min(1f)] private float multiplicadorDeTamanhoNaFase2 = 1.15f;
+    [FormerlySerializedAs("multiplicadorDeTamanhoNaFase2")]
+    [SerializeField, Min(1f)] private float multiplicadorDeTamanhoEnfurecido = 1.15f;
 
     [Header("Minis do Tralalero")]
     [SerializeField] private MiniTralalero prefabMiniTralalero;
@@ -92,6 +94,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
     private Vector3 escalaInicial;
     private float alturaInicialDaBaseAoPivo;
     private float multiplicadorAtual = 1f;
+    private bool enfurecido;
     private float proximaInvocacao;
     private readonly List<Ataque> ataquesDisponiveis = new List<Ataque>(5);
     private Ataque ultimoAtaqueNoChao;
@@ -100,7 +103,10 @@ public sealed partial class BossNetanyahu : MonoBehaviour
     private bool ignorandoColisaoComLing;
 
     private const float FolgaDeColisao = 0.04f;
+    private const float IntervaloAtePisada = 0.15f;
     private bool LutaEncerrada => estado == Estado.Encerrado;
+    private bool FaseRobo => vida.CurrentBar == 2;
+    private bool NaMetadeDaVida => vida.CurrentHealth <= vida.MaxHealth * 0.5f;
     private float RaioDoBoss => colisaoDoBoss.radius * Mathf.Max(Mathf.Abs(transform.lossyScale.x), Mathf.Abs(transform.lossyScale.z));
     private float DistanciaDeParadaDoCombo => RaioDoBoss + colisaoDoLing.bounds.extents.x + 0.35f;
 
@@ -141,8 +147,10 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         ConectarAcertosNoAviao();
         if (!LutaEncerrada || (!vida.IsDead && !ling.IsDead))
         {
-            AjustarTamanho(vida.CurrentBar >= 2 ? multiplicadorDeTamanhoNaFase2 : 1f);
-            ExibirForma(vida.CurrentBar == 3);
+            enfurecido = !FaseRobo && NaMetadeDaVida;
+            AjustarTamanho(FaseRobo || enfurecido ? multiplicadorDeTamanhoEnfurecido : 1f);
+            ColorirFormaHumana(enfurecido ? 1f : 0f);
+            ExibirForma(FaseRobo);
             colisaoDoBoss.enabled = true;
             estado = Estado.Descansando;
             StartCoroutine(Combater(0.9f));
@@ -151,6 +159,12 @@ public sealed partial class BossNetanyahu : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!LutaEncerrada && !vida.IsDead && !FaseRobo && enfurecido != NaMetadeDaVida)
+        {
+            enfurecido = NaMetadeDaVida;
+            ReiniciarCombate(enfurecido ? duracaoDaTransicao : 0.9f, transicao: enfurecido);
+        }
+
         if (ignorandoColisaoComLing && !emInvestida && !SobrepostoAoLing())
             IgnorarColisaoComLing(false);
 
@@ -161,7 +175,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
     private IEnumerator Combater(float espera)
     {
         ataqueEscolhido = Ataque.Nenhum;
-        if (estado == Estado.Transicao && vida.CurrentBar == 3)
+        if (estado == Estado.Transicao && FaseRobo)
             yield return RenascerComoRobo();
         else if (estado == Estado.Transicao)
             yield return CrescerNaTransicao(espera);
@@ -170,65 +184,34 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         estado = Estado.Descansando;
         while (!LutaEncerrada)
         {
-            float margemParaRecuo = tempoDeRecuo * velocidadeDeRecuo;
-            float distanciaAntesDoRecuo = Mathf.Max(distanciaParaBombas - margemParaRecuo, distanciaParaBombas * 0.5f);
-            if (vida.CurrentBar == 3)
-            {
+            if (FaseRobo)
                 yield return ExecutarRodadaRobo();
-                continue;
-            }
-            if (vida.CurrentBar == 2)
-            {
-                yield return ExecutarRodadaDaFase2(distanciaAntesDoRecuo);
-                continue;
-            }
-
-            ataquesDisponiveis.Clear();
-            if (prefabBomba != null)
-                ataquesDisponiveis.Add(Ataque.Bombas);
-            ataquesDisponiveis.Add(Ataque.Combo);
-            ataquesDisponiveis.Add(Ataque.Investida);
-            ataquesDisponiveis.Add(Ataque.Pisada);
-            if (modeloTralaleroDoGiro != null)
-                ataquesDisponiveis.Add(Ataque.GiroTralalero);
-            ataqueEscolhido = SortearAtaque(ref ultimoAtaqueNoChao);
-            switch (ataqueEscolhido)
-            {
-                case Ataque.Bombas:
-                    yield return ExecutarQuandoPerto(LancarBombas(incendiaria: false), distanciaAntesDoRecuo);
-                    break;
-                case Ataque.Combo:
-                    float distanciaDeParada = DistanciaDeParadaDoCombo;
-                    yield return ExecutarQuandoPerto(ExecutarCombo(), alcanceDoDash + distanciaDeParada, distanciaDeParada);
-                    break;
-                case Ataque.Investida:
-                    yield return ExecutarQuandoPerto(ExecutarInvestida(), distanciaParaInvestida);
-                    break;
-                case Ataque.Pisada:
-                    yield return ExecutarQuandoPerto(ExecutarPisada(), distanciaParaPisada);
-                    break;
-                case Ataque.GiroTralalero:
-                    yield return ExecutarQuandoPerto(ExecutarGiroTralalero(), raioDoGiro);
-                    break;
-            }
+            else
+                yield return ExecutarRodadaHumana();
         }
     }
 
-    private IEnumerator ExecutarRodadaDaFase2(float distanciaAntesDoRecuo)
+    private IEnumerator ExecutarRodadaHumana()
     {
         ataquesDisponiveis.Clear();
-        if (prefabAviao != null && Time.time >= podeVoarApos)
-            ataquesDisponiveis.Add(Ataque.ModoAviao);
-        if (PodeInvocarMinis(prefabMiniTralalero))
-            ataquesDisponiveis.Add(Ataque.ComandarMinis);
-        if (PodeUsarBombaMassiva)
-            ataquesDisponiveis.Add(Ataque.BombaMassiva);
+        if (prefabBomba != null)
+            ataquesDisponiveis.Add(Ataque.Bombas);
+        ataquesDisponiveis.Add(Ataque.Combo);
+        ataquesDisponiveis.Add(Ataque.Investida);
+        ataquesDisponiveis.Add(Ataque.Pisada);
         if (modeloTralaleroDoGiro != null)
             ataquesDisponiveis.Add(Ataque.GiroTralalero);
-        if (prefabBomba != null && prefabPocaDeFogo != null)
-            ataquesDisponiveis.Add(Ataque.BombaIncendiaria);
-        if (ataquesDisponiveis.Count < 2)
-            ataquesDisponiveis.Add(Ataque.Pisada);
+        if (enfurecido)
+        {
+            if (prefabAviao != null && Time.time >= podeVoarApos)
+                ataquesDisponiveis.Add(Ataque.ModoAviao);
+            if (PodeInvocarMinis(prefabMiniTralalero))
+                ataquesDisponiveis.Add(Ataque.ComandarMinis);
+            if (PodeUsarBombaMassiva)
+                ataquesDisponiveis.Add(Ataque.BombaMassiva);
+            if (prefabBomba != null && prefabPocaDeFogo != null)
+                ataquesDisponiveis.Add(Ataque.BombaIncendiaria);
+        }
 
         ataqueEscolhido = SortearAtaque(ref ultimoAtaqueNoChao);
         switch (ataqueEscolhido)
@@ -239,17 +222,25 @@ public sealed partial class BossNetanyahu : MonoBehaviour
             case Ataque.ComandarMinis:
                 yield return ExecutarQuandoPerto(ComandarMinis(prefabMiniTralalero), distanciaParaInvocar);
                 break;
+            case Ataque.Combo:
+                float distanciaDeParada = DistanciaDeParadaDoCombo;
+                yield return ExecutarQuandoPerto(ExecutarCombo(), alcanceDoDash + distanciaDeParada, distanciaDeParada);
+                break;
+            case Ataque.Investida:
+                yield return ExecutarQuandoPerto(ExecutarInvestida(), distanciaParaInvestida);
+                break;
             case Ataque.BombaMassiva:
                 yield return ExecutarBombaMassiva();
-                estado = Estado.Descansando;
-                ataqueEscolhido = Ataque.Nenhum;
-                yield return new WaitForSeconds(recuperacao);
+                yield return DescansarAposAtaque();
                 break;
             case Ataque.GiroTralalero:
-                yield return ExecutarQuandoPerto(ExecutarGiroTralalero(), raioDoGiro);
+                yield return ExecutarQuandoPerto(ExecutarGiroComModelo(), raioDoGiro);
                 break;
+            case Ataque.Bombas:
             case Ataque.BombaIncendiaria:
-                yield return ExecutarQuandoPerto(LancarBombas(incendiaria: true), distanciaAntesDoRecuo);
+                float margemParaRecuo = tempoDeRecuo * velocidadeDeRecuo;
+                float distanciaAntesDoRecuo = Mathf.Max(distanciaParaBombas - margemParaRecuo, distanciaParaBombas * 0.5f);
+                yield return ExecutarQuandoPerto(LancarBombas(ataqueEscolhido == Ataque.BombaIncendiaria), distanciaAntesDoRecuo);
                 break;
             case Ataque.Pisada:
                 yield return ExecutarQuandoPerto(ExecutarPisada(), distanciaParaPisada);
@@ -289,7 +280,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
             MarcarArea(ponto, 0.85f, Vector3.forward, 180f);
 
         momentoDaInvocacaoVisual = Time.time + avisoDaInvocacao;
-        yield return new WaitForSeconds(avisoDaInvocacao);
+        yield return new WaitForSeconds(BalanceamentoDificuldade.Atual.Aviso(avisoDaInvocacao));
         LimparEfeitos();
 
         momentoDaInvocacaoVisual = Time.time;
@@ -321,7 +312,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
             MarcarArea(ponto, 0.85f, Vector3.forward, 180f);
         }
 
-        yield return new WaitForSeconds(avisoDaOrdem);
+        yield return new WaitForSeconds(BalanceamentoDificuldade.Atual.Aviso(avisoDaOrdem));
         estado = Estado.Atacando;
         foreach (MiniTralalero mini in minis)
         {
@@ -363,10 +354,12 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         {
             yield return passoFisico;
             float progresso = (Time.time - inicio) / duracao;
-            AjustarTamanho(Mathf.SmoothStep(tamanhoInicial, multiplicadorDeTamanhoNaFase2, progresso));
+            AjustarTamanho(Mathf.SmoothStep(tamanhoInicial, multiplicadorDeTamanhoEnfurecido, progresso));
+            ColorirFormaHumana(Mathf.SmoothStep(0f, 1f, progresso));
         }
 
-        AjustarTamanho(multiplicadorDeTamanhoNaFase2);
+        AjustarTamanho(multiplicadorDeTamanhoEnfurecido);
+        ColorirFormaHumana(1f);
     }
 
     private void AjustarTamanho(float multiplicador)
@@ -405,9 +398,19 @@ public sealed partial class BossNetanyahu : MonoBehaviour
 
         if (LutaEncerrada)
             yield break;
+
+        yield return DescansarAposAtaque();
+    }
+
+    private WaitForSeconds DescansarAposAtaque()
+    {
+        float tempo = BalanceamentoDificuldade.Atual.Descanso(recuperacao);
+        if (estado == Estado.Atacando && ataqueEscolhido == Ataque.Pisada)
+            tempo *= 0.5f;
+
         estado = Estado.Descansando;
         ataqueEscolhido = Ataque.Nenhum;
-        yield return new WaitForSeconds(recuperacao);
+        return new WaitForSeconds(tempo);
     }
 
     private bool PodeIniciarAtaque(float distanciaMaxima, float distanciaDeParadaDoDash = 0f)
@@ -450,11 +453,13 @@ public sealed partial class BossNetanyahu : MonoBehaviour
             yield break;
 
         yield return ArremessarBombas(incendiaria);
+        if (incendiaria && !LutaEncerrada)
+            yield return ExecutarPisadaEmSeguida();
     }
 
     private IEnumerator ArremessarBombas(bool incendiaria)
     {
-        const float duracaoDoArremesso = 0.34f;
+        float duracaoDoArremesso = BalanceamentoDificuldade.Atual.Aviso(0.34f, 0.25f);
         estado = Estado.Preparando;
         if (aviao == null)
             corpo.rotation = Quaternion.LookRotation(DirecaoDoLing());
@@ -463,6 +468,8 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         Vector3 origem = aviao != null ? aviao.transform.position : corpo.position + Vector3.up * (0.65f * transform.lossyScale.y);
         var bombas = new Bomba[incendiaria ? 1 : 3];
         bombaNaMao = bombas[0] = Instantiate(prefabBomba, origem, Quaternion.identity, efeitosDoAtaque.transform);
+        if (incendiaria)
+            bombaNaMao.Redimensionar(fatorVisual: 1.5f, fatorDoRaio: 3f);
         float inicio = Time.time;
         for (float tempo = 0f; tempo < duracaoDoArremesso; tempo = Time.time - inicio)
         {
@@ -536,6 +543,16 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         proximaInvocacao = 0f;
     }
 
+    private float AvisoDoSoco(int golpe)
+    {
+        var balanceamento = BalanceamentoDificuldade.Atual;
+        if (golpe != 0)
+            return balanceamento.Aviso(avisoDoGolpe + (golpe == 2 ? 0.2f : 0f), 0.68f);
+
+        bool dificuldadeAlta = SelecaoDificuldade.DificuldadeEscolhida is Dificuldade.Dificil or Dificuldade.Impossivel;
+        return balanceamento.Aviso(avisoDoPrimeiroGolpe * (dificuldadeAlta ? 0.83f : 1f));
+    }
+
     private IEnumerator ExecutarCombo()
     {
         golpeDoCombo = -1;
@@ -549,7 +566,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         {
             yield return passoFisico;
             corpo.MoveRotation(Quaternion.LookRotation(frente));
-            Vector3 proximo = Vector3.MoveTowards(corpo.position, destino, velocidadeDoDash * Time.fixedDeltaTime);
+            Vector3 proximo = Vector3.MoveTowards(corpo.position, destino, BalanceamentoDificuldade.Atual.Velocidade(velocidadeDoDash) * Time.fixedDeltaTime);
             if (!Mover(proximo))
                 break;
             if (proximo == destino)
@@ -562,7 +579,6 @@ public sealed partial class BossNetanyahu : MonoBehaviour
             golpeDoCombo = i;
             bool ultimo = i == 2;
             float alcance = alcanceDoCombo * (ultimo ? 1.14f : 1f);
-            float aviso = i == 0 ? avisoDoPrimeiroGolpe : avisoDoGolpe;
             float semiAngulo = ultimo ? 70f : 50f;
             frente = DirecaoDoLing();
             corpo.rotation = Quaternion.LookRotation(frente);
@@ -572,7 +588,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
             CriarEfeitos("Golpe do boss");
             LineRenderer marcador = MarcarArea(origem, alcance, frente, semiAngulo);
 
-            yield return new WaitForSeconds(aviso + (ultimo ? 0.2f : 0f));
+            yield return new WaitForSeconds(AvisoDoSoco(i));
             estado = Estado.Atacando;
             MostrarImpacto(marcador);
             EfeitosSonoros.Tocar(Som.SocoDoYahu, origem);
@@ -610,23 +626,33 @@ public sealed partial class BossNetanyahu : MonoBehaviour
 
     private IEnumerator ExecutarInvestida()
     {
+        const float margemDaParede = 1.5f;
         estado = Estado.Preparando;
         Vector3 origem = corpo.position;
         Vector3 frente = DirecaoDoLing();
-        float distancia = DistanciaAteBorda(origem, frente);
+        float distancia = DistanciaAteBorda(origem, frente, margemDaParede);
         if (distancia < 3f)
         {
             // Se a mira sair pela borda mais próxima, a investida segue pelo centro.
             frente = VetorHorizontal(piso.bounds.center - origem).normalized;
-            distancia = DistanciaAteBorda(origem, frente);
+            distancia = DistanciaAteBorda(origem, frente, margemDaParede);
         }
         corpo.rotation = Quaternion.LookRotation(frente);
+        ObterExtremosDaCapsula(origem, RaioDoBoss, out Vector3 inferior, out Vector3 superior);
+        foreach (RaycastHit hit in Physics.CapsuleCastAll(inferior, superior, RaioDoBoss, frente,
+            distancia + margemDaParede, obstaculos, QueryTriggerInteraction.Ignore))
+        {
+            if (hit.collider != piso && hit.collider.GetComponentInParent<PillarHealth>() == null)
+                distancia = Mathf.Min(distancia, Mathf.Max(0f, hit.distance - margemDaParede));
+        }
+        if (distancia <= 0f)
+            yield break;
 
         CriarEfeitos("Investida do boss");
         Vector3 inicioDaFaixa = new Vector3(origem.x, piso.bounds.max.y, origem.z);
         float raioDaInvestida = RaioDoBoss * multiplicadorDeLarguraDaInvestida;
         LineRenderer faixa = MarcarTrajeto(inicioDaFaixa, frente, distancia, raioDaInvestida);
-        yield return new WaitForSeconds(avisoDaInvestida);
+        yield return new WaitForSeconds(BalanceamentoDificuldade.Atual.Aviso(avisoDaInvestida));
 
         estado = Estado.Atacando;
         MostrarImpacto(faixa);
@@ -638,11 +664,11 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         for (float avancou = 0f; avancou < distancia;)
         {
             yield return passoFisico;
-            float proximo = Mathf.Min(distancia, avancou + velocidadeDaInvestida * Time.fixedDeltaTime);
+            float proximo = Mathf.Min(distancia, avancou + BalanceamentoDificuldade.Atual.Velocidade(velocidadeDaInvestida) * Time.fixedDeltaTime);
             if (!passouPeloLing && InvestidaAtingeLing(frente, proximo - avancou, raioDaInvestida))
             {
                 passouPeloLing = true;
-                ling.TakeDamage(danoDaInvestida, corpo.position - frente * RaioDoBoss);
+                ling.TakeBossDamage(danoDaInvestida, corpo.position - frente * RaioDoBoss);
                 if (LutaEncerrada)
                     yield break;
             }
@@ -655,6 +681,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         yield return passoFisico;
         emInvestida = false;
         LimparEfeitos();
+        yield return ExecutarPisadaEmSeguida();
     }
 
     private void AtingirPilaresNaInvestida(Vector3 frente, float distancia, float raio,
@@ -677,6 +704,19 @@ public sealed partial class BossNetanyahu : MonoBehaviour
                 QueryTriggerInteraction.Ignore);
     }
 
+    private IEnumerator ExecutarPisadaEmSeguida()
+    {
+        if (!enfurecido || FaseRobo || LutaEncerrada)
+            yield break;
+
+        yield return new WaitForSeconds(IntervaloAtePisada);
+        if (LutaEncerrada)
+            yield break;
+
+        ataqueEscolhido = Ataque.Pisada;
+        yield return ExecutarPisada();
+    }
+
     private IEnumerator ExecutarPisada()
     {
         estado = Estado.Preparando;
@@ -691,7 +731,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         PosicionarOndaNoPiso(aviso, centro, RaioDoBoss + 1.2f, ateCentroDoPiso, raioDoPiso);
         LineRenderer limiteDaOnda = CriarLinha("Limite da onda", 96);
         PosicionarOndaNoPiso(limiteDaOnda, centro, alcance, ateCentroDoPiso, raioDoPiso);
-        yield return new WaitForSeconds(avisoDaPisada);
+        yield return new WaitForSeconds(BalanceamentoDificuldade.Atual.Aviso(avisoDaPisada));
 
         estado = Estado.Atacando;
         EfeitosSonoros.Tocar(Som.Bonk, centro);
@@ -705,7 +745,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         for (float raio = 0f; raio < alcance;)
         {
             yield return passoFisico;
-            float proximoRaio = Mathf.Min(alcance, raio + velocidadeDaOnda * Time.fixedDeltaTime);
+            float proximoRaio = Mathf.Min(alcance, raio + BalanceamentoDificuldade.Atual.Velocidade(velocidadeDaOnda) * Time.fixedDeltaTime);
             PosicionarOndaNoPiso(onda, centro, proximoRaio, ateCentroDoPiso, raioDoPiso);
 
             Bounds alvo = colisaoDoLing.bounds;
@@ -715,7 +755,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
                 && distancia >= raio - margem && distancia <= proximoRaio + margem
                 && VetorHorizontal(alvo.center - limites.center).sqrMagnitude <= raioDoPiso * raioDoPiso)
             {
-                atingiuLing = ling.TakeDamage(danoDaPisada, centro);
+                atingiuLing = ling.TakeBossDamage(danoDaPisada, centro);
                 if (LutaEncerrada)
                     yield break;
             }
@@ -807,10 +847,10 @@ public sealed partial class BossNetanyahu : MonoBehaviour
             Physics.IgnoreCollision(colisaoDoBoss, colisaoDoLing, ignorar);
     }
 
-    private float DistanciaAteBorda(Vector3 origem, Vector3 direcao)
+    private float DistanciaAteBorda(Vector3 origem, Vector3 direcao, float margem = 0.1f)
     {
         Bounds limites = piso.bounds;
-        float raio = Mathf.Max(0f, RaioDoPiso(limites) - RaioDoBoss - 0.1f);
+        float raio = Mathf.Max(0f, RaioDoPiso(limites) - RaioDoBoss - margem);
         Vector3 desvio = VetorHorizontal(origem - limites.center);
         // Interseção com a borda na direção travada da investida.
         float projecao = Vector3.Dot(desvio, direcao);
@@ -846,7 +886,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
             Physics.Linecast(origem, alvo, obstaculos, QueryTriggerInteraction.Ignore))
             return false;
 
-        return ling.TakeDamage(dano, centro);
+        return ling.TakeBossDamage(dano, centro);
     }
 
     private void CriarEfeitos(string nome) => efeitosDoAtaque = new GameObject(nome);
@@ -931,11 +971,17 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         colisaoDoBoss.enabled = false;
     }
 
-    private void AoTrocarBarra(int barra)
+    private void AoTrocarBarra(int _)
     {
         if (ling.IsDead)
             return;
 
+        enfurecido = false;
+        ReiniciarCombate(FaseRobo ? tempoParaRessurgir + 0.65f : 0.9f, transicao: FaseRobo);
+    }
+
+    private void ReiniciarCombate(float espera, bool transicao)
+    {
         StopAllCoroutines();
         emInvestida = false;
         LimparModoAviao(voltarAoChao: true);
@@ -947,18 +993,21 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         ultimoAtaqueNoChao = Ataque.Nenhum;
         ultimoAtaqueNoAr = Ataque.Nenhum;
         colisaoDoBoss.enabled = true;
-        estado = barra >= 2 ? Estado.Transicao : Estado.Descansando;
-        float espera = barra == 3 ? tempoParaRessurgir + 0.65f : barra == 2 ? duracaoDaTransicao : 0.9f;
+        estado = transicao ? Estado.Transicao : Estado.Descansando;
         proximaBombaMassiva = Time.time + espera;
         podeVoarApos = Time.time + espera + esperaAntesDoPrimeiroVoo;
         proximoComboRobo = 0f;
-        if (barra >= 2)
+        if (TryGetComponent<DamageFlash>(out var flash))
+            flash.Clear();
+        if (!enfurecido)
+        {
+            AjustarTamanho(FaseRobo ? multiplicadorDeTamanhoEnfurecido : 1f);
+            ColorirFormaHumana(0f);
+        }
+        if (transicao)
             vida.GrantInvulnerability(espera);
         else
-        {
-            AjustarTamanho(1f);
             ExibirForma(false);
-        }
         StartCoroutine(Combater(espera));
     }
 
@@ -973,7 +1022,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         LimparPocaDeFogo();
         LimparMinis();
         ApagarOlhoDoCombo();
-        ExibirForma(vida.CurrentBar == 3);
+        ExibirForma(FaseRobo);
     }
 
     private void LimparEfeitos()
@@ -1032,7 +1081,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         Color corAnterior = GUI.color;
         GUI.color = new Color(0.18f, 0.18f, 0.18f);
         GUI.DrawTexture(new Rect(25f, 43f, 207f, 7f), Texture2D.whiteTexture);
-        GUI.color = vida.CurrentBar == 3 ? new Color(0.22f, 0.83f, 1f) : vida.CurrentBar == 2 ? Vermelho : Amarelo;
+        GUI.color = FaseRobo ? new Color(0.22f, 0.83f, 1f) : enfurecido ? Vermelho : Amarelo;
         float proporcao = Mathf.Clamp01(vida.CurrentHealth / vida.MaxHealth);
         GUI.DrawTexture(new Rect(25f, 43f, 207f * proporcao, 7f), Texture2D.whiteTexture);
         GUI.color = corAnterior;
@@ -1040,12 +1089,12 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         if (LutaEncerrada)
             GUI.Box(new Rect(16f, 87f, 225f, 28f), ling.IsDead ? "Ling caiu" : "Vitória");
         else if (estado == Estado.Transicao)
-            GUI.Box(new Rect(16f, 87f, 225f, 28f), vida.CurrentBar == 3 ? "Ressurgimento do robô" : "Início da fase 2");
+            GUI.Box(new Rect(16f, 87f, 225f, 28f), FaseRobo ? "Ressurgimento do robô" : "Big Yahu enfurecido");
         else if (estado == Estado.Atordoado)
             GUI.Box(new Rect(16f, 87f, 225f, 28f), "Atordoado");
         else if (ataqueEscolhido == Ataque.BombaMassiva && fimDoAvisoMassivo > Time.time)
             GUI.Box(new Rect(16f, 87f, 225f, 28f), $"Suba em um pilar   {Mathf.CeilToInt(fimDoAvisoMassivo - Time.time)} s");
-        else if (etapaDoVoo == EtapaDoVoo.Cruzeiro || etapaDoVoo == EtapaDoVoo.Rasante)
+        else if (AviaoPodeSerDerrubado)
             GUI.Box(new Rect(16f, 87f, 225f, 28f), $"Avião   Hashis: {hashisNoAviao}/2");
     }
 }

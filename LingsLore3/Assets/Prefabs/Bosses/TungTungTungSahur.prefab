@@ -98,10 +98,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd3e6bc6f120b8b439eb947a1c8c8ec9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
-  maxHealth: 280
-  secondBarHealth: 230
-  thirdBarHealth: 190
-  currentHealth: 280
+  maxHealth: 300
+  secondBarHealth: 180
+  thirdBarHealth: 180
+  currentHealth: 300
   somenteAtaqueBasico: 0
   onDeath:
     m_PersistentCalls:

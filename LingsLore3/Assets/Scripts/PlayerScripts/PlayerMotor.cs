@@ -344,7 +344,7 @@ public class PlayerMotor : MonoBehaviour
 
         // Se os dois pedidos chegarem juntos, o dodge tem prioridade.
         if (dodgeRequested && CanDodge &&
-            resources.TrySpendStamina(dodgeStaminaCost))
+            resources.TrySpendDodgeStamina(dodgeStaminaCost))
         {
             Vector3 rollDirection = direction.sqrMagnitude > 0.001f
                 ? direction.normalized

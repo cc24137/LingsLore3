@@ -15,16 +15,23 @@ public class EnemyHealth : MonoBehaviour
     public event System.Action<int> HealthBarChanged;
 
     private float invulnerableUntil;
+    private bool chefeDaSequencia;
+    private bool EhChefe => chefeDaSequencia || this is Enemy ||
+        TryGetComponent<BossNetanyahu>(out _) || TryGetComponent<BossTungTungTungSahur>(out _);
+
+    internal void MarcarComoChefeDaSequencia() => chefeDaSequencia = true;
+
     public bool IsDead => currentHealth <= 0f;
     public float CurrentHealth => currentHealth;
     public int CurrentBar { get; private set; } = 1;
     public int BarCount => secondBarHealth <= 0f ? 1 : (thirdBarHealth > 0f ? 3 : 2);
-    public float MaxHealth => CurrentBar switch
+    private float VidaBase => CurrentBar switch
     {
         2 => secondBarHealth,
         3 => thirdBarHealth,
         _ => maxHealth
     };
+    public float MaxHealth => EhChefe ? VidaBase * BalanceamentoDificuldade.Atual.Vida : VidaBase;
 
     public void SetBasicAttackOnly(bool active)
     {
@@ -33,7 +40,7 @@ public class EnemyHealth : MonoBehaviour
 
     protected virtual void Awake()
     {
-        currentHealth = maxHealth;
+        currentHealth = MaxHealth;
     }
 
     public void TakeDamage(float amount)
@@ -66,8 +73,7 @@ public class EnemyHealth : MonoBehaviour
             }
             else
             {
-                if (this is Enemy || TryGetComponent<BossNetanyahu>(out _) ||
-                    TryGetComponent<BossTungTungTungSahur>(out _))
+                if (EhChefe)
                     EfeitosSonoros.Tocar(Som.MorteDoChefe);
 
                 onDeath.Invoke();
@@ -91,7 +97,7 @@ public class EnemyHealth : MonoBehaviour
 
         bool changedBar = CurrentBar != 1;
         CurrentBar = 1;
-        currentHealth = maxHealth;
+        currentHealth = MaxHealth;
         invulnerableUntil = 0f;
         if (changedBar)
             HealthBarChanged?.Invoke(CurrentBar);

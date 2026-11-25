@@ -127,7 +127,7 @@ public sealed partial class BossNetanyahu
             (estado == Estado.Preparando || estado == Estado.Atacando))
         {
             bool direita = golpe != 1;
-            float aviso = golpe == 0 ? avisoDoPrimeiroGolpe : avisoDoGolpe + (golpe == 2 ? 0.2f : 0f);
+            float aviso = AvisoDoSoco(golpe);
             float preparacao = Mathf.SmoothStep(0f, 1f, tempo / aviso);
             bool impacto = estado == Estado.Atacando;
             float forca = golpe == 2 ? 1.15f : 1f;

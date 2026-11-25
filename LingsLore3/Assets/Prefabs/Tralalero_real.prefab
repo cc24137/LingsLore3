@@ -530,8 +530,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f49edc542de240a428db65bb588acea0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
-  maxHealth: 200
-  currentHealth: 150
+  maxHealth: 300
+  secondBarHealth: 0
+  thirdBarHealth: 0
+  currentHealth: 300
   somenteAtaqueBasico: 0
   onDeath:
     m_PersistentCalls:
@@ -546,10 +548,27 @@ MonoBehaviour:
   distanciaChegadaAtaque: 0.35
   duracaoMaximaAtaque: 3
   distanciaAposJogador: 3
+  velocidadeGiroPulo: 360
   delayAfterAttack: 1.5
   tempoDaAnimacaoCue: 2
+  apoioPiso: {fileID: 0}
+  profundidadeAtaqueChao: 4
+  velocidadeVerticalAtaqueChao: 6
+  tempoSubmerso: 1
+  delayAntesDeEmergir: 1.5
+  prefabMarcadorEmergencia: {fileID: 0}
+  distanciaParaAtaqueCauda: 3
+  duracaoAtaqueCauda: 1.6
+  tempoTravarAlvoCauda: 0.55
+  inicioDanoCauda: 0.9
+  fimDanoCauda: 1.35
+  velocidadeAvancoCauda: 2
+  distanciaAvancoCauda: 0.7
+  velocidadeRotacaoCauda: 720
+  descansoAposAtaqueCauda: 2
   danoFrente: 25
   danoBarbatana: 10
+  danoCauda: 25
   intervaloDanoBarbatana: 0.75
   aoCausarDano:
     m_PersistentCalls:
@@ -566,6 +585,8 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  pivotVisual: {fileID: 0}
+  inclinacaoVisualZ: 0
   estado: 1
 --- !u!95 &7403814723883977874
 Animator:

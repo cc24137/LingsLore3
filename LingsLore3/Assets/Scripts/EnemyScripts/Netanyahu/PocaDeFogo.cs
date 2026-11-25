@@ -40,7 +40,7 @@ public sealed class PocaDeFogo : MonoBehaviour
                 && DentroDaPoca(colisor, centro))
             {
                 proximoDano = Time.time + intervaloDoDano;
-                alvo.TakeDamage(danoPorPulso, centro);
+                alvo.TakeBossDamage(danoPorPulso, centro);
             }
 
             if (Time.time >= proximoDanoNosPilares)

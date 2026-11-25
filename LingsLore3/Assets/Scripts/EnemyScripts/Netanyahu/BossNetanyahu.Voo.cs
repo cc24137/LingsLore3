@@ -4,7 +4,7 @@ using UnityEngine;
 
 public sealed partial class BossNetanyahu
 {
-    private enum EtapaDoVoo { NoChao, Decolagem, Cruzeiro, Rasante, Caindo }
+    private enum EtapaDoVoo { NoChao, Decolagem, Cruzeiro, Rasante, Caindo, Pousando }
 
     [Header("Modo avião")]
     [SerializeField] private AviaoBigYahu prefabAviao;
@@ -37,6 +37,8 @@ public sealed partial class BossNetanyahu
     private int hashisNoAviao;
     private LineRenderer espiralDoStun;
     private Camera cameraDaCena;
+    private bool AviaoPodeSerDerrubado =>
+        etapaDoVoo == EtapaDoVoo.Cruzeiro || etapaDoVoo == EtapaDoVoo.Rasante || etapaDoVoo == EtapaDoVoo.Pousando;
 
     private void ConectarAcertosNoAviao()
     {
@@ -79,7 +81,7 @@ public sealed partial class BossNetanyahu
             Debug.LogError("O modo avião precisa do modelo do Bombombini Gusini.", this);
             LimparModoAviao(voltarAoChao: false);
             podeVoarApos = Time.time + intervaloEntreVoos;
-            yield return new WaitForSeconds(recuperacao);
+            yield return new WaitForSeconds(BalanceamentoDificuldade.Atual.Descanso(recuperacao));
             yield break;
         }
 
@@ -98,7 +100,7 @@ public sealed partial class BossNetanyahu
         etapaDoVoo = EtapaDoVoo.Cruzeiro;
         aviao.Hitbox.enabled = true;
 
-        while (!LutaEncerrada)
+        while (!LutaEncerrada && etapaDoVoo != EtapaDoVoo.NoChao)
         {
             ataquesDisponiveis.Clear();
             if (prefabMetralhadora != null)
@@ -122,7 +124,11 @@ public sealed partial class BossNetanyahu
                     break;
                 case Ataque.BombaIncendiaria:
                     yield return ArremessarBombas(incendiaria: true);
-                    break;
+                    etapaDoVoo = EtapaDoVoo.Pousando;
+                    yield return PousarAviao(queda: false);
+                    yield return ExecutarPisadaEmSeguida();
+                    yield return DescansarAposAtaque();
+                    yield break;
                 case Ataque.Rasante:
                     yield return ExecutarRasante();
                     break;
@@ -130,7 +136,7 @@ public sealed partial class BossNetanyahu
                     yield return ComandarMinis(prefabMiniTralalero);
                     break;
             }
-            yield return new WaitForSeconds(recuperacao);
+            yield return new WaitForSeconds(BalanceamentoDificuldade.Atual.Descanso(recuperacao));
         }
     }
 
@@ -200,7 +206,7 @@ public sealed partial class BossNetanyahu
         Vector3 aviso = new Vector3(entrada.x, piso.bounds.max.y, entrada.z);
         LineRenderer faixa = MarcarTrajeto(aviso, frente, Vector3.Distance(entrada, saida), raioDoRasante);
         var entradaAlta = new Vector3(entrada.x, centroDaOrbita.y, entrada.z);
-        yield return TransladarAviao(entradaAlta, rotacao, avisoDoRasante);
+        yield return TransladarAviao(entradaAlta, rotacao, BalanceamentoDificuldade.Atual.Aviso(avisoDoRasante, 0.72f));
         yield return TransladarAviao(entrada, rotacao, 0.32f);
 
         estado = Estado.Atacando;
@@ -211,7 +217,7 @@ public sealed partial class BossNetanyahu
         while ((saida - atual).sqrMagnitude > 0.0001f)
         {
             yield return passoFisico;
-            Vector3 seguinte = Vector3.MoveTowards(atual, saida, velocidadeDoRasante * Time.fixedDeltaTime);
+            Vector3 seguinte = Vector3.MoveTowards(atual, saida, BalanceamentoDificuldade.Atual.Velocidade(velocidadeDoRasante) * Time.fixedDeltaTime);
             Vector3 centroDoDano = atual + Vector3.down * 0.35f;
             Vector3 volume = new Vector3(raioDoRasante, 0.8f, 0.65f);
             if (!acertou)
@@ -225,7 +231,7 @@ public sealed partial class BossNetanyahu
                     Mathf.Abs(Vector3.Dot(delta, lateral)) <= volume.x + alvo.extents.x &&
                     Mathf.Abs(Vector3.Dot(delta, frente)) <= volume.z + alvo.extents.z;
                 if (acertouLing)
-                    acertou = ling.TakeDamage(danoDoRasante, atual);
+                    acertou = ling.TakeBossDamage(danoDoRasante, atual);
                 if (LutaEncerrada)
                     yield break;
             }
@@ -287,7 +293,7 @@ public sealed partial class BossNetanyahu
 
     private void DerrubarAviao()
     {
-        if (etapaDoVoo != EtapaDoVoo.Cruzeiro && etapaDoVoo != EtapaDoVoo.Rasante)
+        if (!AviaoPodeSerDerrubado)
             return;
 
         etapaDoVoo = EtapaDoVoo.Caindo;
@@ -304,17 +310,7 @@ public sealed partial class BossNetanyahu
 
     private IEnumerator CairEAtordoar()
     {
-        Vector3 destino = EncontrarPouso(aviao.transform.position);
-        Vector3 impacto = new Vector3(destino.x, piso.bounds.max.y + 0.85f, destino.z);
-        Quaternion inclinacao = aviao.transform.rotation * Quaternion.Euler(23f, 0f, 28f);
-        yield return TransladarAviao(impacto, inclinacao, 0.8f);
-        yield return passoFisico;
-
-        LimparModoAviao(voltarAoChao: false);
-        podeVoarApos = Time.time + intervaloEntreVoos;
-        corpo.position = destino;
-        corpo.rotation = Quaternion.LookRotation(DirecaoDoLing());
-        colisaoDoBoss.enabled = true;
+        yield return PousarAviao(queda: true);
         estado = Estado.Atordoado;
         ataqueEscolhido = Ataque.Nenhum;
         CriarEspiralDoStun();
@@ -322,6 +318,21 @@ public sealed partial class BossNetanyahu
         LimparEspiralDoStun();
 
         yield return Combater(0f);
+    }
+
+    private IEnumerator PousarAviao(bool queda)
+    {
+        Vector3 destino = EncontrarPouso(aviao.transform.position);
+        Vector3 impacto = new Vector3(destino.x, piso.bounds.max.y + 0.85f, destino.z);
+        Quaternion inclinacao = aviao.transform.rotation * Quaternion.Euler(queda ? 23f : 12f, 0f, queda ? 28f : 0f);
+        yield return TransladarAviao(impacto, inclinacao, queda ? 0.8f : 0.65f);
+        yield return passoFisico;
+
+        LimparModoAviao(voltarAoChao: false);
+        podeVoarApos = Time.time + intervaloEntreVoos;
+        corpo.position = destino;
+        corpo.rotation = Quaternion.LookRotation(DirecaoDoLing());
+        colisaoDoBoss.enabled = true;
     }
 
     private Vector3 EncontrarPouso(Vector3 pertoDe)

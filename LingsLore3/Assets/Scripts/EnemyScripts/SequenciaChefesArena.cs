@@ -91,6 +91,7 @@ public sealed class SequenciaChefesArena : MonoBehaviour
 
         for (int i = 0; i < chefes.Length; i++)
         {
+            chefes[i].MarcarComoChefeDaSequencia();
             if (TemAcessos || i != etapaAtual)
                 chefes[i].gameObject.SetActive(false);
         }
@@ -201,6 +202,8 @@ public sealed class SequenciaChefesArena : MonoBehaviour
         derrotado.Died -= AoDerrotarChefe;
         chefeAtual = null;
         derrotado.gameObject.SetActive(false);
+        if (!BalanceamentoDificuldade.Impossivel)
+            jogador.RestoreHealthAndHealCharges();
 
         bool ultimoChefe = etapaAtual == chefes.Length - 1;
         TocarMusica(ultimoChefe ? null : musicaInterludio);

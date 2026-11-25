@@ -103,7 +103,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ca2e22db30448f399626a0fbec1455b, type: 3}
   m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::PocaDeFogo
-  raio: 3.5
+  raio: 7
   duracao: 4.5
   danoPorPulso: 7
   intervaloDoDano: 0.8

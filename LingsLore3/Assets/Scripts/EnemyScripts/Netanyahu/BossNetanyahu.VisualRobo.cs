@@ -13,6 +13,7 @@ public sealed partial class BossNetanyahu
     private Material energia;
     private Material materialDoOlho;
     private Material[] materiaisDaCabeca;
+    private MaterialPropertyBlock corDaFormaHumana;
     private Transform suporteDaArmaRobo;
     private Renderer olhoDoRobo;
     private Light luzDoOlho;
@@ -283,6 +284,21 @@ public sealed partial class BossNetanyahu
             rotacaoAnteriorDoRobo = transform.rotation;
         }
         robo.SetActive(robotica);
+    }
+
+    private void ColorirFormaHumana(float intensidade)
+    {
+        Material material = visualHumano != null ? visualHumano.sharedMaterial : null;
+        if (material == null || !material.HasColor(CorBase))
+            return;
+
+        corDaFormaHumana ??= new MaterialPropertyBlock();
+        visualHumano.GetPropertyBlock(corDaFormaHumana);
+        Color cor = material.GetColor(CorBase);
+        cor.g *= Mathf.Lerp(1f, 0.52f, intensidade);
+        cor.b *= Mathf.Lerp(1f, 0.48f, intensidade);
+        corDaFormaHumana.SetColor(CorBase, cor);
+        visualHumano.SetPropertyBlock(corDaFormaHumana);
     }
 
     private void AnimarRobo()
