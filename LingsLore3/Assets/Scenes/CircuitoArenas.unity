@@ -63878,302 +63878,196 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2104800003}
-  - {fileID: 2104800006}
-  - {fileID: 2104800009}
+  - {fileID: 2104900001}
+  - {fileID: 2104900003}
+  - {fileID: 2104900005}
+  - {fileID: 2104900007}
   m_Father: {fileID: 1385803613}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &2104800002
-GameObject:
+--- !u!1001 &2104900000
+PrefabInstance:
   m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2104800003}
-  - component: {fileID: 2104800004}
-  m_Layer: 0
-  m_Name: Luz central
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2104800003
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2104800002}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 11, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2104800001}
-  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
---- !u!108 &2104800004
-Light:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2104800002}
-  m_Enabled: 1
-  serializedVersion: 12
-  m_Type: 0
-  m_Color: {r: 1, g: 0.88, b: 0.73, a: 1}
-  m_Intensity: 92
-  m_Range: 24
-  m_SpotAngle: 118
-  m_InnerSpotAngle: 85
-  m_CookieSize2D: {x: 0.5, y: 0.5}
-  m_Shadows:
-    m_Type: 0
-    m_Resolution: -1
-    m_CustomResolution: -1
-    m_Strength: 1
-    m_Bias: 0.05
-    m_NormalBias: 0.4
-    m_NearPlane: 0.2
-    m_CullingMatrixOverride:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_UseCullingMatrixOverride: 0
-  m_Cookie: {fileID: 0}
-  m_DrawHalo: 0
-  m_Flare: {fileID: 0}
-  m_RenderMode: 0
-  m_CullingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_RenderingLayerMask: 1
-  m_Lightmapping: 4
-  m_LightShadowCasterMode: 0
-  m_AreaSize: {x: 1, y: 1}
-  m_BounceIntensity: 1
-  m_ColorTemperature: 6570
-  m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
-  m_UseBoundingSphereOverride: 0
-  m_UseViewFrustumForShadowCasterCull: 1
-  m_ForceVisible: 0
-  m_ShadowRadius: 0
-  m_ShadowAngle: 0
-  m_LightUnit: 1
-  m_LuxAtDistance: 1
-  m_EnableSpotReflector: 1
---- !u!1 &2104800005
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2104800006}
-  - component: {fileID: 2104800007}
-  m_Layer: 0
-  m_Name: Luz lateral oeste
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2104800006
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 2104800001}
+    m_Modifications:
+    - target: {fileID: 4350000000000000001, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_Name
+      value: Lanterna sudoeste
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -17.666918
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 5.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -10.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.86602541
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 60
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+--- !u!4 &2104900001 stripped
 Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+  m_PrefabInstance: {fileID: 2104900000}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2104800005}
+--- !u!1001 &2104900002
+PrefabInstance:
+  m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -10, y: 6, z: -3.5}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2104800001}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!108 &2104800007
-Light:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2104800005}
-  m_Enabled: 1
-  serializedVersion: 12
-  m_Type: 2
-  m_Color: {r: 0.72, g: 0.84, b: 1, a: 1}
-  m_Intensity: 33
-  m_Range: 16
-  m_SpotAngle: 30
-  m_InnerSpotAngle: 21.80208
-  m_CookieSize2D: {x: 0.5, y: 0.5}
-  m_Shadows:
-    m_Type: 0
-    m_Resolution: -1
-    m_CustomResolution: -1
-    m_Strength: 1
-    m_Bias: 0.05
-    m_NormalBias: 0.4
-    m_NearPlane: 0.2
-    m_CullingMatrixOverride:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_UseCullingMatrixOverride: 0
-  m_Cookie: {fileID: 0}
-  m_DrawHalo: 0
-  m_Flare: {fileID: 0}
-  m_RenderMode: 0
-  m_CullingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_RenderingLayerMask: 1
-  m_Lightmapping: 4
-  m_LightShadowCasterMode: 0
-  m_AreaSize: {x: 1, y: 1}
-  m_BounceIntensity: 1
-  m_ColorTemperature: 6570
-  m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
-  m_UseBoundingSphereOverride: 0
-  m_UseViewFrustumForShadowCasterCull: 1
-  m_ForceVisible: 0
-  m_ShadowRadius: 0
-  m_ShadowAngle: 0
-  m_LightUnit: 1
-  m_LuxAtDistance: 1
-  m_EnableSpotReflector: 1
---- !u!1 &2104800008
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2104800009}
-  - component: {fileID: 2104800010}
-  m_Layer: 0
-  m_Name: Luz lateral leste
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2104800009
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 2104800001}
+    m_Modifications:
+    - target: {fileID: 4350000000000000001, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_Name
+      value: Lanterna noroeste
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -17.666918
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 5.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 10.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.86602541
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 120
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+--- !u!4 &2104900003 stripped
 Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+  m_PrefabInstance: {fileID: 2104900002}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2104800008}
+--- !u!1001 &2104900004
+PrefabInstance:
+  m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 10, y: 6, z: 3.5}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2104800001}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!108 &2104800010
-Light:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 2104800001}
+    m_Modifications:
+    - target: {fileID: 4350000000000000001, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_Name
+      value: Lanterna nordeste
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 17.666918
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 5.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 10.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.86602541
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -120
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+--- !u!4 &2104900005 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+  m_PrefabInstance: {fileID: 2104900004}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2104800008}
-  m_Enabled: 1
-  serializedVersion: 12
-  m_Type: 2
-  m_Color: {r: 1, g: 0.78, b: 0.54, a: 1}
-  m_Intensity: 35
-  m_Range: 16
-  m_SpotAngle: 30
-  m_InnerSpotAngle: 21.80208
-  m_CookieSize2D: {x: 0.5, y: 0.5}
-  m_Shadows:
-    m_Type: 0
-    m_Resolution: -1
-    m_CustomResolution: -1
-    m_Strength: 1
-    m_Bias: 0.05
-    m_NormalBias: 0.4
-    m_NearPlane: 0.2
-    m_CullingMatrixOverride:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_UseCullingMatrixOverride: 0
-  m_Cookie: {fileID: 0}
-  m_DrawHalo: 0
-  m_Flare: {fileID: 0}
-  m_RenderMode: 0
-  m_CullingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_RenderingLayerMask: 1
-  m_Lightmapping: 4
-  m_LightShadowCasterMode: 0
-  m_AreaSize: {x: 1, y: 1}
-  m_BounceIntensity: 1
-  m_ColorTemperature: 6570
-  m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
-  m_UseBoundingSphereOverride: 0
-  m_UseViewFrustumForShadowCasterCull: 1
-  m_ForceVisible: 0
-  m_ShadowRadius: 0
-  m_ShadowAngle: 0
-  m_LightUnit: 1
-  m_LuxAtDistance: 1
-  m_EnableSpotReflector: 1
+--- !u!1001 &2104900006
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 2104800001}
+    m_Modifications:
+    - target: {fileID: 4350000000000000001, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_Name
+      value: Lanterna sudeste
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 17.666918
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 5.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -10.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.86602541
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -60
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+--- !u!4 &2104900007 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+  m_PrefabInstance: {fileID: 2104900006}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2104800020
 GameObject:
   m_ObjectHideFlags: 0
@@ -64203,302 +64097,196 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2104800023}
-  - {fileID: 2104800026}
-  - {fileID: 2104800029}
+  - {fileID: 2104900009}
+  - {fileID: 2104900011}
+  - {fileID: 2104900013}
+  - {fileID: 2104900015}
   m_Father: {fileID: 8063240}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &2104800022
-GameObject:
+--- !u!1001 &2104900008
+PrefabInstance:
   m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2104800023}
-  - component: {fileID: 2104800024}
-  m_Layer: 0
-  m_Name: Luz central
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2104800023
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2104800022}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 11, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2104800021}
-  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
---- !u!108 &2104800024
-Light:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2104800022}
-  m_Enabled: 1
-  serializedVersion: 12
-  m_Type: 0
-  m_Color: {r: 1, g: 0.88, b: 0.73, a: 1}
-  m_Intensity: 92
-  m_Range: 24
-  m_SpotAngle: 118
-  m_InnerSpotAngle: 85
-  m_CookieSize2D: {x: 0.5, y: 0.5}
-  m_Shadows:
-    m_Type: 0
-    m_Resolution: -1
-    m_CustomResolution: -1
-    m_Strength: 1
-    m_Bias: 0.05
-    m_NormalBias: 0.4
-    m_NearPlane: 0.2
-    m_CullingMatrixOverride:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_UseCullingMatrixOverride: 0
-  m_Cookie: {fileID: 0}
-  m_DrawHalo: 0
-  m_Flare: {fileID: 0}
-  m_RenderMode: 0
-  m_CullingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_RenderingLayerMask: 1
-  m_Lightmapping: 4
-  m_LightShadowCasterMode: 0
-  m_AreaSize: {x: 1, y: 1}
-  m_BounceIntensity: 1
-  m_ColorTemperature: 6570
-  m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
-  m_UseBoundingSphereOverride: 0
-  m_UseViewFrustumForShadowCasterCull: 1
-  m_ForceVisible: 0
-  m_ShadowRadius: 0
-  m_ShadowAngle: 0
-  m_LightUnit: 1
-  m_LuxAtDistance: 1
-  m_EnableSpotReflector: 1
---- !u!1 &2104800025
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2104800026}
-  - component: {fileID: 2104800027}
-  m_Layer: 0
-  m_Name: Luz lateral oeste
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2104800026
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 2104800021}
+    m_Modifications:
+    - target: {fileID: 4350000000000000001, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_Name
+      value: Lanterna sudoeste
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -17.666918
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 5.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -10.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.86602541
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 60
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+--- !u!4 &2104900009 stripped
 Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+  m_PrefabInstance: {fileID: 2104900008}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2104800025}
+--- !u!1001 &2104900010
+PrefabInstance:
+  m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -10, y: 6, z: -3.5}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2104800021}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!108 &2104800027
-Light:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2104800025}
-  m_Enabled: 1
-  serializedVersion: 12
-  m_Type: 2
-  m_Color: {r: 0.72, g: 0.84, b: 1, a: 1}
-  m_Intensity: 33
-  m_Range: 16
-  m_SpotAngle: 30
-  m_InnerSpotAngle: 21.80208
-  m_CookieSize2D: {x: 0.5, y: 0.5}
-  m_Shadows:
-    m_Type: 0
-    m_Resolution: -1
-    m_CustomResolution: -1
-    m_Strength: 1
-    m_Bias: 0.05
-    m_NormalBias: 0.4
-    m_NearPlane: 0.2
-    m_CullingMatrixOverride:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_UseCullingMatrixOverride: 0
-  m_Cookie: {fileID: 0}
-  m_DrawHalo: 0
-  m_Flare: {fileID: 0}
-  m_RenderMode: 0
-  m_CullingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_RenderingLayerMask: 1
-  m_Lightmapping: 4
-  m_LightShadowCasterMode: 0
-  m_AreaSize: {x: 1, y: 1}
-  m_BounceIntensity: 1
-  m_ColorTemperature: 6570
-  m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
-  m_UseBoundingSphereOverride: 0
-  m_UseViewFrustumForShadowCasterCull: 1
-  m_ForceVisible: 0
-  m_ShadowRadius: 0
-  m_ShadowAngle: 0
-  m_LightUnit: 1
-  m_LuxAtDistance: 1
-  m_EnableSpotReflector: 1
---- !u!1 &2104800028
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2104800029}
-  - component: {fileID: 2104800030}
-  m_Layer: 0
-  m_Name: Luz lateral leste
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2104800029
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 2104800021}
+    m_Modifications:
+    - target: {fileID: 4350000000000000001, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_Name
+      value: Lanterna noroeste
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -17.666918
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 5.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 10.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.86602541
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 120
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+--- !u!4 &2104900011 stripped
 Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+  m_PrefabInstance: {fileID: 2104900010}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2104800028}
+--- !u!1001 &2104900012
+PrefabInstance:
+  m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 10, y: 6, z: 3.5}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2104800021}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!108 &2104800030
-Light:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 2104800021}
+    m_Modifications:
+    - target: {fileID: 4350000000000000001, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_Name
+      value: Lanterna nordeste
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 17.666918
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 5.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 10.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.86602541
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -120
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+--- !u!4 &2104900013 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+  m_PrefabInstance: {fileID: 2104900012}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2104800028}
-  m_Enabled: 1
-  serializedVersion: 12
-  m_Type: 2
-  m_Color: {r: 1, g: 0.78, b: 0.54, a: 1}
-  m_Intensity: 35
-  m_Range: 16
-  m_SpotAngle: 30
-  m_InnerSpotAngle: 21.80208
-  m_CookieSize2D: {x: 0.5, y: 0.5}
-  m_Shadows:
-    m_Type: 0
-    m_Resolution: -1
-    m_CustomResolution: -1
-    m_Strength: 1
-    m_Bias: 0.05
-    m_NormalBias: 0.4
-    m_NearPlane: 0.2
-    m_CullingMatrixOverride:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_UseCullingMatrixOverride: 0
-  m_Cookie: {fileID: 0}
-  m_DrawHalo: 0
-  m_Flare: {fileID: 0}
-  m_RenderMode: 0
-  m_CullingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_RenderingLayerMask: 1
-  m_Lightmapping: 4
-  m_LightShadowCasterMode: 0
-  m_AreaSize: {x: 1, y: 1}
-  m_BounceIntensity: 1
-  m_ColorTemperature: 6570
-  m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
-  m_UseBoundingSphereOverride: 0
-  m_UseViewFrustumForShadowCasterCull: 1
-  m_ForceVisible: 0
-  m_ShadowRadius: 0
-  m_ShadowAngle: 0
-  m_LightUnit: 1
-  m_LuxAtDistance: 1
-  m_EnableSpotReflector: 1
+--- !u!1001 &2104900014
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 2104800021}
+    m_Modifications:
+    - target: {fileID: 4350000000000000001, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_Name
+      value: Lanterna sudeste
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 17.666918
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 5.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -10.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.86602541
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -60
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+--- !u!4 &2104900015 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+  m_PrefabInstance: {fileID: 2104900014}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2104800040
 GameObject:
   m_ObjectHideFlags: 0
@@ -64528,302 +64316,196 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2104800043}
-  - {fileID: 2104800046}
-  - {fileID: 2104800049}
+  - {fileID: 2104900017}
+  - {fileID: 2104900019}
+  - {fileID: 2104900021}
+  - {fileID: 2104900023}
   m_Father: {fileID: 838174534}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &2104800042
-GameObject:
+--- !u!1001 &2104900016
+PrefabInstance:
   m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2104800043}
-  - component: {fileID: 2104800044}
-  m_Layer: 0
-  m_Name: Luz central
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2104800043
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2104800042}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 11, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2104800041}
-  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
---- !u!108 &2104800044
-Light:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2104800042}
-  m_Enabled: 1
-  serializedVersion: 12
-  m_Type: 0
-  m_Color: {r: 1, g: 0.88, b: 0.73, a: 1}
-  m_Intensity: 92
-  m_Range: 24
-  m_SpotAngle: 118
-  m_InnerSpotAngle: 85
-  m_CookieSize2D: {x: 0.5, y: 0.5}
-  m_Shadows:
-    m_Type: 0
-    m_Resolution: -1
-    m_CustomResolution: -1
-    m_Strength: 1
-    m_Bias: 0.05
-    m_NormalBias: 0.4
-    m_NearPlane: 0.2
-    m_CullingMatrixOverride:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_UseCullingMatrixOverride: 0
-  m_Cookie: {fileID: 0}
-  m_DrawHalo: 0
-  m_Flare: {fileID: 0}
-  m_RenderMode: 0
-  m_CullingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_RenderingLayerMask: 1
-  m_Lightmapping: 4
-  m_LightShadowCasterMode: 0
-  m_AreaSize: {x: 1, y: 1}
-  m_BounceIntensity: 1
-  m_ColorTemperature: 6570
-  m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
-  m_UseBoundingSphereOverride: 0
-  m_UseViewFrustumForShadowCasterCull: 1
-  m_ForceVisible: 0
-  m_ShadowRadius: 0
-  m_ShadowAngle: 0
-  m_LightUnit: 1
-  m_LuxAtDistance: 1
-  m_EnableSpotReflector: 1
---- !u!1 &2104800045
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2104800046}
-  - component: {fileID: 2104800047}
-  m_Layer: 0
-  m_Name: Luz lateral oeste
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2104800046
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 2104800041}
+    m_Modifications:
+    - target: {fileID: 4350000000000000001, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_Name
+      value: Lanterna sudoeste
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -17.666918
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 5.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -10.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.86602541
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 60
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+--- !u!4 &2104900017 stripped
 Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+  m_PrefabInstance: {fileID: 2104900016}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2104800045}
+--- !u!1001 &2104900018
+PrefabInstance:
+  m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -10, y: 6, z: -3.5}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2104800041}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!108 &2104800047
-Light:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2104800045}
-  m_Enabled: 1
-  serializedVersion: 12
-  m_Type: 2
-  m_Color: {r: 0.72, g: 0.84, b: 1, a: 1}
-  m_Intensity: 33
-  m_Range: 16
-  m_SpotAngle: 30
-  m_InnerSpotAngle: 21.80208
-  m_CookieSize2D: {x: 0.5, y: 0.5}
-  m_Shadows:
-    m_Type: 0
-    m_Resolution: -1
-    m_CustomResolution: -1
-    m_Strength: 1
-    m_Bias: 0.05
-    m_NormalBias: 0.4
-    m_NearPlane: 0.2
-    m_CullingMatrixOverride:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_UseCullingMatrixOverride: 0
-  m_Cookie: {fileID: 0}
-  m_DrawHalo: 0
-  m_Flare: {fileID: 0}
-  m_RenderMode: 0
-  m_CullingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_RenderingLayerMask: 1
-  m_Lightmapping: 4
-  m_LightShadowCasterMode: 0
-  m_AreaSize: {x: 1, y: 1}
-  m_BounceIntensity: 1
-  m_ColorTemperature: 6570
-  m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
-  m_UseBoundingSphereOverride: 0
-  m_UseViewFrustumForShadowCasterCull: 1
-  m_ForceVisible: 0
-  m_ShadowRadius: 0
-  m_ShadowAngle: 0
-  m_LightUnit: 1
-  m_LuxAtDistance: 1
-  m_EnableSpotReflector: 1
---- !u!1 &2104800048
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2104800049}
-  - component: {fileID: 2104800050}
-  m_Layer: 0
-  m_Name: Luz lateral leste
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2104800049
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 2104800041}
+    m_Modifications:
+    - target: {fileID: 4350000000000000001, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_Name
+      value: Lanterna noroeste
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -17.666918
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 5.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 10.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.86602541
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 120
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+--- !u!4 &2104900019 stripped
 Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+  m_PrefabInstance: {fileID: 2104900018}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2104800048}
+--- !u!1001 &2104900020
+PrefabInstance:
+  m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 10, y: 6, z: 3.5}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2104800041}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!108 &2104800050
-Light:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 2104800041}
+    m_Modifications:
+    - target: {fileID: 4350000000000000001, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_Name
+      value: Lanterna nordeste
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 17.666918
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 5.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 10.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.86602541
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -120
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+--- !u!4 &2104900021 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+  m_PrefabInstance: {fileID: 2104900020}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2104800048}
-  m_Enabled: 1
-  serializedVersion: 12
-  m_Type: 2
-  m_Color: {r: 1, g: 0.78, b: 0.54, a: 1}
-  m_Intensity: 35
-  m_Range: 16
-  m_SpotAngle: 30
-  m_InnerSpotAngle: 21.80208
-  m_CookieSize2D: {x: 0.5, y: 0.5}
-  m_Shadows:
-    m_Type: 0
-    m_Resolution: -1
-    m_CustomResolution: -1
-    m_Strength: 1
-    m_Bias: 0.05
-    m_NormalBias: 0.4
-    m_NearPlane: 0.2
-    m_CullingMatrixOverride:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_UseCullingMatrixOverride: 0
-  m_Cookie: {fileID: 0}
-  m_DrawHalo: 0
-  m_Flare: {fileID: 0}
-  m_RenderMode: 0
-  m_CullingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_RenderingLayerMask: 1
-  m_Lightmapping: 4
-  m_LightShadowCasterMode: 0
-  m_AreaSize: {x: 1, y: 1}
-  m_BounceIntensity: 1
-  m_ColorTemperature: 6570
-  m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
-  m_UseBoundingSphereOverride: 0
-  m_UseViewFrustumForShadowCasterCull: 1
-  m_ForceVisible: 0
-  m_ShadowRadius: 0
-  m_ShadowAngle: 0
-  m_LightUnit: 1
-  m_LuxAtDistance: 1
-  m_EnableSpotReflector: 1
+--- !u!1001 &2104900022
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 2104800041}
+    m_Modifications:
+    - target: {fileID: 4350000000000000001, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_Name
+      value: Lanterna sudeste
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 17.666918
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 5.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -10.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.86602541
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -60
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+--- !u!4 &2104900023 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+  m_PrefabInstance: {fileID: 2104900022}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2104800060
 GameObject:
   m_ObjectHideFlags: 0
@@ -64853,302 +64535,196 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2104800063}
-  - {fileID: 2104800066}
-  - {fileID: 2104800069}
+  - {fileID: 2104900025}
+  - {fileID: 2104900027}
+  - {fileID: 2104900029}
+  - {fileID: 2104900031}
   m_Father: {fileID: 5984244}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &2104800062
-GameObject:
+--- !u!1001 &2104900024
+PrefabInstance:
   m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2104800063}
-  - component: {fileID: 2104800064}
-  m_Layer: 0
-  m_Name: Luz central
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2104800063
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2104800062}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 11, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2104800061}
-  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
---- !u!108 &2104800064
-Light:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2104800062}
-  m_Enabled: 1
-  serializedVersion: 12
-  m_Type: 0
-  m_Color: {r: 1, g: 0.88, b: 0.73, a: 1}
-  m_Intensity: 92
-  m_Range: 24
-  m_SpotAngle: 118
-  m_InnerSpotAngle: 85
-  m_CookieSize2D: {x: 0.5, y: 0.5}
-  m_Shadows:
-    m_Type: 0
-    m_Resolution: -1
-    m_CustomResolution: -1
-    m_Strength: 1
-    m_Bias: 0.05
-    m_NormalBias: 0.4
-    m_NearPlane: 0.2
-    m_CullingMatrixOverride:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_UseCullingMatrixOverride: 0
-  m_Cookie: {fileID: 0}
-  m_DrawHalo: 0
-  m_Flare: {fileID: 0}
-  m_RenderMode: 0
-  m_CullingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_RenderingLayerMask: 1
-  m_Lightmapping: 4
-  m_LightShadowCasterMode: 0
-  m_AreaSize: {x: 1, y: 1}
-  m_BounceIntensity: 1
-  m_ColorTemperature: 6570
-  m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
-  m_UseBoundingSphereOverride: 0
-  m_UseViewFrustumForShadowCasterCull: 1
-  m_ForceVisible: 0
-  m_ShadowRadius: 0
-  m_ShadowAngle: 0
-  m_LightUnit: 1
-  m_LuxAtDistance: 1
-  m_EnableSpotReflector: 1
---- !u!1 &2104800065
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2104800066}
-  - component: {fileID: 2104800067}
-  m_Layer: 0
-  m_Name: Luz lateral oeste
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2104800066
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 2104800061}
+    m_Modifications:
+    - target: {fileID: 4350000000000000001, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_Name
+      value: Lanterna sudoeste
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -17.666918
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 5.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -10.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.86602541
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 60
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+--- !u!4 &2104900025 stripped
 Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+  m_PrefabInstance: {fileID: 2104900024}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2104800065}
+--- !u!1001 &2104900026
+PrefabInstance:
+  m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -10, y: 6, z: -3.5}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2104800061}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!108 &2104800067
-Light:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2104800065}
-  m_Enabled: 1
-  serializedVersion: 12
-  m_Type: 2
-  m_Color: {r: 0.72, g: 0.84, b: 1, a: 1}
-  m_Intensity: 33
-  m_Range: 16
-  m_SpotAngle: 30
-  m_InnerSpotAngle: 21.80208
-  m_CookieSize2D: {x: 0.5, y: 0.5}
-  m_Shadows:
-    m_Type: 0
-    m_Resolution: -1
-    m_CustomResolution: -1
-    m_Strength: 1
-    m_Bias: 0.05
-    m_NormalBias: 0.4
-    m_NearPlane: 0.2
-    m_CullingMatrixOverride:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_UseCullingMatrixOverride: 0
-  m_Cookie: {fileID: 0}
-  m_DrawHalo: 0
-  m_Flare: {fileID: 0}
-  m_RenderMode: 0
-  m_CullingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_RenderingLayerMask: 1
-  m_Lightmapping: 4
-  m_LightShadowCasterMode: 0
-  m_AreaSize: {x: 1, y: 1}
-  m_BounceIntensity: 1
-  m_ColorTemperature: 6570
-  m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
-  m_UseBoundingSphereOverride: 0
-  m_UseViewFrustumForShadowCasterCull: 1
-  m_ForceVisible: 0
-  m_ShadowRadius: 0
-  m_ShadowAngle: 0
-  m_LightUnit: 1
-  m_LuxAtDistance: 1
-  m_EnableSpotReflector: 1
---- !u!1 &2104800068
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2104800069}
-  - component: {fileID: 2104800070}
-  m_Layer: 0
-  m_Name: Luz lateral leste
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2104800069
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 2104800061}
+    m_Modifications:
+    - target: {fileID: 4350000000000000001, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_Name
+      value: Lanterna noroeste
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -17.666918
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 5.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 10.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.86602541
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 120
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+--- !u!4 &2104900027 stripped
 Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+  m_PrefabInstance: {fileID: 2104900026}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2104800068}
+--- !u!1001 &2104900028
+PrefabInstance:
+  m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 10, y: 6, z: 3.5}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2104800061}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!108 &2104800070
-Light:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 2104800061}
+    m_Modifications:
+    - target: {fileID: 4350000000000000001, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_Name
+      value: Lanterna nordeste
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 17.666918
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 5.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 10.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.86602541
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -120
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+--- !u!4 &2104900029 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+  m_PrefabInstance: {fileID: 2104900028}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2104800068}
-  m_Enabled: 1
-  serializedVersion: 12
-  m_Type: 2
-  m_Color: {r: 1, g: 0.78, b: 0.54, a: 1}
-  m_Intensity: 35
-  m_Range: 16
-  m_SpotAngle: 30
-  m_InnerSpotAngle: 21.80208
-  m_CookieSize2D: {x: 0.5, y: 0.5}
-  m_Shadows:
-    m_Type: 0
-    m_Resolution: -1
-    m_CustomResolution: -1
-    m_Strength: 1
-    m_Bias: 0.05
-    m_NormalBias: 0.4
-    m_NearPlane: 0.2
-    m_CullingMatrixOverride:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_UseCullingMatrixOverride: 0
-  m_Cookie: {fileID: 0}
-  m_DrawHalo: 0
-  m_Flare: {fileID: 0}
-  m_RenderMode: 0
-  m_CullingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_RenderingLayerMask: 1
-  m_Lightmapping: 4
-  m_LightShadowCasterMode: 0
-  m_AreaSize: {x: 1, y: 1}
-  m_BounceIntensity: 1
-  m_ColorTemperature: 6570
-  m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
-  m_UseBoundingSphereOverride: 0
-  m_UseViewFrustumForShadowCasterCull: 1
-  m_ForceVisible: 0
-  m_ShadowRadius: 0
-  m_ShadowAngle: 0
-  m_LightUnit: 1
-  m_LuxAtDistance: 1
-  m_EnableSpotReflector: 1
+--- !u!1001 &2104900030
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 2104800061}
+    m_Modifications:
+    - target: {fileID: 4350000000000000001, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_Name
+      value: Lanterna sudeste
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 17.666918
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 5.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -10.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.86602541
+      objectReference: {fileID: 0}
+    - target: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -60
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+--- !u!4 &2104900031 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4350000000000000002, guid: 3e27befd65e1dbe4b49ad569a9f23775, type: 3}
+  m_PrefabInstance: {fileID: 2104900030}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2105737192
 GameObject:
   m_ObjectHideFlags: 0
