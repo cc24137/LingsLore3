@@ -1,0 +1,26 @@
+# Material library for tophat
+
+newmtl Cartola_Preto
+Ka 0.0240 0.0240 0.0300
+Kd 0.1200 0.1200 0.1500
+Ks 0.4320 0.4320 0.4320
+Ns 70.00
+d 1.0000
+illum 2
+
+newmtl Fita_Vermelha
+Ka 0.1480 0.0220 0.0300
+Kd 0.7400 0.1100 0.1500
+Ks 0.6075 0.6075 0.6075
+Ns 137.50
+d 1.0000
+illum 2
+
+newmtl Fivela_Ouro
+Ka 0.1760 0.1400 0.0400
+Kd 0.8800 0.7000 0.2000
+Ks 0.7375 0.7375 0.7375
+Ns 187.50
+d 1.0000
+illum 2
+

@@ -1,0 +1,18 @@
+# Material library for laco_rosa
+
+newmtl Laco_Rosa
+Ka 0.1960 0.0900 0.1400
+Kd 0.9800 0.4500 0.7000
+Ks 0.5425 0.5425 0.5425
+Ns 112.50
+d 1.0000
+illum 2
+
+newmtl Laco_Rosa_Escuro
+Ka 0.1720 0.0520 0.1100
+Kd 0.8600 0.2600 0.5500
+Ks 0.5620 0.5620 0.5620
+Ns 120.00
+d 1.0000
+illum 2
+

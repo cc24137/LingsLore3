@@ -1,0 +1,26 @@
+# Material library for chapeu_chines
+
+newmtl Palha_Dourada
+Ka 0.1700 0.1420 0.0780
+Kd 0.8500 0.7100 0.3900
+Ks 0.3670 0.3670 0.3670
+Ns 45.00
+d 1.0000
+illum 2
+
+newmtl Palha_Borda_Escura
+Ka 0.0960 0.0620 0.0320
+Kd 0.4800 0.3100 0.1600
+Ks 0.3475 0.3475 0.3475
+Ns 37.50
+d 1.0000
+illum 2
+
+newmtl Palha_Trancado
+Ka 0.1440 0.1080 0.0520
+Kd 0.7200 0.5400 0.2600
+Ks 0.3540 0.3540 0.3540
+Ns 40.00
+d 1.0000
+illum 2
+
