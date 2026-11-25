@@ -51,7 +51,7 @@ public sealed class SequenciaChefesArena : MonoBehaviour
             string nome = nomesDosChefes != null && etapaAtual < nomesDosChefes.Length
                 ? nomesDosChefes[etapaAtual]
                 : null;
-            return string.IsNullOrWhiteSpace(nome) ? chefeAtual.gameObject.name : nome;
+            return chefeAtual.ObterNomeDaFase(string.IsNullOrWhiteSpace(nome) ? chefeAtual.gameObject.name : nome);
         }
     }
 

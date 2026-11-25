@@ -1074,9 +1074,10 @@ public sealed partial class BossNetanyahu : MonoBehaviour
             return;
 
         GUI.Box(new Rect(16f, 16f, 225f, 66f), GUIContent.none);
-        string textoVida = vida.IsDead ? "Boss derrotado" : $"Fase {vida.CurrentBar}    HP {Mathf.CeilToInt(vida.CurrentHealth)} / {Mathf.CeilToInt(vida.MaxHealth)}";
+        string textoVida = vida.IsDead ? "Boss derrotado" :
+            $"{vida.ObterNomeDaFase(gameObject.name)}   {Mathf.CeilToInt(vida.CurrentHealth)}/{Mathf.CeilToInt(vida.MaxHealth)} HP";
         GUI.Label(new Rect(25f, 21f, 207f, 20f), textoVida);
-        GUI.Label(new Rect(25f, 54f, 207f, 20f), "Vida do Ling: " + Mathf.CeilToInt(ling.CurrentHealth));
+        GUI.Label(new Rect(25f, 54f, 207f, 20f), $"Vida do Ling: {Mathf.CeilToInt(ling.CurrentHealth)}   Fase {vida.CurrentBar}");
 
         Color corAnterior = GUI.color;
         GUI.color = new Color(0.18f, 0.18f, 0.18f);

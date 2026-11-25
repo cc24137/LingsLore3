@@ -7,6 +7,7 @@ public class EnemyHealth : MonoBehaviour
     [SerializeField, Min(1f)] private float maxHealth = 200f;
     [SerializeField, Min(0f)] private float secondBarHealth;
     [SerializeField, Min(0f)] private float thirdBarHealth;
+    [SerializeField] private string[] nomesDasFases;
     [SerializeField] private float currentHealth;
     [SerializeField] private bool somenteAtaqueBasico;
     [SerializeField] private UnityEvent onDeath = new UnityEvent();
@@ -32,6 +33,14 @@ public class EnemyHealth : MonoBehaviour
         _ => maxHealth
     };
     public float MaxHealth => EhChefe ? VidaBase * BalanceamentoDificuldade.Atual.Vida : VidaBase;
+
+    internal string ObterNomeDaFase(string nomePadrao)
+    {
+        string nomeDaFase = nomesDasFases != null && CurrentBar <= nomesDasFases.Length
+            ? nomesDasFases[CurrentBar - 1]
+            : null;
+        return string.IsNullOrWhiteSpace(nomeDaFase) ? nomePadrao : nomeDaFase;
+    }
 
     public void SetBasicAttackOnly(bool active)
     {

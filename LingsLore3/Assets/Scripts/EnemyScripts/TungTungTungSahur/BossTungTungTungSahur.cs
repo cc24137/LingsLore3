@@ -562,15 +562,12 @@ public sealed partial class BossTungTungTungSahur : MonoBehaviour
         if (!mostrarHudDeTeste || ling == null)
             return;
 
-        string nomeDaForma = estado == Estado.Transformando ? "Transformação" : faseVisual switch
-        {
-            2 => "Sahur Demônio",
-            3 => "Tung Tung Tung Sahur God",
-            _ => "Tung Tung Tung Sahur"
-        };
+        string nomeDaForma = vida.ObterNomeDaFase("Tung Tung Tung Sahur");
         string textoBoss = vida.IsDead ? "Boss derrotado" :
             $"{nomeDaForma}   {Mathf.CeilToInt(vida.CurrentHealth)} / {Mathf.CeilToInt(vida.MaxHealth)} HP";
         string textoLing = ling.IsDead ? "Ling caiu" : $"Ling   HP {Mathf.CeilToInt(ling.CurrentHealth)}";
+        if (estado == Estado.Transformando)
+            textoLing += "   Transformação";
         GUI.Box(new Rect(16f, 16f, 310f, 58f), GUIContent.none);
         GUI.Label(new Rect(25f, 22f, 292f, 20f), textoBoss);
         GUI.Label(new Rect(25f, 43f, 207f, 20f), textoLing);
