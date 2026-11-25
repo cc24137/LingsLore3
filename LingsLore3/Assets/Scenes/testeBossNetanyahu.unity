@@ -575,68 +575,6 @@ Transform:
   - {fileID: 1896010131}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &1473365650
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 2026112202}
-    m_Modifications:
-    - target: {fileID: -8679921383154817045, guid: 0c42abb855ff4548b5c4011a15a34e5d, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 0c42abb855ff4548b5c4011a15a34e5d, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -1
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 0c42abb855ff4548b5c4011a15a34e5d, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 0c42abb855ff4548b5c4011a15a34e5d, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 0c42abb855ff4548b5c4011a15a34e5d, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 0c42abb855ff4548b5c4011a15a34e5d, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 0c42abb855ff4548b5c4011a15a34e5d, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 0c42abb855ff4548b5c4011a15a34e5d, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 0c42abb855ff4548b5c4011a15a34e5d, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 0c42abb855ff4548b5c4011a15a34e5d, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: 0c42abb855ff4548b5c4011a15a34e5d, type: 3}
-      propertyPath: m_Name
-      value: BenjaminNetanyahu
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 0c42abb855ff4548b5c4011a15a34e5d, type: 3}
---- !u!4 &1473365651 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 0c42abb855ff4548b5c4011a15a34e5d, type: 3}
-  m_PrefabInstance: {fileID: 1473365650}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1513958042
 GameObject:
   m_ObjectHideFlags: 0
@@ -912,197 +850,47 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1385803612}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &2026112201
-GameObject:
+--- !u!1001 &2026112201
+PrefabInstance:
   m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2026112202}
-  - component: {fileID: 2026112203}
-  - component: {fileID: 2026112205}
-  - component: {fileID: 2026112204}
-  - component: {fileID: 2026112206}
-  m_Layer: 8
-  m_Name: Boss Netanyahu
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2026112202
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2026112201}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 0, y: 3.4, z: 3}
-  m_LocalScale: {x: 3.4, y: 3.4, z: 3.4}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1473365651}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
---- !u!136 &2026112203
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2026112201}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &2026112204
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2026112201}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dd3e6bc6f120b8b439eb947a1c8c8ec9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
-  maxHealth: 220
-  secondBarHealth: 220
-  thirdBarHealth: 240
-  currentHealth: 220
-  somenteAtaqueBasico: 0
-  onDeath:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!54 &2026112205
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2026112201}
-  serializedVersion: 5
-  m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 1
-  m_Constraints: 112
-  m_CollisionDetection: 0
---- !u!114 &2026112206
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2026112201}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 69634065f7bb4049b3a160cc78ebce30, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BossNetanyahu
-  preparacaoDaBombaMassiva: 4.3
-  alturaDaExplosaoMassiva: 9
-  danoDaBombaMassiva: 100
-  intervaloDaBombaMassiva: 20
-  modeloTralaleroDoGiro: {fileID: 919132149155446097, guid: 4fad7acd5f255f443a7a2584c73b6600, type: 3}
-  raioDoGiro: 15
-  alturaDoGiro: 6
-  avisoDoGiro: 0.85
-  duracaoDoGiro: 0.3
-  danoDoGiro: 24
-  ling: {fileID: 28656684}
-  piso: {fileID: 1896010128}
-  obstaculos:
-    serializedVersion: 2
-    m_Bits: 520
-  shaderDosAvisos: {fileID: 4800000, guid: 650dd9526735d5b46b79224bc6e94025, type: 3}
-  prefabBomba: {fileID: 150100005, guid: c94f155914ef4506b477ed2a023d69f2, type: 3}
-  distanciaParaBombas: 20
-  tempoDeRecuo: 0.65
-  velocidadeDeRecuo: 3
-  prefabPocaDeFogo: {fileID: 150200005, guid: 465ba080a9b94ad8a937d64c43e1bf15, type: 3}
-  duracaoDaTransicao: 1.4
-  multiplicadorDeTamanhoNaFase2: 1.15
-  prefabMiniTralalero: {fileID: 150300006, guid: fc10f31b471044179ec693d3c5de2c60, type: 3}
-  quantidadeDeMinis: 4
-  distanciaParaInvocar: 20
-  raioDaInvocacao: 4.25
-  avisoDaInvocacao: 0.75
-  tempoAntesDaOrdem: 1.3
-  avisoDaOrdem: 0.65
-  intervaloEntreInvocacoes: 8
-  velocidadeInicialDaCorrida: 7
-  velocidadeMaximaDaCorrida: 13
-  aceleracaoDaCorrida: 5
-  tempoMaximoDeCorrida: 7
-  velocidadeDoDash: 28
-  alcanceDoDash: 12
-  alcanceDoCombo: 6.4
-  avisoDoPrimeiroGolpe: 0.6
-  avisoDoGolpe: 0.3
-  danoDoGolpe: 8
-  danoDoUltimoGolpe: 15
-  distanciaParaInvestida: 17
-  avisoDaInvestida: 0.65
-  multiplicadorDeLarguraDaInvestida: 1.5
-  velocidadeDaInvestida: 32
-  danoDaInvestida: 20
-  distanciaParaPisada: 8
-  avisoDaPisada: 0.7
-  fracaoAteBordaMaisDistante: 0.95
-  velocidadeDaOnda: 18
-  alturaDaOnda: 0.45
-  larguraDaOnda: 1.1
-  danoDaPisada: 16
-  recuperacao: 1.1
-  estado: 0
-  ataqueEscolhido: 0
-  prefabAviao: {fileID: 150400004, guid: d19242e7b4cd4f44a5b80004697d89d8, type: 3}
-  esperaAntesDoPrimeiroVoo: 6
-  intervaloEntreVoos: 40
-  alturaDeVoo: 15.5
-  raioDaOrbita: 14.7
-  velocidadeDeVoo: 12
-  alturaMinimaDoGarfo: 10
-  prefabMetralhadora: {fileID: 150500005, guid: 589f3abaa98b4ea28b7438566b483e11, type: 3}
-  avisoDoRasante: 1.1
-  velocidadeDoRasante: 42
-  raioDoRasante: 2.2
-  danoDoRasante: 24
-  prefabExplosaoRobo: {fileID: 1732138503, guid: 86cf5662995e497fb7db8bb6e8c722fe, type: 3}
-  prefabMiniNetanyahu: {fileID: 150300006, guid: 90518a1748994199ab6826f56c29f9b2, type: 3}
-  tempoParaRessurgir: 2.8
-  intervaloDoComboRobo: 20
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2026112202, guid: 8e494521a9f24bfe92144825c41bf5fd, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2026112202, guid: 8e494521a9f24bfe92144825c41bf5fd, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2026112202, guid: 8e494521a9f24bfe92144825c41bf5fd, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2026112202, guid: 8e494521a9f24bfe92144825c41bf5fd, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 2026112206, guid: 8e494521a9f24bfe92144825c41bf5fd, type: 3}
+      propertyPath: ling
+      value: 
+      objectReference: {fileID: 28656684}
+    - target: {fileID: 2026112206, guid: 8e494521a9f24bfe92144825c41bf5fd, type: 3}
+      propertyPath: piso
+      value: 
+      objectReference: {fileID: 1896010128}
+    - target: {fileID: 2026112206, guid: 8e494521a9f24bfe92144825c41bf5fd, type: 3}
+      propertyPath: mostrarHudDeTeste
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 8e494521a9f24bfe92144825c41bf5fd, type: 3}
 --- !u!1001 &2130316293
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1486,7 +1274,7 @@ SceneRoots:
   - {fileID: 1675172693}
   - {fileID: 1385803612}
   - {fileID: 8789802962302815298}
-  - {fileID: 2026112202}
+  - {fileID: 2026112201}
   - {fileID: 1361583359}
   - {fileID: 863917025}
   - {fileID: 2845741620339171421}

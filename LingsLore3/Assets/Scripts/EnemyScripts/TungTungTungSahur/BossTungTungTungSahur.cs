@@ -14,8 +14,8 @@ public sealed partial class BossTungTungTungSahur : MonoBehaviour
     }
 
     [Header("Arena")]
-    [SerializeField] private PlayerResources ling;
-    [SerializeField] private Collider piso;
+    [SerializeField, Tooltip("Arraste o Ling da cena para definir o alvo do chefe.")] private PlayerResources ling;
+    [SerializeField, Tooltip("Collider do piso circular da arena deste chefe.")] private Collider piso;
     [SerializeField] private LayerMask obstaculos;
     [SerializeField] private Shader shaderDosAvisos;
     [SerializeField] private ExplosaoVfx prefabExplosao;
@@ -100,6 +100,12 @@ public sealed partial class BossTungTungTungSahur : MonoBehaviour
             enabled = false;
             return;
         }
+
+        float escalaVertical = transform.lossyScale.y;
+        float meiaAlturaDaCapsula = Mathf.Max(colisor.height * Mathf.Abs(escalaVertical) * 0.5f, RaioDoCorpo);
+        Vector3 posicao = corpo.position;
+        posicao.y = piso.bounds.max.y + meiaAlturaDaCapsula - colisor.center.y * escalaVertical;
+        corpo.position = posicao;
 
         materialDoAviso = new Material(shaderDosAvisos);
         GameObject objetoDoAviso = new GameObject("Aviso dos ataques");

@@ -13,11 +13,12 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         Rasante, Rajada, GiroTralalero, BombaMassiva, Laser, RajadaRobo, MinisRobo, ComboRobo
     }
 
-    [Header("Cena de teste")]
-    [SerializeField] private PlayerResources ling;
-    [SerializeField] private Collider piso;
+    [Header("Arena")]
+    [SerializeField, Tooltip("Arraste o Ling da cena para definir o alvo do chefe.")] private PlayerResources ling;
+    [SerializeField, Tooltip("Collider do piso circular da arena deste chefe.")] private Collider piso;
     [SerializeField] private LayerMask obstaculos;
     [SerializeField] private Shader shaderDosAvisos;
+    [SerializeField] private bool mostrarHudDeTeste;
 
     [Header("Bombas")]
     [SerializeField] private Bomba prefabBomba;
@@ -125,6 +126,9 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         float escalaVertical = transform.lossyScale.y;
         float meiaAlturaDaCapsula = Mathf.Max(colisaoDoBoss.height * Mathf.Abs(escalaVertical) * 0.5f, RaioDoBoss);
         alturaInicialDaBaseAoPivo = meiaAlturaDaCapsula - colisaoDoBoss.center.y * escalaVertical;
+        Vector3 posicao = corpo.position;
+        posicao.y = piso.bounds.max.y + alturaInicialDaBaseAoPivo;
+        corpo.position = posicao;
         PrepararAnimacao();
         PrepararRobo();
     }
@@ -983,6 +987,9 @@ public sealed partial class BossNetanyahu : MonoBehaviour
 
     private void OnGUI()
     {
+        if (!mostrarHudDeTeste || ling == null)
+            return;
+
         GUI.Box(new Rect(16f, 16f, 225f, 66f), GUIContent.none);
         string textoVida = vida.IsDead ? "Boss derrotado" : $"Fase {vida.CurrentBar}    HP {Mathf.CeilToInt(vida.CurrentHealth)} / {Mathf.CeilToInt(vida.MaxHealth)}";
         GUI.Label(new Rect(25f, 21f, 207f, 20f), textoVida);
