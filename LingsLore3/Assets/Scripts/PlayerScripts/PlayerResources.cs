@@ -34,6 +34,7 @@ public class PlayerResources : MonoBehaviour
     private float lastStaminaUseTime = float.NegativeInfinity;
     private float respawnInvulnerableUntil = float.NegativeInfinity;
     private bool respawnDoTutorial;
+    private bool iniciou;
     private double healStartedAt = -1d;
 
     // Evento C# usado pelo ContadorCreditos para reiniciar a rodada atual.
@@ -59,6 +60,12 @@ public class PlayerResources : MonoBehaviour
     {
         motor = GetComponent<PlayerMotor>();
         RestoreFullResources();
+    }
+
+    private void Start()
+    {
+        iniciou = true;
+        EfeitosSonoros.Tocar(Som.AparecimentoDoLing);
     }
 
     private void OnDisable()
@@ -144,9 +151,11 @@ public class PlayerResources : MonoBehaviour
         currentHealth = Mathf.Max(0f, currentHealth - amount);
         CancelHealing();
         DamageFlash.PlayOn(this);
+        EfeitosSonoros.Tocar(Som.DanoDoLing);
 
         if (IsDead)
         {
+            EfeitosSonoros.Tocar(Som.MorteDoLing);
             motor?.ClearImpactMotion();
             Debug.Log("Ling morreu.", this);
             Died?.Invoke();
@@ -180,6 +189,7 @@ public class PlayerResources : MonoBehaviour
 
         healCharges--;
         healStartedAt = Time.timeAsDouble;
+        EfeitosSonoros.Tocar(Som.Cura);
     }
 
     internal void CancelHealing()
@@ -192,11 +202,14 @@ public class PlayerResources : MonoBehaviour
         if (TryGetComponent<DamageFlash>(out var flash))
             flash.Clear();
 
+        bool reapareceu = iniciou && IsDead;
         currentHealth = maxHealth;
         currentStamina = maxStamina;
         healCharges = MaxHealCharges;
         CancelHealing();
         lastStaminaUseTime = float.NegativeInfinity;
+        if (reapareceu)
+            EfeitosSonoros.Tocar(Som.AparecimentoDoLing);
     }
 
     // Chamado pelo ContadorCreditos depois de reposicionar o jogador.

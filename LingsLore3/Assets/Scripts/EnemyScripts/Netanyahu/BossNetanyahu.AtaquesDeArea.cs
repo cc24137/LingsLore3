@@ -184,6 +184,7 @@ public sealed partial class BossNetanyahu
         modelo.localScale = escala;
         modelo.localPosition = posicao;
         MostrarImpacto(aviso);
+        EfeitosSonoros.Tocar(Som.Bonk, centro);
         estado = Estado.Atacando;
         bool contatoResolvido = false;
         var pilaresAtingidos = new HashSet<PillarHealth>();

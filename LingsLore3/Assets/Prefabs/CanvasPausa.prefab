@@ -4178,7 +4178,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "<line-height=24>W / A / S / D\nMouse\nEspaço\nShift (toque)\nShift (segurar)\nClique esquerdo (toques)\nClique esquerdo (segurar)\nClique esquerdo (no ar)\nQ (segurar)\nClique direito\nEsc\nEnter (tutorial)\nSetas / Enter\nM (contextualização)</line-height>"
+  m_text: "<line-height=24>W / A / S / D\nMouse\nEspaço\nShift (toque)\nShift (segurar)\nClique esquerdo (toques)\nClique esquerdo (segurar)\nClique esquerdo (no ar)\nQ (segurar)\nClique direito\nE\nEsc\nEnter (tutorial)\nSetas / Enter\nM (contextualização)</line-height>"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 985e8991e4960f049ae0799350741e86, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 985e8991e4960f049ae0799350741e86, type: 2}
@@ -4315,7 +4315,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "<line-height=24>Mover\nOlhar ao redor\nPular\nEsquivar\nCorrer enquanto se move\nAtaque leve e combo\nCarregar golpe ascendente\nAtaque aéreo giratório\nMostrar a mira do Hashi\nArremessar Hashi\nPausa ou voltar dos controles\nIr à arena\nNavegar / confirmar nos menus\nAlternar música</line-height>"
+  m_text: "<line-height=24>Mover\nOlhar ao redor\nPular\nEsquivar\nCorrer enquanto se move\nAtaque leve e combo\nCarregar golpe ascendente\nAtaque aéreo giratório\nMostrar a mira do Hashi\nArremessar Hashi\nCurar\nPausa ou voltar dos controles\nIr à arena\nNavegar / confirmar nos menus\nAlternar música</line-height>"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 985e8991e4960f049ae0799350741e86, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 985e8991e4960f049ae0799350741e86, type: 2}

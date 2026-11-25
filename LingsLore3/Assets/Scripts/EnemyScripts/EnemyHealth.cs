@@ -66,6 +66,10 @@ public class EnemyHealth : MonoBehaviour
             }
             else
             {
+                if (this is Enemy || TryGetComponent<BossNetanyahu>(out _) ||
+                    TryGetComponent<BossTungTungTungSahur>(out _))
+                    EfeitosSonoros.Tocar(Som.MorteDoChefe);
+
                 onDeath.Invoke();
                 Died?.Invoke(this);
             }

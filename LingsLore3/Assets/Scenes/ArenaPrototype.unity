@@ -214,6 +214,13 @@ MonoBehaviour:
   jogador: {fileID: 28656684}
   fimDeJogo: {fileID: 337561535}
   intervaloEntreChefes: 0.75
+  musicaInterludio: {fileID: 8300000, guid: a58872e0b2cfe2a4ca47a61c3c54025f, type: 3}
+  musicasDosChefes:
+  - {fileID: 8300000, guid: 76abfc9c96748a84394f6c3c18f49dfa, type: 3}
+  - {fileID: 8300000, guid: 7e71aad13283094459d1d6c0c0f39699, type: 3}
+  - {fileID: 0}
+  - {fileID: 8300000, guid: dce44f010864a2e4ea19f880dc1823ee, type: 3}
+  volumeDaTrilha: 0.55
 --- !u!1001 &133032375
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -42,6 +42,7 @@ public sealed partial class BossNetanyahu
 
     private void ExplodirRobo(Vector3 ponto, float raio, Color cor, float intensidade)
     {
+        EfeitosSonoros.Tocar(Som.Explosao, ponto);
         if (prefabExplosaoRobo == null)
             return;
 
@@ -195,6 +196,7 @@ public sealed partial class BossNetanyahu
             linha.SetPosition(1, origem + direcao * alcance);
 
         yield return new WaitForSeconds(aviso);
+        EfeitosSonoros.Tocar(Som.Laser, origem);
         linha.widthMultiplier = rapida ? 0.33f : 0.44f;
         Colorir(linha, cor * 2f);
         linha.SetPosition(0, posicao);

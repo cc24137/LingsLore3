@@ -97,6 +97,7 @@ public class Enemy : EnemyHealth
     private Rigidbody body;
     private Vector3 jumpAttackCoordinate;
     private float fimDoAtaque;
+    private bool tocouSomDaCauda;
     private float fimDoDescanso;
     private float fimDaCue;
     private float proximoDanoBarbatana;
@@ -279,6 +280,7 @@ public class Enemy : EnemyHealth
         inicioAtaqueCauda = Time.time;
         alvoCaudaTravado = false;
         caudaAcertouNesteAtaque = false;
+        tocouSomDaCauda = false;
         pilaresAtingidosPelaCauda.Clear();
         MudarEstado(State.tailAttack);
     }
@@ -294,6 +296,12 @@ public class Enemy : EnemyHealth
             fimDoDescanso = Time.time + descansoAposAtaqueCauda;
             MudarEstado(State.idle);
             return;
+        }
+
+        if (!tocouSomDaCauda && tempoDecorrido >= inicioDanoCauda && tempoDecorrido < fimDanoCauda)
+        {
+            tocouSomDaCauda = true;
+            EfeitosSonoros.Tocar(Som.Bonk, body.position);
         }
 
         if (!alvoCaudaTravado)
@@ -382,6 +390,7 @@ public class Enemy : EnemyHealth
 
     private void SetJumpAttack()
     {
+        EfeitosSonoros.Tocar(Som.Bonk, body.position);
         MudarEstado(State.jumpAttack);
         // Guarda uma posicao, em vez de uma referencia que acompanha o jogador.
         jumpAttackCoordinate = CalcularDestinoJumpAttack(
@@ -493,6 +502,7 @@ public class Enemy : EnemyHealth
                     marcadorEmergencia = null;
                     inclinacaoVisualX = 270f;
                     etapaAtaqueChao = EtapaAtaqueChao.subindo;
+                    EfeitosSonoros.Tocar(Som.Bonk, posicaoDeEmergencia);
                 }
                 break;
 

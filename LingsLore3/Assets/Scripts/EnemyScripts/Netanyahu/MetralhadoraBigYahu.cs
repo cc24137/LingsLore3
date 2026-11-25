@@ -73,6 +73,7 @@ public sealed class MetralhadoraBigYahu : MonoBehaviour
 
             fimDoClarao = Time.time + 0.045f;
             clarao.SetActive(true);
+            EfeitosSonoros.Tocar(Som.Tiro, origem);
             projeteisEmVoo++;
             StartCoroutine(MoverProjetil(origem, direcao, dano));
             yield return new WaitForSeconds(intervaloEntreDisparos);

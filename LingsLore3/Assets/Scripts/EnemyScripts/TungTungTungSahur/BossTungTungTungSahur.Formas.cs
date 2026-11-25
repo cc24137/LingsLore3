@@ -37,6 +37,7 @@ public sealed partial class BossTungTungTungSahur
 
         vida.GrantInvulnerability(DuracaoDaTransformacao + Time.fixedDeltaTime);
         EntrarNoEstado(Estado.Transformando, DuracaoDaTransformacao);
+        EfeitosSonoros.Tocar(novaFase == 3 ? Som.SomSagrado : Som.Fogo, corpo.position);
         AtualizarTransformacao();
     }
 

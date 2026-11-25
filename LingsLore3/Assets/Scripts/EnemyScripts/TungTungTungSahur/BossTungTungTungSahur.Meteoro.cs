@@ -31,6 +31,7 @@ public sealed partial class BossTungTungTungSahur
             IgnorarColisaoComLing(true);
             AcenderBrilhoDoMeteoro();
             EntrarNoEstado(Estado.ElevandoMeteoro, tempoDaElevacaoDoMeteoro);
+            EfeitosSonoros.Tocar(Som.TungTung, corpo.position);
             return true;
         }
 
@@ -72,6 +73,8 @@ public sealed partial class BossTungTungTungSahur
                     modelo.gameObject.SetActive(true);
                 AcenderBrilhoDoMeteoro();
                 PrepararRastroDoMeteoro();
+                if (vida.CurrentBar == 2)
+                    EfeitosSonoros.Tocar(Som.Fogo, pousoDoSalto);
                 EntrarNoEstado(Estado.CaindoMeteoro, TempoDeQuedaDoMeteoro);
                 break;
             case Estado.CaindoMeteoro:

@@ -7,6 +7,8 @@ public sealed class VolumeDaFonte : MonoBehaviour
 {
     public enum Canal { Efeitos, Musica }
 
+    private const float FatorDeVolumeGeral = 0.8f;
+
     [SerializeField] private Canal canal;
 
     private static event Action<Canal> VolumeAlterado;
@@ -73,6 +75,6 @@ public sealed class VolumeDaFonte : MonoBehaviour
 
     private void AplicarVolume()
     {
-        fonte.volume = volumeOriginal * ObterVolume(canal);
+        fonte.volume = volumeOriginal * FatorDeVolumeGeral * ObterVolume(canal);
     }
 }

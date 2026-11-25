@@ -118,6 +118,7 @@ public class HashiProjectile : MonoBehaviour
         EnemyHealth enemy = target.GetComponentInParent<EnemyHealth>();
         if (enemy != null && enemy.TryTakeDamage(damage))
         {
+            EfeitosSonoros.Tocar(Som.ImpactoDoHashi, point);
             if (hitImpactVfx != null)
                 hitImpactVfx.Play(point - direction * 0.05f);
 

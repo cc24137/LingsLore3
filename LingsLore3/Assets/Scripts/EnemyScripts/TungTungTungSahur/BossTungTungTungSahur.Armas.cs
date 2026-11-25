@@ -83,6 +83,7 @@ public sealed partial class BossTungTungTungSahur
         invocarMartelosNaProxima = !martelos;
         proximaInvocacao = Time.fixedTime + (vida.CurrentBar == 3 ? 5.8f : 8.5f);
         EntrarNoEstado(Estado.PreparandoArmas, martelos ? avisoDosMartelos : avisoDasLancas);
+        EfeitosSonoros.Tocar(Som.TungTung, corpo.position);
         return true;
     }
 
@@ -163,6 +164,8 @@ public sealed partial class BossTungTungTungSahur
 
             foreach (ArmaInvocada arma in armas)
                 ColorirAvisoDaArma(arma.Aviso, !martelos && ArmasGuiadas ? Dourado : Vermelho);
+            if (martelos)
+                EfeitosSonoros.Tocar(Som.SomSagrado, armas[0].Destino);
             EntrarNoEstado(Estado.LancandoArmas, martelos ? TempoDeQuedaDoMartelo :
                 alcanceDasLancas / VelocidadeAtivaDaLanca);
             return;

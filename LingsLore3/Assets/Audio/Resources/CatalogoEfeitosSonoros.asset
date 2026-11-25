@@ -1,0 +1,69 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6486bc09f82a499ba4c708d54a64b1db, type: 3}
+  m_Name: CatalogoEfeitosSonoros
+  m_EditorClassIdentifier:
+  efeitos:
+  - som: 0
+    clipe: {fileID: 8300000, guid: 7e96cd146e7b4a6ca53b415cedd315d3, type: 3}
+    volume: 0.82
+  - som: 1
+    clipe: {fileID: 8300000, guid: 3a63a9b52f504d2b9fdf072be2432467, type: 3}
+    volume: 0.9
+  - som: 2
+    clipe: {fileID: 8300000, guid: c084a717ef164f0d85bf19b3d53da1bc, type: 3}
+    volume: 0.86
+  - som: 3
+    clipe: {fileID: 8300000, guid: 0b3bb759a59a485ba649edcde5b8a6cb, type: 3}
+    volume: 0.64
+  - som: 4
+    clipe: {fileID: 8300000, guid: 278d4f808e384ffaa0496bb35b09886a, type: 3}
+    volume: 0.75
+  - som: 5
+    clipe: {fileID: 8300000, guid: 19b5b18e8b7c472fafa43e41c53c80bd, type: 3}
+    volume: 0.75
+  - som: 6
+    clipe: {fileID: 8300000, guid: 3c17deabc7f74271b6e1e71654cde916, type: 3}
+    volume: 0.9
+  - som: 7
+    clipe: {fileID: 8300000, guid: 2aec9ece91c24c43b7d78efc3f46d630, type: 3}
+    volume: 0.3
+  - som: 9
+    clipe: {fileID: 8300000, guid: 9a77f83d3f1f4953afcad0146670b2da, type: 3}
+    volume: 0.69
+  - som: 10
+    clipe: {fileID: 8300000, guid: 7c23461f37f24dafb9c4ac2ad6a368d7, type: 3}
+    volume: 0.72
+  - som: 11
+    clipe: {fileID: 8300000, guid: 5bfcf76519ad42afa929775d597ff3c4, type: 3}
+    volume: 0.76
+  - som: 12
+    clipe: {fileID: 8300000, guid: 3371338f6d084090821ae6c44587226b, type: 3}
+    volume: 0.8
+  - som: 13
+    clipe: {fileID: 8300000, guid: 8ca372ccf3f14a39bb29459f9b61be90, type: 3}
+    volume: 0.42
+  - som: 14
+    clipe: {fileID: 8300000, guid: 9dd042d063f047dfbff6e1a036a31d29, type: 3}
+    volume: 0.86
+  - som: 15
+    clipe: {fileID: 8300000, guid: fc7e8a94adad4f59b76b89f57e57a2b1, type: 3}
+    volume: 0.8
+  - som: 16
+    clipe: {fileID: 8300000, guid: 50724e99c7d64f59992834483b84be5f, type: 3}
+    volume: 0.6
+  - som: 17
+    clipe: {fileID: 8300000, guid: 279f184a34694197965bf08f4a06aa87, type: 3}
+    volume: 0.77
+  - som: 18
+    clipe: {fileID: 8300000, guid: a1f3d425d5054dfeac93718df844abb6, type: 3}
+    volume: 0.79

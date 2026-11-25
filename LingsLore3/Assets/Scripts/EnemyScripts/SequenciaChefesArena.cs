@@ -23,12 +23,19 @@ public sealed class SequenciaChefesArena : MonoBehaviour
     [SerializeField] private AcessoArena[] acessos;
     [SerializeField] private ContadorCreditos tutorial;
 
+    [Header("Trilha sonora")]
+    [SerializeField] private AudioClip musicaInterludio;
+    [Tooltip("Mesma ordem da lista de chefes. Uma faixa vazia usa o interlúdio.")]
+    [SerializeField] private AudioClip[] musicasDosChefes;
+    [SerializeField, Range(0f, 1f)] private float volumeDaTrilha = 0.55f;
+
     private static int etapaDaRetentativa;
     private static string cenaDaRetentativa;
     private int etapaAtual;
     private EnemyHealth chefeAtual;
     private PortaoArena entradaAtual;
     private bool retomando;
+    private AudioSource trilha;
 
     private bool TemAcessos => acessos != null && acessos.Length > 0;
 
@@ -124,6 +131,7 @@ public sealed class SequenciaChefesArena : MonoBehaviour
         }
         else
         {
+            TocarMusica(musicaInterludio);
             StartCoroutine(AguardarEntrada());
         }
     }
@@ -178,6 +186,10 @@ public sealed class SequenciaChefesArena : MonoBehaviour
         chefeAtual = chefes[etapaAtual];
         chefeAtual.RestoreHealth();
         chefeAtual.Died += AoDerrotarChefe;
+        AudioClip musicaDoChefe = musicasDosChefes != null && etapaAtual < musicasDosChefes.Length
+            ? musicasDosChefes[etapaAtual]
+            : null;
+        TocarMusica(musicaDoChefe != null ? musicaDoChefe : musicaInterludio);
         chefeAtual.gameObject.SetActive(true);
     }
 
@@ -191,6 +203,7 @@ public sealed class SequenciaChefesArena : MonoBehaviour
         derrotado.gameObject.SetActive(false);
 
         bool ultimoChefe = etapaAtual == chefes.Length - 1;
+        TocarMusica(ultimoChefe ? null : musicaInterludio);
         if (!ultimoChefe)
             etapaAtual++;
 
@@ -219,6 +232,30 @@ public sealed class SequenciaChefesArena : MonoBehaviour
         }
         else
             AtivarChefeAtual();
+    }
+
+    private void TocarMusica(AudioClip faixa)
+    {
+        if (trilha == null)
+        {
+            if (faixa == null)
+                return;
+
+            trilha = gameObject.AddComponent<AudioSource>();
+            trilha.playOnAwake = false;
+            trilha.loop = true;
+            trilha.spatialBlend = 0f;
+            trilha.volume = volumeDaTrilha;
+            gameObject.AddComponent<VolumeDaFonte>().DefinirCanal(VolumeDaFonte.Canal.Musica);
+        }
+
+        if (trilha.clip == faixa)
+            return;
+
+        trilha.Stop();
+        trilha.clip = faixa;
+        if (faixa != null)
+            trilha.Play();
     }
 
     private void PrepararRetentativa()

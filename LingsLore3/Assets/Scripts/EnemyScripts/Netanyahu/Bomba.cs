@@ -75,6 +75,7 @@ public sealed class Bomba : MonoBehaviour
         yield return new WaitForSeconds(pavio);
 
         visual.enabled = false;
+        EfeitosSonoros.Tocar(Som.Explosao, destino);
         if (aviso != null)
         {
             aviso.widthMultiplier = 0.22f;

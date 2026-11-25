@@ -96,6 +96,8 @@ public sealed class PortaoArena : MonoBehaviour
         if (progresso == 1f)
         {
             enabled = false;
+            if (encontro != null || (jogador != null && !jogador.IsDead && FechouAposEntrada != null))
+                EfeitosSonoros.Tocar(Som.GongoDaArena);
             if (encontro != null)
                 encontro.SetActive(true);
             FechouAposEntrada?.Invoke();

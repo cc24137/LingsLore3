@@ -575,6 +575,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
             yield return new WaitForSeconds(aviso + (ultimo ? 0.2f : 0f));
             estado = Estado.Atacando;
             MostrarImpacto(marcador);
+            EfeitosSonoros.Tocar(Som.SocoDoYahu, origem);
             float dano = ultimo ? danoDoUltimoGolpe : danoDoGolpe;
             TentarAtingirLing(origem, alcance, frente, semiAngulo, dano);
             foreach (PillarHealth pilar in PillarHealth.ActivePillars)
@@ -629,6 +630,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
 
         estado = Estado.Atacando;
         MostrarImpacto(faixa);
+        EfeitosSonoros.Tocar(Som.Bonk, corpo.position);
         emInvestida = true;
         IgnorarColisaoComLing(true);
         bool passouPeloLing = false;
@@ -692,6 +694,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         yield return new WaitForSeconds(avisoDaPisada);
 
         estado = Estado.Atacando;
+        EfeitosSonoros.Tocar(Som.Bonk, centro);
         aviso.enabled = false;
         limiteDaOnda.enabled = false;
         LineRenderer onda = CriarLinha("Onda da pisada", 96);

@@ -187,7 +187,11 @@ public class PlayerMelee : MonoBehaviour
         bool queriedHitbox = nextTime > HitStart && attackTimer < HitEnd;
         int attackSerial = AttackSerial;
         if (queriedHitbox)
+        {
+            if (attackTimer <= HitStart)
+                EfeitosSonoros.Tocar(Som.Garfo, body.position, variacaoDePitch: 0.08f);
             ApplyHits();
+        }
 
         if (!IsActive || AttackSerial != attackSerial)
             return;

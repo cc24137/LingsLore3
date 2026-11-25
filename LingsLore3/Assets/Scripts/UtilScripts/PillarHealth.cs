@@ -96,6 +96,7 @@ public sealed class PillarHealth : MonoBehaviour
     private void BreakApart()
     {
         Bounds bounds = shaft.bounds;
+        EfeitosSonoros.Tocar(Som.QuebraDoPilar, bounds.center);
         MeshRenderer shaftVisual = GetComponent<MeshRenderer>();
         if (shaftVisual != null)
         {

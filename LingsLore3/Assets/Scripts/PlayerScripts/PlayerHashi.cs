@@ -195,6 +195,7 @@ public class PlayerHashi : MonoBehaviour
         if (nextReloadTime < 0f)
             nextReloadTime = Time.time + reloadTime;
 
+        EfeitosSonoros.Tocar(Som.ArremessoDoHashi, firePoint.position);
         projectile.Launch(owner, direction, damage, hitMask);
 
         return true;

@@ -162,6 +162,7 @@ public sealed partial class BossTungTungTungSahur : MonoBehaviour
                 AproximarDoLing();
                 break;
             case Estado.PreparandoTacada when Time.fixedTime >= fimDoEstado:
+                EfeitosSonoros.Tocar(Som.Bonk, corpo.position);
                 MarcarImpacto();
                 anguloAnteriorDaTacada = TacadaGiratoria ? 0f : semiAnguloDoGolpe;
                 pilaresAtingidosNaTacada.Clear();
@@ -176,6 +177,7 @@ public sealed partial class BossTungTungTungSahur : MonoBehaviour
                 ExplodirTacada();
                 break;
             case Estado.PreparandoSalto when Time.fixedTime >= fimDoEstado:
+                EfeitosSonoros.Tocar(Som.TungTung, corpo.position);
                 IgnorarColisaoComLing(true);
                 EntrarNoEstado(Estado.Subindo, TempoDeSubida);
                 break;
@@ -465,6 +467,7 @@ public sealed partial class BossTungTungTungSahur : MonoBehaviour
 
     private void ExplodirTacada()
     {
+        EfeitosSonoros.Tocar(Som.Fogo, centroDaExplosaoDaTacada);
         ReproduzirExplosao(centroDaExplosaoDaTacada, raioDaExplosaoDaTacada, Carmesim);
         if (LingNaArea(centroDaExplosaoDaTacada, raioDaExplosaoDaTacada, 1.8f, out _))
             ling.TakeDamage(danoDaExplosaoDaTacada, centroDaExplosaoDaTacada);
@@ -474,6 +477,7 @@ public sealed partial class BossTungTungTungSahur : MonoBehaviour
 
     private void ReproduzirExplosao(Vector3 centro, float raio, Color cor, float intensidade = 1f)
     {
+        EfeitosSonoros.Tocar(Som.Explosao, centro);
         if (prefabExplosao == null)
             return;
 
