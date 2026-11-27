@@ -4,12 +4,12 @@ using UnityEngine;
 
 public sealed partial class BossNetanyahu
 {
-    private enum EtapaDoVoo { NoChao, Decolagem, Cruzeiro, Rasante, Caindo, Pousando }
+    private enum EtapaDoVoo { NoChao, Decolagem, Cruzeiro, Rasante, Caindo }
 
     [Header("Modo avião")]
     [SerializeField] private AviaoBigYahu prefabAviao;
     [SerializeField, Min(0f)] private float esperaAntesDoPrimeiroVoo = 6f;
-    [SerializeField, Min(0f)] private float intervaloEntreVoos = 40f;
+    [SerializeField, Min(0f)] private float intervaloEntreVoos = 30f;
     [SerializeField, Min(0.1f)] private float alturaDeVoo = 15.5f;
     [SerializeField, Min(0.1f)] private float raioDaOrbita = 14.7f;
     [SerializeField, Min(0.1f)] private float velocidadeDeVoo = 12f;
@@ -38,7 +38,7 @@ public sealed partial class BossNetanyahu
     private LineRenderer espiralDoStun;
     private Camera cameraDaCena;
     private bool AviaoPodeSerDerrubado =>
-        etapaDoVoo == EtapaDoVoo.Cruzeiro || etapaDoVoo == EtapaDoVoo.Rasante || etapaDoVoo == EtapaDoVoo.Pousando;
+        etapaDoVoo == EtapaDoVoo.Cruzeiro || etapaDoVoo == EtapaDoVoo.Rasante;
 
     private void ConectarAcertosNoAviao()
     {
@@ -124,11 +124,7 @@ public sealed partial class BossNetanyahu
                     break;
                 case Ataque.BombaIncendiaria:
                     yield return ArremessarBombas(incendiaria: true);
-                    etapaDoVoo = EtapaDoVoo.Pousando;
-                    yield return PousarAviao(queda: false);
-                    yield return ExecutarPisadaEmSeguida();
-                    yield return DescansarAposAtaque();
-                    yield break;
+                    break;
                 case Ataque.Rasante:
                     yield return ExecutarRasante();
                     break;
@@ -310,7 +306,7 @@ public sealed partial class BossNetanyahu
 
     private IEnumerator CairEAtordoar()
     {
-        yield return PousarAviao(queda: true);
+        yield return PousarAviao();
         estado = Estado.Atordoado;
         ataqueEscolhido = Ataque.Nenhum;
         CriarEspiralDoStun();
@@ -320,12 +316,12 @@ public sealed partial class BossNetanyahu
         yield return Combater(0f);
     }
 
-    private IEnumerator PousarAviao(bool queda)
+    private IEnumerator PousarAviao()
     {
         Vector3 destino = EncontrarPouso(aviao.transform.position);
         Vector3 impacto = new Vector3(destino.x, piso.bounds.max.y + 0.85f, destino.z);
-        Quaternion inclinacao = aviao.transform.rotation * Quaternion.Euler(queda ? 23f : 12f, 0f, queda ? 28f : 0f);
-        yield return TransladarAviao(impacto, inclinacao, queda ? 0.8f : 0.65f);
+        Quaternion inclinacao = aviao.transform.rotation * Quaternion.Euler(23f, 0f, 28f);
+        yield return TransladarAviao(impacto, inclinacao, 0.8f);
         yield return passoFisico;
 
         LimparModoAviao(voltarAoChao: false);

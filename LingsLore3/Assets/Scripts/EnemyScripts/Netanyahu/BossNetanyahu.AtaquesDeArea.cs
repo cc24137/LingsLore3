@@ -18,6 +18,7 @@ public sealed partial class BossNetanyahu
     [SerializeField, Min(0.1f)] private float raioDoGiro = 9f;
     [SerializeField, Min(0.1f)] private float alturaDoGiro = 4f;
     [SerializeField, Min(0.1f)] private float avisoDoGiro = 0.85f;
+    [SerializeField, Min(0.1f)] private float avisoDoGiroTung = 1f;
     [SerializeField, Min(0.1f)] private float duracaoDoGiro = 0.30f;
     [SerializeField, Min(0f)] private float danoDoGiro = 24f;
 
@@ -151,7 +152,7 @@ public sealed partial class BossNetanyahu
     private IEnumerator ExecutarGiroComModelo(bool robotico = false, bool frontal = false)
     {
         float raio = robotico ? (frontal ? RaioDaPancadaRobo : RaioDoGiroRobo) : raioDoGiro;
-        float vento = BalanceamentoDificuldade.Atual.Aviso(robotico ? (frontal ? 0.55f : 0.48f) : avisoDoGiro);
+        float vento = BalanceamentoDificuldade.Atual.Aviso(robotico ? (frontal ? 0.55f : avisoDoGiroTung) : avisoDoGiro);
         float duracao = BalanceamentoDificuldade.Atual.Duracao(robotico ? (frontal ? 0.26f : 0.36f) : duracaoDoGiro);
         float dano = robotico ? (frontal ? 18f : 21f) * MultiplicadorDeDanoRobo : danoDoGiro;
         estado = Estado.Preparando;
