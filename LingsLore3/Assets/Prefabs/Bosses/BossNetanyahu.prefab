@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2026112204}
   - component: {fileID: 2026112206}
   m_Layer: 8
-  m_Name: Boss Netanyahu
+  m_Name: BossNetanyahu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -33,7 +33,7 @@ Transform:
   m_LocalScale: {x: 3.4, y: 3.4, z: 3.4}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1473365651}
+  - {fileID: 543450652268601721}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!136 &2026112203
@@ -59,29 +59,6 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &2026112204
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2026112201}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dd3e6bc6f120b8b439eb947a1c8c8ec9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
-  maxHealth: 600
-  secondBarHealth: 600
-  thirdBarHealth: 0
-  nomesDasFases:
-  - Nenjamin Betanyahu
-  - Yahu Droide
-  currentHealth: 600
-  somenteAtaqueBasico: 0
-  onDeath:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!54 &2026112205
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -109,6 +86,29 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 112
   m_CollisionDetection: 0
+--- !u!114 &2026112204
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2026112201}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd3e6bc6f120b8b439eb947a1c8c8ec9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
+  maxHealth: 600
+  secondBarHealth: 600
+  thirdBarHealth: 0
+  nomesDasFases:
+  - Nenjamin Betanyahu
+  - Yahu Droide
+  currentHealth: 600
+  somenteAtaqueBasico: 0
+  onDeath:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &2026112206
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -130,16 +130,16 @@ MonoBehaviour:
   materialTungDoGiro: {fileID: 2100000, guid: 486ea52dc0bd4742bcb6ba4d54a12d4f, type: 2}
   raioDoGiro: 15
   alturaDoGiro: 6
-  avisoDoGiro: 0.85
+  avisoDoGiro: 1.1
   duracaoDoGiro: 0.3
   danoDoGiro: 24
   ling: {fileID: 0}
   piso: {fileID: 0}
-  mostrarHudDeTeste: 0
   obstaculos:
     serializedVersion: 2
     m_Bits: 520
   shaderDosAvisos: {fileID: 4800000, guid: 650dd9526735d5b46b79224bc6e94025, type: 3}
+  mostrarHudDeTeste: 0
   prefabBomba: {fileID: 150100005, guid: c94f155914ef4506b477ed2a023d69f2, type: 3}
   distanciaParaBombas: 20
   tempoDeRecuo: 0.65
@@ -178,9 +178,13 @@ MonoBehaviour:
   alturaDaOnda: 0.45
   larguraDaOnda: 1.1
   danoDaPisada: 16
-  recuperacao: 1.1
+  recuperacao: 1.3
   estado: 0
   ataqueEscolhido: 0
+  prefabExplosaoRobo: {fileID: 1732138503, guid: 86cf5662995e497fb7db8bb6e8c722fe, type: 3}
+  prefabMiniNetanyahu: {fileID: 150300006, guid: 90518a1748994199ab6826f56c29f9b2, type: 3}
+  tempoParaRessurgir: 2.8
+  intervaloDoComboRobo: 20
   prefabAviao: {fileID: 150400004, guid: d19242e7b4cd4f44a5b80004697d89d8, type: 3}
   esperaAntesDoPrimeiroVoo: 6
   intervaloEntreVoos: 40
@@ -193,10 +197,6 @@ MonoBehaviour:
   velocidadeDoRasante: 42
   raioDoRasante: 2.2
   danoDoRasante: 24
-  prefabExplosaoRobo: {fileID: 1732138503, guid: 86cf5662995e497fb7db8bb6e8c722fe, type: 3}
-  prefabMiniNetanyahu: {fileID: 150300006, guid: 90518a1748994199ab6826f56c29f9b2, type: 3}
-  tempoParaRessurgir: 2.8
-  intervaloDoComboRobo: 20
 --- !u!1001 &1473365650
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -254,7 +254,7 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0c42abb855ff4548b5c4011a15a34e5d, type: 3}
---- !u!4 &1473365651 stripped
+--- !u!4 &543450652268601721 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 0c42abb855ff4548b5c4011a15a34e5d, type: 3}
   m_PrefabInstance: {fileID: 1473365650}
