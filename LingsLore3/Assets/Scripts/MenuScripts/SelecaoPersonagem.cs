@@ -1,6 +1,8 @@
 using System;
+using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -11,7 +13,7 @@ public class SelecaoPersonagem : MonoBehaviour
     {
         public Image fundo;
         public Outline borda;
-        public Image retrato;
+        public RawImage retrato;
         public TMP_Text nome;
     }
 
@@ -19,10 +21,9 @@ public class SelecaoPersonagem : MonoBehaviour
     [SerializeField] private RectTransform marcador;
     [SerializeField] private TMP_Text nomeDetalhe;
     [SerializeField] private TMP_Text textoDetalhe;
-    [SerializeField] private Image retratoDetalhe;
     [SerializeField] private Button botaoAvancar;
-
-    public static int PersonagemEscolhido { get; private set; } = -1;
+    [SerializeField] private CatalogoSkinsLing catalogo;
+    [SerializeField] private PreviaSkinsLing previa;
 
     private static readonly Color32 FundoPadrao = new Color32(43, 42, 51, 255);
     private static readonly Color32 FundoSelecionado = new Color32(54, 37, 40, 255);
@@ -35,8 +36,40 @@ public class SelecaoPersonagem : MonoBehaviour
     private void Awake()
     {
         marcador.gameObject.SetActive(false);
-        retratoDetalhe.enabled = false;
         botaoAvancar.interactable = false;
+        previa.Preparar();
+
+        for (int i = 0; i < slots.Length; i++)
+        {
+            Slot slot = slots[i];
+            slot.nome.text = catalogo.Obter(i).Nome;
+            slot.retrato.enabled = false;
+            AtualizarSlot(slot, false);
+        }
+
+        int indiceSalvo = catalogo.LerIndiceSalvo();
+        SelecionarPersonagem(indiceSalvo);
+    }
+
+    private IEnumerator Start()
+    {
+        if (indiceSelecionado >= 0 && EventSystem.current != null &&
+            EventSystem.current.currentSelectedGameObject == null)
+        {
+            EventSystem.current.SetSelectedGameObject(slots[indiceSelecionado].fundo.gameObject);
+        }
+
+        yield return null;
+
+        for (int i = 0; i < slots.Length; i++)
+        {
+            previa.Mostrar(catalogo.Obter(i));
+            slots[i].retrato.texture = previa.RenderizarMiniatura();
+            slots[i].retrato.enabled = true;
+        }
+
+        if (indiceSelecionado >= 0)
+            previa.Mostrar(catalogo.Obter(indiceSelecionado));
     }
 
     public void SelecionarPersonagem(int indice)
@@ -54,10 +87,10 @@ public class SelecaoPersonagem : MonoBehaviour
         marcador.SetAsLastSibling();
         marcador.gameObject.SetActive(true);
 
-        nomeDetalhe.text = slot.nome.text;
-        textoDetalhe.text = $"Espaço {indice + 1:00} de {slots.Length:00}";
-        retratoDetalhe.sprite = slot.retrato.sprite;
-        retratoDetalhe.enabled = retratoDetalhe.sprite != null;
+        CatalogoSkinsLing.Skin skin = catalogo.Obter(indice);
+        nomeDetalhe.text = skin.Nome;
+        textoDetalhe.text = skin.Descricao;
+        previa.Mostrar(skin);
         botaoAvancar.interactable = true;
     }
 
@@ -67,7 +100,7 @@ public class SelecaoPersonagem : MonoBehaviour
             return;
 
         carregandoCena = true;
-        PersonagemEscolhido = indiceSelecionado;
+        catalogo.Salvar(catalogo.Obter(indiceSelecionado));
         SceneManager.LoadScene("SelecaoDificuldade");
     }
 

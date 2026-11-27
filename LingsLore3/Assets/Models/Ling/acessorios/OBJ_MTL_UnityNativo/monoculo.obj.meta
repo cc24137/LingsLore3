@@ -3,7 +3,17 @@ guid: 71bca5af612deab41aa80762c06670cf
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Ouro_Armacao
+    second: {fileID: 2100000, guid: d14fe4ccc0805d11b0d37348907221aa, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Vidro_Lente
+    second: {fileID: 2100000, guid: c1f35f78eda95fc59f70690b0029b58d, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

@@ -633,6 +633,7 @@ GameObject:
   - component: {fileID: 5565780530721533133}
   - component: {fileID: 4594158712362881732}
   - component: {fileID: 4267931072346750802}
+  - component: {fileID: 7435981457800126990}
   m_Layer: 6
   m_Name: Ling
   m_TagString: Untagged
@@ -1337,3 +1338,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 76737bab7ccc447ea8b36eba1ea4ae65, type: 3}
   m_PrefabInstance: {fileID: 9063317525705377313}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &7435981457800126990
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8005583530017208899}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65ae500b33d15da684f26fd0e1d5ea63, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VisualSkinLing
+  catalogo: {fileID: 11400000, guid: 1592bb3545db514f8a6a9ffe3fc9c0ba, type: 2}
+  encaixe: {fileID: 8801109326435163005}

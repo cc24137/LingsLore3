@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee75ff008b775de98b00c49ac1dbf816, type: 3}
+  m_Name: CatalogoSkinsLing
+  m_EditorClassIdentifier: Assembly-CSharp::CatalogoSkinsLing
+  skins:
+  - id: original
+    nome: Ling Original
+    descricao: O visual clássico do Ling.
+    adereco: {fileID: 0}
+  - id: monoculo
+    nome: Monóculo
+    descricao: Armação preta e lente translúcida.
+    adereco: {fileID: 7435981457800126970, guid: 4a74c4570f415393bcaaf42d8fe8a3df, type: 3}
+  - id: cartola
+    nome: Cartola
+    descricao: Cartola preta com fita vermelha.
+    adereco: {fileID: 7435981457800126970, guid: efc92b6f43695d4eb77afe45acbd2df5, type: 3}
+  - id: laco-rosa
+    nome: Laço Rosa
+    descricao: Um laço rosa inclinado sobre a testa.
+    adereco: {fileID: 7435981457800126970, guid: 65902ebddc3c55728d8067e17d865962, type: 3}
+  - id: bone-helice
+    nome: Boné de Hélice
+    descricao: Boné colorido com hélice giratória.
+    adereco: {fileID: 7435981457800126970, guid: 4db1943a7b5c5f45a0e161bb61559cbe, type: 3}
+  - id: oculos-quadrados
+    nome: Óculos Quadrados
+    descricao: Armação quadrada com lentes translúcidas.
+    adereco: {fileID: 7435981457800126970, guid: c685d28363c65ffd82e8405fbc4cb5c6, type: 3}
+  - id: gorro-verde
+    nome: Gorro Verde
+    descricao: Gorro verde com a ponta caída.
+    adereco: {fileID: 7435981457800126970, guid: 4e74aead14335902bae5339c49424801, type: 3}
+  - id: chapeu-palha
+    nome: Chapéu de Palha
+    descricao: Chapéu cônico com borda trançada.
+    adereco: {fileID: 7435981457800126970, guid: fdc275ebf67953d1a69065db31ac8ea2, type: 3}
