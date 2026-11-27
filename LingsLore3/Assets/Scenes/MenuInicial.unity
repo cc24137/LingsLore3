@@ -3043,8 +3043,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "a wordless prayer\nSEALCORE CORE JAZZ\nwoodlands (battle)\nMECHANICAL
-    GOD <color=#C9BFCF>\xB7 com crow</color>\nshow me the sky. show me how to live"
+  m_text: "a wordless prayer\nSEALCORE CORE JAZZ\nMECHANICAL GOD <color=#C9BFCF>\xB7
+    com crow</color>\nshow me the sky. show me how to live"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 985e8991e4960f049ae0799350741e86, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 985e8991e4960f049ae0799350741e86, type: 2}

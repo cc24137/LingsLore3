@@ -131,7 +131,7 @@ MonoBehaviour:
   raioDoGiro: 15
   alturaDoGiro: 6
   avisoDoGiro: 1
-  avisoDoGiroTung: 0.8
+  avisoDoGiroTung: 0.7
   duracaoDoGiro: 0.3
   danoDoGiro: 24
   ling: {fileID: 0}
