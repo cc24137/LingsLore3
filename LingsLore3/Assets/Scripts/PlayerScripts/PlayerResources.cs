@@ -38,7 +38,12 @@ public class PlayerResources : MonoBehaviour
     private double healStartedAt = -1d;
     private double nextHealChargeAt;
     private float staminaDaEsquiva;
-    private static int MaxHealCharges => BalanceamentoDificuldade.Facil ? 5 : 4;
+    private static int MaxHealCharges => SelecaoDificuldade.DificuldadeEscolhida switch
+    {
+        Dificuldade.Facil => 5,
+        Dificuldade.Impossivel => 3,
+        _ => 4
+    };
 
     // Evento C# usado pelo ContadorCreditos para reiniciar a rodada atual.
     public event Action Died;

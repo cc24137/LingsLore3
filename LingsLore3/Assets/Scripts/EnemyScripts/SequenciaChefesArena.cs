@@ -202,8 +202,7 @@ public sealed class SequenciaChefesArena : MonoBehaviour
         derrotado.Died -= AoDerrotarChefe;
         chefeAtual = null;
         derrotado.gameObject.SetActive(false);
-        if (!BalanceamentoDificuldade.Impossivel)
-            jogador.RestoreHealthAndHealCharges();
+        jogador.RestoreHealthAndHealCharges();
 
         bool ultimoChefe = etapaAtual == chefes.Length - 1;
         TocarMusica(ultimoChefe ? null : musicaInterludio);

@@ -996,7 +996,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Chefes mais r\xE1pidos e resistentes. Vida e curas n\xE3o s\xE3o restauradas entre as lutas."
+  m_text: "Chefes mais r\xE1pidos e resistentes. At\xE9 3 cargas de cura por luta."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 985e8991e4960f049ae0799350741e86, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 985e8991e4960f049ae0799350741e86, type: 2}
