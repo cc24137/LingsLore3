@@ -130,7 +130,8 @@ MonoBehaviour:
   materialTungDoGiro: {fileID: 2100000, guid: 486ea52dc0bd4742bcb6ba4d54a12d4f, type: 2}
   raioDoGiro: 15
   alturaDoGiro: 6
-  avisoDoGiro: 1.2
+  avisoDoGiro: 1
+  avisoDoGiroTung: 0.8
   duracaoDoGiro: 0.3
   danoDoGiro: 24
   ling: {fileID: 0}
@@ -187,7 +188,7 @@ MonoBehaviour:
   intervaloDoComboRobo: 20
   prefabAviao: {fileID: 150400004, guid: d19242e7b4cd4f44a5b80004697d89d8, type: 3}
   esperaAntesDoPrimeiroVoo: 6
-  intervaloEntreVoos: 40
+  intervaloEntreVoos: 30
   alturaDeVoo: 15.5
   raioDaOrbita: 14.7
   velocidadeDeVoo: 12

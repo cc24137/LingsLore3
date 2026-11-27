@@ -24640,7 +24640,7 @@ MonoBehaviour:
     ehRodadaRevisao: 0
     instrucao: "Aperte Espa\xE7o para pular as estruturas e alcan\xE7ar as notas."
   - grupoCreditos: {fileID: 362483028}
-    tempoLimite: 30
+    tempoLimite: 15
     pontoInicial: {fileID: 64577040}
     alvoParaDerrotar: {fileID: 0}
     exigeComboLeve: 0
