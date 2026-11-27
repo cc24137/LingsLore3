@@ -17,6 +17,7 @@ public class ContadorCreditos : MonoBehaviour
         public bool exigeComboCarregado;
         public bool exigeAtaqueAereoGiratorio;
         public bool exigeArremessoHashi;
+        public bool exigeCura;
         public bool ehRodadaRevisao;
         [TextArea(2, 4)] public string instrucao;
     }
@@ -82,7 +83,7 @@ public class ContadorCreditos : MonoBehaviour
         if (!PodePularTutorial)
             return;
 
-        rodadas[rodadaAtual].grupoCreditos.SetActive(false);
+        ExibirGrupoDeCreditos(rodadas[rodadaAtual], false);
         FinalizarTutorial();
     }
 
@@ -119,6 +120,12 @@ public class ContadorCreditos : MonoBehaviour
             }
 
             GameObject grupo = rodadas[i].grupoCreditos;
+            if (rodadas[i].exigeCura && grupo == null)
+            {
+                notasPorRodada[i] = Array.Empty<MoedaColetavel>();
+                continue;
+            }
+
             if (grupo == null || transform.IsChildOf(grupo.transform) ||
                 grupo.GetComponentsInChildren<MoedaColetavel>(true).Length == 0)
             {
@@ -140,7 +147,7 @@ public class ContadorCreditos : MonoBehaviour
             for (int j = 0; j < i; j++)
             {
                 GameObject anterior = rodadas[j].grupoCreditos;
-                if (grupo == anterior)
+                if (anterior == null || grupo == anterior)
                     continue;
 
                 if (grupo.transform.IsChildOf(anterior.transform) ||
@@ -164,6 +171,7 @@ public class ContadorCreditos : MonoBehaviour
         }
 
         jogador.Died += AoJogadorMorrer;
+        jogador.CuraConcluida += AoJogadorConcluirCura;
         motorJogador = jogador.GetComponent<PlayerMotor>();
         meleeJogador = jogador.GetComponent<PlayerMelee>();
         hashiJogador = jogador.GetComponent<PlayerHashi>();
@@ -194,8 +202,7 @@ public class ContadorCreditos : MonoBehaviour
 
         for (int i = 0; i < rodadas.Length; i++)
         {
-            GameObject grupo = rodadas[i].grupoCreditos;
-            grupo.SetActive(false);
+            ExibirGrupoDeCreditos(rodadas[i], false);
 
             foreach (MoedaColetavel nota in notasPorRodada[i])
             {
@@ -231,8 +238,14 @@ public class ContadorCreditos : MonoBehaviour
 
     private void Update()
     {
-        if (MenuPausa.EstaPausado || !tempoAtivo || tutorialConcluido || reiniciandoPorMorte ||
+        if (MenuPausa.EstaPausado || tutorialConcluido || rodadaAtual < 0 || reiniciandoPorMorte ||
             (jogador != null && jogador.IsDead))
+            return;
+
+        if (rodadas[rodadaAtual].exigeCura && jogador.HealCharges == 0 && !jogador.IsHealing)
+            jogador.PrepararAulaDeCura();
+
+        if (!tempoAtivo)
             return;
 
         tempoRestante = Mathf.Max(0f, tempoRestante - Time.deltaTime);
@@ -275,12 +288,10 @@ public class ContadorCreditos : MonoBehaviour
             yield break;
         }
 
-        // IniciarRodada restaura notas, contador, cronometro e ponto inicial.
-        IniciarRodada(rodadaAtual);
-
         // Reanima o jogador e protege contra dano imediato ao reaparecer.
         jogador.SetRespawnInvulnerability(tempoInvulnerabilidade);
         jogador.RestoreFullResources();
+        IniciarRodada(rodadaAtual);
 
         reiniciandoPorMorte = false;
         coroutineReinicio = null;
@@ -522,15 +533,25 @@ public class ContadorCreditos : MonoBehaviour
         AtualizarTexto();
 
         if (creditosColetados == totalCreditos && rodadaAtual >= 0)
-        {
-            tempoAtivo = false;
-            rodadas[rodadaAtual].grupoCreditos.SetActive(false);
+            AvancarRodada();
+    }
 
-            if (rodadaAtual + 1 < rodadas.Length)
-                IniciarRodada(rodadaAtual + 1);
-            else
-                FinalizarTutorial();
-        }
+    private void AoJogadorConcluirCura()
+    {
+        if (isActiveAndEnabled && !tutorialConcluido && !reiniciandoPorMorte &&
+            rodadaAtual >= 0 && rodadas[rodadaAtual].exigeCura)
+            AvancarRodada();
+    }
+
+    private void AvancarRodada()
+    {
+        tempoAtivo = false;
+        ExibirGrupoDeCreditos(rodadas[rodadaAtual], false);
+
+        if (rodadaAtual + 1 < rodadas.Length)
+            IniciarRodada(rodadaAtual + 1);
+        else
+            FinalizarTutorial();
     }
 
     private void FinalizarTutorial()
@@ -589,7 +610,7 @@ public class ContadorCreditos : MonoBehaviour
             hashiJogador.SetAimIndicatorVisible(rodada.exigeArremessoHashi);
 
         tempoAtivo = false;
-        rodada.grupoCreditos.SetActive(false);
+        ExibirGrupoDeCreditos(rodada, false);
         notasDaRodadaAtual.Clear();
         notasContadas.Clear();
         totalCreditos = notasPorRodada[indice].Length;
@@ -601,7 +622,7 @@ public class ContadorCreditos : MonoBehaviour
             nota.ReiniciarColeta();
         }
 
-        creditosLiberadosPeloAlvo = rodada.alvoParaDerrotar == null;
+        creditosLiberadosPeloAlvo = rodada.alvoParaDerrotar == null && !rodada.exigeCura;
         if (rodada.alvoParaDerrotar != null)
         {
             rodada.alvoParaDerrotar.RestoreHealth();
@@ -613,8 +634,11 @@ public class ContadorCreditos : MonoBehaviour
             ReposicionarJogador(rodada.pontoInicial);
         }
 
+        if (rodada.exigeCura)
+            jogador.PrepararAulaDeCura();
+
         AtualizarTexto();
-        rodada.grupoCreditos.SetActive(creditosLiberadosPeloAlvo);
+        ExibirGrupoDeCreditos(rodada, creditosLiberadosPeloAlvo);
 
         tempoRestante = Mathf.Max(0f, rodada.tempoLimite);
         tempoAtivo = tempoRestante > 0f;
@@ -623,6 +647,12 @@ public class ContadorCreditos : MonoBehaviour
             textoTempo.gameObject.SetActive(tempoAtivo);
             AtualizarTempo();
         }
+    }
+
+    private static void ExibirGrupoDeCreditos(RodadaTutorial rodada, bool visivel)
+    {
+        if (rodada.grupoCreditos != null)
+            rodada.grupoCreditos.SetActive(visivel);
     }
 
     private void ReposicionarJogadorDianteDoAlvo(Transform alvo)
@@ -698,6 +728,12 @@ public class ContadorCreditos : MonoBehaviour
         }
 
         RodadaTutorial rodada = rodadas[rodadaAtual];
+        if (rodada.exigeCura)
+        {
+            textoContador.text = $"{rodada.instrucao}\nAguarde a cura terminar para continuar.";
+            return;
+        }
+
         string progresso;
         if (rodada.alvoParaDerrotar != null && !creditosLiberadosPeloAlvo)
         {
@@ -732,6 +768,7 @@ public class ContadorCreditos : MonoBehaviour
         if (jogador != null)
         {
             jogador.Died -= AoJogadorMorrer;
+            jogador.CuraConcluida -= AoJogadorConcluirCura;
             if (saidaDoTutorial != null)
                 jogador.DefinirRespawnDoTutorial(false);
         }

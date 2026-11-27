@@ -11,13 +11,11 @@ public sealed class HudCombate : MonoBehaviour
     [SerializeField] private GameObject painelChefe;
     [SerializeField] private RectTransform preenchimentoChefe;
     [SerializeField] private TMP_Text nomeChefe;
-    [SerializeField] private GameObject painelFase;
-    [SerializeField] private TMP_Text faseChefe;
 
     private PlayerResources jogador;
     private PlayerHashi hashi;
     private EnemyHealth chefeExibido;
-    private int faseExibida;
+    private int barraExibida;
     private int cargasExibidas = -1;
 
     private void Awake()
@@ -76,18 +74,11 @@ public sealed class HudCombate : MonoBehaviour
             return;
         }
 
-        if (chefe != chefeExibido)
+        if (chefe != chefeExibido || barraExibida != chefe.CurrentBar)
         {
             chefeExibido = chefe;
-            faseExibida = 0;
-        }
-
-        if (faseExibida != chefe.CurrentBar)
-        {
-            faseExibida = chefe.CurrentBar;
+            barraExibida = chefe.CurrentBar;
             nomeChefe.text = sequencia.NomeDoChefeAtual;
-            painelFase.SetActive(chefe.BarCount > 1);
-            faseChefe.SetText("FASE {0}/{1}", faseExibida, chefe.BarCount);
         }
 
         float proporcaoDaVida = Mathf.Clamp01(chefe.CurrentHealth / chefe.MaxHealth);

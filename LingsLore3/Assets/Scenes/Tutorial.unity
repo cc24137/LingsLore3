@@ -2452,6 +2452,12 @@ MonoBehaviour:
     alvoParaDerrotar: {fileID: 0}
     exigeArremessoHashi: 1
     instrucao: "Segure Q para mirar; clique com o botão direito para arremessar o Hashi."
+  - grupoCreditos: {fileID: 0}
+    tempoLimite: 0
+    pontoInicial: {fileID: 0}
+    alvoParaDerrotar: {fileID: 0}
+    exigeCura: 1
+    instrucao: "Pressione E para se curar. Cada gato no HUD representa uma carga."
   - grupoCreditos: {fileID: 6115951146}
     tempoLimite: 0
     pontoInicial: {fileID: 0}

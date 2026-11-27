@@ -47,6 +47,7 @@ public class PlayerResources : MonoBehaviour
 
     // Evento C# usado pelo ContadorCreditos para reiniciar a rodada atual.
     public event Action Died;
+    internal event Action CuraConcluida;
 
     public float MaxHealth => maxHealth;
     public float MaxStamina => maxStamina;
@@ -94,7 +95,10 @@ public class PlayerResources : MonoBehaviour
             return;
 
         CancelHealing();
+        float vidaAnterior = currentHealth;
         Heal(HealAmount);
+        if (currentHealth > vidaAnterior)
+            CuraConcluida?.Invoke();
     }
 
     private void FixedUpdate()
@@ -244,6 +248,19 @@ public class PlayerResources : MonoBehaviour
     internal void CancelHealing()
     {
         healStartedAt = -1d;
+    }
+
+    internal void PrepararAulaDeCura()
+    {
+        CancelHealing();
+        float deficitDaAula = Mathf.Min(HealAmount, maxHealth * 0.3f);
+        currentHealth = Mathf.Min(currentHealth, maxHealth - deficitDaAula);
+
+        if (healCharges > 0)
+            return;
+
+        healCharges = 1;
+        nextHealChargeAt = Time.timeAsDouble + HealRechargeInterval;
     }
 
     internal void RestoreHealthAndHealCharges()

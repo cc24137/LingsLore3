@@ -184,6 +184,7 @@ public sealed class SequenciaChefesArena : MonoBehaviour
     private void AtivarChefeAtual()
     {
         tutorial?.OcultarObjetivo();
+        jogador.RestoreHealthAndHealCharges();
         chefeAtual = chefes[etapaAtual];
         chefeAtual.RestoreHealth();
         chefeAtual.Died += AoDerrotarChefe;
