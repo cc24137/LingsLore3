@@ -42,6 +42,7 @@ public class PlayerMotor : MonoBehaviour
     [SerializeField, Min(0f)] private float dodgeStaminaCost = 20f;
     [SerializeField, Min(0f)] private float sprintStaminaPerSecond = 15f;
     [SerializeField, Min(0f)] private float minStaminaToResumeSprint = 20f;
+    [SerializeField, Min(0f)] private float minStaminaForContinuousPogo = 30f;
 
     [Header("Carregamento do garfo")]
     [SerializeField, Min(0.05f)] private float chargeDuration = 0.6f;
@@ -85,6 +86,7 @@ public class PlayerMotor : MonoBehaviour
 
     private bool wasAirborne;
     private float airborneReferenceSpeed;
+    private int airSpinCount;
 
     public bool IsDead => resources != null && resources.IsDead;
     public bool IsGrounded { get; private set; }
@@ -308,8 +310,10 @@ public class PlayerMotor : MonoBehaviour
             return;
         }
 
-        if (IsGrounded)
+        if (IsGrounded){
+            airSpinCount = 0;
             wasAirborne = false;
+        }
 
         if (IsKnockedBack)
         {
@@ -613,8 +617,12 @@ public class PlayerMotor : MonoBehaviour
             attackLessonMode == AttackLessonMode.HashiOnly)
             return false;
 
+        float staminaCost = melee.GetStaminaCost(type);
+        if (type == PlayerMelee.AttackType.AirSpin && airSpinCount == 0)
+            staminaCost = 0f;
+            
         if (!CanStartAttack ||
-            !resources.TrySpendStamina(melee.GetStaminaCost(type)))
+            !resources.TrySpendStamina(staminaCost))
             return false;
 
         Vector3 attackDirection = direction.sqrMagnitude > 0.001f
@@ -623,6 +631,8 @@ public class PlayerMotor : MonoBehaviour
         queuedLightAttack = false;
         queuedChargedAttack = PlayerMelee.AttackType.None;
         melee.BeginAttack(type, attackDirection);
+        if (type == PlayerMelee.AttackType.AirSpin)
+            airSpinCount++;
         IsSprinting = false;
 
         return true;
@@ -808,6 +818,7 @@ public class PlayerMotor : MonoBehaviour
         sprintExhausted = false;
         sprintNeedsRelease = false;
         wasAirborne = false;
+        airSpinCount = 0;
         airborneReferenceSpeed = 0f;
         IsSprinting = false;
         attackHeld = false;

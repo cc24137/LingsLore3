@@ -176,42 +176,16 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Durante muitos anos, a cidade de Aurora foi considerada o \xFAltimo lugar
-    seguro de um mundo marcado por guerras e abandono. Protegida por enormes muralhas
-    e abastecida por uma fonte de energia descoberta nas profundezas da terra, ela
-    cresceu enquanto as cidades vizinhas desapareciam dos mapas. Dentro de seus limites,
-    uma nova gera\xE7\xE3o aprendeu a viver sem conhecer a escurid\xE3o.\n\nMas a
-    tranquilidade terminou em uma \xFAnica noite. Primeiro, as comunica\xE7\xF5es
-    foram interrompidas. Depois, as m\xE1quinas pararam e as luzes come\xE7aram a
-    se apagar, bairro por bairro. Quando o sol nasceu, os port\xF5es estavam fechados
-    e os respons\xE1veis pela fonte de energia haviam desaparecido. Nenhuma explica\xE7\xE3o
-    foi dada \xE0 popula\xE7\xE3o. Restavam apenas rumores e perguntas que ningu\xE9m
-    parecia disposto a responder.\n\nNos dias seguintes, grupos de explora\xE7\xE3o
-    partiram em busca de ajuda. Alguns retornaram sem encontrar nada al\xE9m de estradas
-    destru\xEDdas e constru\xE7\xF5es vazias. Outros nunca voltaram. Aos poucos,
-    os moradores passaram a ouvir ru\xEDdos vindos das galerias subterr\xE2neas.
-    Guardas relataram movimentos pr\xF3ximos \xE0s muralhas, embora as c\xE2meras
-    n\xE3o registrassem ningu\xE9m. Pela primeira vez em d\xE9cadas, Aurora come\xE7ou
-    a sentir medo.\n\nFoi ent\xE3o que uma antiga esta\xE7\xE3o de comunica\xE7\xE3o
-    recebeu uma transmiss\xE3o. A mensagem era curta, cercada por interfer\xEAncias,
-    mas trazia coordenadas e uma promessa: ainda existia uma maneira de restaurar
-    a energia. O sinal vinha de uma instala\xE7\xE3o de pesquisa abandonada, localizada
-    al\xE9m das montanhas. Segundo os registros oficiais, aquele lugar havia sido
-    destru\xEDdo muitos anos antes.\n\nVoc\xEA conhece o caminho at\xE9 as montanhas.
-    Antes de trabalhar na manuten\xE7\xE3o da cidade, acompanhava seu pai em viagens
-    pelas regi\xF5es externas. Ele costumava dizer que os mapas de Aurora escondiam
-    mais do que mostravam. Na \xE9poca, voc\xEA n\xE3o entendia o significado dessas
-    palavras. Agora, diante das coordenadas recebidas, reconhece uma marca que encontrou
-    entre os pertences dele ap\xF3s seu desaparecimento.\n\nCom os recursos da cidade
-    chegando ao fim, o conselho autoriza uma \xFAltima expedi\xE7\xE3o. Voc\xEA recebe
-    uma mochila, uma lanterna e um comunicador que funciona apenas a curtas dist\xE2ncias.
-    N\xE3o h\xE1 equipe dispon\xEDvel para acompanhar a viagem. Antes de sua partida,
-    a transmiss\xE3o retorna por alguns segundos. Dessa vez, a voz do outro lado
-    diz seu nome.\n\nAo atravessar os port\xF5es, voc\xEA encontra uma estrada silenciosa
-    e sinais recentes de passagem. Algu\xE9m seguiu naquela dire\xE7\xE3o pouco antes
-    de voc\xEA. Mais adiante, entre as \xE1rvores, uma luz pisca no ritmo da mensagem
-    recebida. A instala\xE7\xE3o est\xE1 esperando. Para salvar Aurora e descobrir
-    o destino de seu pai, ser\xE1 preciso entrar onde os mapas terminam."
+  m_text: "\n\n\n\nMesmo ap\xF3s derrotar Tonald Drump e suas for\xE7as invasoras,
+    Ling se deparou com um cen\xE1rio de destrui\xE7\xE3o e morte que j\xE1 n\xE3o
+    possibilitavam a continuidade de seu restaurante. Diante disso, passou muito
+    tempo vagando sem objetivo, desolado pela perda.\n\nContudo, logo sua tristeza
+    come\xE7ou a se transformar em rancor, e a vontade de vingan\xE7a cresceu em
+    seu cora\xE7\xE3o. Assim, voltou-se para um velho amigo de Drump, canalizando
+    seu \xF3dio contra ele. \n\nAgora, Ling se depara com mais uma jornada de viol\xEAncia,
+    mas uma em que ele n\xE3o \xE9 mais a v\xEDtima, e sim o agressor\u2026\n\t\nSer\xE1
+    que Ling conseguir\xE1 sua vingan\xE7a? Ser\xE1 que ela vale a pena? Essas s\xE3o
+    as perguntas que devem ser respondidas."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -245,7 +219,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 8
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -778,7 +752,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Contextualizacao
   textoHistoria: {fileID: 445078304}
-  velocidade: 40
+  velocidade: 25
   posicaoInicial: -200
   posicaoFinal: 6000
   cenaJogo: CircuitoArenas

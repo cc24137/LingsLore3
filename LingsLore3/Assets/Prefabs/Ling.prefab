@@ -395,6 +395,37 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &4820724610216195859
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5930514618660703157}
+  m_Layer: 6
+  m_Name: PivotBatataCura
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &5930514618660703157
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4820724610216195859}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.29, y: -0.29, z: 0.45}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7187820936272000593}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5427494111280436155
 GameObject:
   m_ObjectHideFlags: 0
@@ -516,38 +547,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!1 &6613033936911940419
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 3075266797777085612}
-  m_Layer: 6
-  m_Name: PivotGarfo
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &3075266797777085612
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6613033936911940419}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.82, y: 0, z: -0.07}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 2567864772281616571}
-  m_Father: {fileID: 7187820936272000593}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6554829947618235026
 GameObject:
   m_ObjectHideFlags: 0
@@ -580,7 +579,7 @@ Transform:
   - {fileID: 7187820936272000593}
   m_Father: {fileID: 4179926326753591687}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &4820724610216195859
+--- !u!1 &6613033936911940419
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -588,27 +587,28 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 5930514618660703157}
+  - component: {fileID: 3075266797777085612}
   m_Layer: 6
-  m_Name: PivotBatataCura
+  m_Name: PivotGarfo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &5930514618660703157
+  m_IsActive: 1
+--- !u!4 &3075266797777085612
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4820724610216195859}
+  m_GameObject: {fileID: 6613033936911940419}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.29, y: -0.29, z: 0.45}
+  m_LocalPosition: {x: 0.82, y: 0, z: -0.07}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 2567864772281616571}
   m_Father: {fileID: 7187820936272000593}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8005583530017208899
@@ -744,30 +744,10 @@ MonoBehaviour:
   dodgeStaminaCost: 20
   sprintStaminaPerSecond: 25
   minStaminaToResumeSprint: 20
+  minStaminaForContinuousPogo: 30
   chargeDuration: 0.6
   followupChargeDuration: 0.25
   chargingMovementMultiplier: 0.2
---- !u!114 &4267931072346750802
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8005583530017208899}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 96a1a4806c7b4ab0a31de6b1fee70017, type: 3}
-  m_Name:
-  m_EditorClassIdentifier: Assembly-CSharp::LingHealVisual
-  leanPivot: {fileID: 7389214128043741093}
-  itemPivot: {fileID: 5930514618660703157}
-  itemModel: {fileID: 919132149155446097, guid: c2fcd19616ee20044a9ea43c59f6200a, type: 3}
-  loweredPosition: {x: 0.29, y: -0.29, z: 0.45}
-  raisedPosition: {x: 0.06, y: -0.18, z: 0.61}
-  loweredRotation: {x: 0, y: -15, z: -8}
-  raisedRotation: {x: -63, y: 0, z: -10}
-  backwardTilt: 18
-  itemSize: 0.56
 --- !u!114 &8653704208097362760
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -975,7 +955,7 @@ MonoBehaviour:
     hitEnd: 0.48
     damage: 22
     hitBounceHeight: 0.8
-    staminaCost: 0
+    staminaCost: 30
     movementMultiplier: 0.3
     stepDistance: 0
     hitboxCenter: {x: 0, y: 0.5, z: 0}
@@ -1034,6 +1014,41 @@ MonoBehaviour:
   horizontalSpeed: 6
   upwardSpeed: 3
   controlLockDuration: 0.18
+--- !u!114 &4267931072346750802
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8005583530017208899}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96a1a4806c7b4ab0a31de6b1fee70017, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LingHealVisual
+  leanPivot: {fileID: 7389214128043741093}
+  itemPivot: {fileID: 5930514618660703157}
+  itemModel: {fileID: 919132149155446097, guid: c2fcd19616ee20044a9ea43c59f6200a, type: 3}
+  loweredPosition: {x: 0.29, y: -0.29, z: 0.45}
+  raisedPosition: {x: 0.06, y: -0.18, z: 0.61}
+  loweredRotation: {x: 0, y: -15, z: -8}
+  raisedRotation: {x: -63, y: 0, z: -10}
+  backwardTilt: 18
+  itemSize: 0.56
+--- !u!114 &7435981457800126990
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8005583530017208899}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65ae500b33d15da684f26fd0e1d5ea63, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VisualSkinLing
+  catalogo: {fileID: 11400000, guid: 1592bb3545db514f8a6a9ffe3fc9c0ba, type: 2}
+  encaixe: {fileID: 8801109326435163005}
 --- !u!1 &8513959521425641727
 GameObject:
   m_ObjectHideFlags: 0
@@ -1338,17 +1353,3 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 76737bab7ccc447ea8b36eba1ea4ae65, type: 3}
   m_PrefabInstance: {fileID: 9063317525705377313}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &7435981457800126990
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8005583530017208899}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 65ae500b33d15da684f26fd0e1d5ea63, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::VisualSkinLing
-  catalogo: {fileID: 11400000, guid: 1592bb3545db514f8a6a9ffe3fc9c0ba, type: 2}
-  encaixe: {fileID: 8801109326435163005}
