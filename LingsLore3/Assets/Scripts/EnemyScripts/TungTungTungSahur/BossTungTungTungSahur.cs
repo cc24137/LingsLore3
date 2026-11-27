@@ -510,7 +510,8 @@ public sealed partial class BossTungTungTungSahur : MonoBehaviour
     private void FinalizarAtaque(Estado recuperando, float descanso)
     {
         aviso.enabled = false;
-        EntrarNoEstado(recuperando, BalanceamentoDificuldade.Atual.Descanso(descanso, Mathf.Min(descanso, 0.75f)));
+        float tempo = BalanceamentoDificuldade.Atual.Descanso(descanso, Mathf.Min(descanso, 0.75f));
+        EntrarNoEstado(recuperando, tempo * 1.265f);
     }
 
     private bool SobrepostoAoLing() => Physics.ComputePenetration(colisor, corpo.position, corpo.rotation,

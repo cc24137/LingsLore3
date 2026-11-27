@@ -407,6 +407,8 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         float tempo = BalanceamentoDificuldade.Atual.Descanso(recuperacao);
         if (estado == Estado.Atacando && ataqueEscolhido == Ataque.Pisada)
             tempo *= 0.5f;
+        else if (estado == Estado.Atacando && ataqueEscolhido is Ataque.Laser or Ataque.RajadaRobo)
+            tempo *= 1.265f;
 
         estado = Estado.Descansando;
         ataqueEscolhido = Ataque.Nenhum;

@@ -6,7 +6,7 @@ internal readonly struct BalanceamentoDificuldade
     {
         Dificuldade.Facil => new(0.75f, 0.55f, 1.35f, 1.35f, 0.8f),
         Dificuldade.Dificil => new(1.25f, 1.2f, 0.88f, 0.9f, 1.08f),
-        Dificuldade.Impossivel => new(1.65f, 1.55f, 0.72f, 0.75f, 1.22f),
+        Dificuldade.Impossivel => new(1.65f, 1.55f, 0.70f, 0.75f, 1.22f),
         _ => new(1f, 1f, 1f, 1f, 1f)
     };
 
