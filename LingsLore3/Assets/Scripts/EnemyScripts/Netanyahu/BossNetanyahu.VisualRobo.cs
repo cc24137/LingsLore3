@@ -24,6 +24,9 @@ public sealed partial class BossNetanyahu
     private float faseDasRodas;
     private float inicioDoOlho;
 
+    internal SkinnedMeshRenderer ModeloNormal => visualHumano;
+    internal Bounds LimitesDoPiso => piso.bounds;
+
     private void PrepararRobo()
     {
         visualHumano = GetComponentInChildren<SkinnedMeshRenderer>(true);

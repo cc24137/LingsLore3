@@ -34,6 +34,8 @@ public sealed class SequenciaChefesArena : MonoBehaviour
     private int etapaAtual;
     private EnemyHealth chefeAtual;
     private PortaoArena entradaAtual;
+    private PortaoArena saidaFinal;
+    private bool executouBetanyahu;
     private bool retomando;
     private AudioSource trilha;
 
@@ -207,10 +209,46 @@ public sealed class SequenciaChefesArena : MonoBehaviour
 
         bool ultimoChefe = etapaAtual == chefes.Length - 1;
         TocarMusica(ultimoChefe ? null : musicaInterludio);
+        if (ultimoChefe && TemAcessos && acessos[etapaAtual].saida != null &&
+            derrotado.TryGetComponent(out BossNetanyahu betanyahu))
+        {
+            saidaFinal = acessos[etapaAtual].saida;
+            StartCoroutine(Desfecho(betanyahu));
+            return;
+        }
         if (!ultimoChefe)
             etapaAtual++;
 
         StartCoroutine(Prosseguir(ultimoChefe));
+    }
+
+    private IEnumerator Desfecho(BossNetanyahu chefe)
+    {
+        var cena = gameObject.AddComponent<EncenacaoFinal>();
+        yield return cena.Apresentar(jogador, chefe);
+        bool decidiu = false;
+        fimDeJogo.MostrarEscolhaFinal(executar =>
+        {
+            executouBetanyahu = executar;
+            decidiu = true;
+        });
+        while (!decidiu)
+            yield return null;
+
+        yield return cena.Resolver(executouBetanyahu);
+        cena.Encerrar();
+        if (tutorial != null)
+            tutorial.ExibirObjetivoDeSaida();
+        saidaFinal.EntrouNaArena += AoSairDaUltimaArena;
+        saidaFinal.AbrirSuavemente(fecharAoPassar: true);
+    }
+
+    private void AoSairDaUltimaArena()
+    {
+        saidaFinal.EntrouNaArena -= AoSairDaUltimaArena;
+        if (tutorial != null)
+            tutorial.OcultarObjetivo();
+        fimDeJogo.ExibirVitoriaFinal(executouBetanyahu);
     }
 
     private IEnumerator Prosseguir(bool ultimoChefe)
@@ -269,6 +307,8 @@ public sealed class SequenciaChefesArena : MonoBehaviour
 
     private void OnDestroy()
     {
+        if (saidaFinal != null)
+            saidaFinal.EntrouNaArena -= AoSairDaUltimaArena;
         if (fimDeJogo != null)
             fimDeJogo.RepetindoAposDerrota -= PrepararRetentativa;
         if (chefeAtual != null)

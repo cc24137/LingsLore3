@@ -78,6 +78,15 @@ public class ContadorCreditos : MonoBehaviour
             textoContador.gameObject.SetActive(false);
     }
 
+    internal void ExibirObjetivoDeSaida()
+    {
+        if (textoContador == null)
+            return;
+
+        textoContador.text = "Atravesse o portão aberto para sair da arena.";
+        textoContador.gameObject.SetActive(true);
+    }
+
     public void PularTutorial()
     {
         if (!PodePularTutorial)

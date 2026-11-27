@@ -55,6 +55,75 @@ public class FimDeJogo : MonoBehaviour
         Encerrar("VITÓRIA!", "Ling venceu esta batalha.", true);
     }
 
+    internal void ExibirVitoriaFinal(bool executou)
+    {
+        string epilogo = executou
+            ? "O garfo voltou pesado na mão de Ling. Na porta do restaurante vazio, ele ainda procurou alguém a quem culpar."
+            : "Ling deixou o garfo sobre o balcão. Pela primeira vez desde a invasão, pensou no que serviria se abrisse as portas amanhã.";
+        Encerrar("VITÓRIA", epilogo, true);
+    }
+
+    internal void MostrarEscolhaFinal(Action<bool> aoEscolher)
+    {
+        var faixa = new GameObject("Decisão de Ling", typeof(RectTransform), typeof(Image));
+        var rect = (RectTransform)faixa.transform;
+        rect.SetParent(transform, false);
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = new Vector2(1f, 0f);
+        rect.pivot = new Vector2(0.5f, 0f);
+        rect.sizeDelta = new Vector2(0f, 248f);
+        faixa.GetComponent<Image>().color = new Color(0.055f, 0.047f, 0.043f, 0.95f);
+
+        var fala = Instantiate(mensagem, rect);
+        fala.rectTransform.anchorMin = new Vector2(0.06f, 0.43f);
+        fala.rectTransform.anchorMax = new Vector2(0.94f, 0.98f);
+        fala.rectTransform.offsetMin = fala.rectTransform.offsetMax = Vector2.zero;
+        fala.alignment = TextAlignmentOptions.Center;
+        fala.fontSize = 36f;
+        fala.enableAutoSizing = true;
+        fala.fontSizeMin = 18f;
+        fala.fontSizeMax = 36f;
+        fala.text = "Quando destruíram meu restaurante, eu queria que alguém tivesse parado.\nAgora sou eu quem segura o garfo.";
+        fala.gameObject.SetActive(true);
+
+        Button poupar = CriarOpcao("Baixar o garfo e partir", 0.26f, false);
+        Button executar = CriarOpcao("Matar Betanyahu", 0.74f, true);
+        var navegacao = new Navigation { mode = Navigation.Mode.Explicit, selectOnRight = executar };
+        poupar.navigation = navegacao;
+        executar.navigation = new Navigation { mode = Navigation.Mode.Explicit, selectOnLeft = poupar };
+        if (EventSystem.current != null)
+        {
+            EventSystem.current.SetSelectedGameObject(null);
+            EventSystem.current.SetSelectedGameObject(poupar.gameObject);
+        }
+
+        Button CriarOpcao(string legenda, float centro, bool golpe)
+        {
+            Button botao = Instantiate(botaoVoltarAoMenu, rect);
+            var area = (RectTransform)botao.transform;
+            area.anchorMin = new Vector2(centro - 0.20f, 0.08f);
+            area.anchorMax = new Vector2(centro + 0.20f, 0.39f);
+            area.offsetMin = area.offsetMax = Vector2.zero;
+            var texto = botao.GetComponentInChildren<TMP_Text>(true);
+            texto.text = legenda;
+            texto.enableAutoSizing = true;
+            texto.fontSizeMin = 16f;
+            texto.fontSizeMax = 28f;
+            botao.onClick = new Button.ButtonClickedEvent();
+            botao.onClick.AddListener(() =>
+            {
+                if (!faixa.activeSelf)
+                    return;
+                faixa.SetActive(false);
+                Destroy(faixa);
+                EventSystem.current?.SetSelectedGameObject(null);
+                aoEscolher(golpe);
+            });
+            botao.gameObject.SetActive(true);
+            return botao;
+        }
+    }
+
     private void Encerrar(string textoTitulo, string textoMensagem, bool vitoria)
     {
         if (!Application.isPlaying || !isActiveAndEnabled || encerrando)
