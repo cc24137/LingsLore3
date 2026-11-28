@@ -1,7 +1,6 @@
 
 using System;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 [DefaultExecutionOrder(100)]
 public class PlayerHashi : MonoBehaviour
@@ -35,6 +34,7 @@ public class PlayerHashi : MonoBehaviour
     private bool tutorialAimIndicatorVisible;
     private bool usesHudReticle;
     private PlayerResources resources;
+    private PlayerMotor motor;
     private GameObject aimIndicatorRoot;
     private LineRenderer aimLine;
     private Transform aimMarker;
@@ -52,7 +52,7 @@ public class PlayerHashi : MonoBehaviour
     internal bool ShowsAimIndicator =>
         isActiveAndEnabled && ready && aimCamera != null &&
         !MenuPausa.BloqueiaEntradaDeJogo && (resources == null || !resources.IsDead) &&
-        (tutorialAimIndicatorVisible || (Keyboard.current != null && Keyboard.current.qKey.isPressed));
+        (tutorialAimIndicatorVisible || (motor != null && motor.IsAimingHashi));
 
     internal void UseHudReticle(bool useHud) => usesHudReticle = useHud;
 
@@ -62,6 +62,7 @@ public class PlayerHashi : MonoBehaviour
     private void Awake()
     {
         resources = GetComponent<PlayerResources>();
+        motor = GetComponent<PlayerMotor>();
         if (projectilePrefab == null || firePoint == null || aimCamera == null ||
             backHashis == null || backHashis.Length != 2 ||
             backHashis[0] == null || backHashis[1] == null ||

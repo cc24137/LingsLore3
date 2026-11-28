@@ -726,7 +726,7 @@ public class ContadorCreditos : MonoBehaviour
         {
             textoContador.text = saidaDoTutorial != null
                 ? "Siga pelo portão aberto para entrar na primeira arena de chefe."
-                : "Tutorial concluído! Pressione Enter para ir ao jogo.";
+                : "Tutorial concluído! Pressione Enter ou Y / Triângulo para ir ao jogo.";
             return;
         }
 
@@ -767,7 +767,7 @@ public class ContadorCreditos : MonoBehaviour
         }
 
         string instrucao = string.IsNullOrWhiteSpace(rodada.instrucao)
-            ? "Mova-se com W, A, S, D e colete os créditos da rodada."
+            ? "Mova-se com WASD ou o analógico esquerdo e colete os créditos da rodada."
             : rodada.instrucao;
         textoContador.text = $"{instrucao}\n{progresso}";
     }

@@ -2392,25 +2392,25 @@ MonoBehaviour:
     pontoInicial: {fileID: 873968533}
     alvoParaDerrotar: {fileID: 0}
     exigeComboLeve: 0
-    instrucao: "Use W, A, S, D para andar e passe sobre as notas para coletá-las."
+    instrucao: "Mova-se com WASD ou o analógico esquerdo e passe sobre as notas para coletá-las."
   - grupoCreditos: {fileID: 75796922}
     tempoLimite: 0
     pontoInicial: {fileID: 64731671}
     alvoParaDerrotar: {fileID: 0}
     exigeComboLeve: 0
-    instrucao: "Aperte Espaço para pular as estruturas e alcançar as notas."
+    instrucao: "Aperte Espaço ou A / X para pular as estruturas e alcançar as notas."
   - grupoCreditos: {fileID: 362483028}
     tempoLimite: 30
     pontoInicial: {fileID: 64577040}
     alvoParaDerrotar: {fileID: 0}
     exigeComboLeve: 0
-    instrucao: "Segure Shift enquanto anda para correr e colete as notas antes do tempo acabar."
+    instrucao: "Segure Shift esquerdo ou B / Círculo enquanto se move para correr. Colete as notas a tempo."
   - grupoCreditos: {fileID: 1504465854}
     tempoLimite: 0
     pontoInicial: {fileID: 1363493122}
     alvoParaDerrotar: {fileID: 0}
     exigeComboLeve: 0
-    instrucao: "Toque Shift perto do laser para esquivar e atravessar sem ser atingido."
+    instrucao: "Toque Shift esquerdo ou B / Círculo perto do laser para esquivar e atravessar."
   - grupoCreditos: {fileID: 2035164071}
     tempoLimite: 0
     pontoInicial: {fileID: 1429409506}
@@ -2420,50 +2420,49 @@ MonoBehaviour:
     exigeAtaqueAereoGiratorio: 0
     exigeArremessoHashi: 0
     ehRodadaRevisao: 0
-    instrucao: "V\xE1 em dire\xE7\xE3o ao poste e toque no Shift esquerdo para rolar
-      pela base. Pouse no topo para pegar a nota."
+    instrucao: "Vá em direção ao poste e toque Shift esquerdo ou B / Círculo para rolar pela base. Pouse no topo."
   - grupoCreditos: {fileID: 2115951146}
     tempoLimite: 0
     pontoInicial: {fileID: 0}
     alvoParaDerrotar: {fileID: 0}
     exigeComboLeve: 0
-    instrucao: "Use o botão esquerdo para atacar."
+    instrucao: "Ataque com o clique esquerdo ou RB / R1."
   - grupoCreditos: {fileID: 3115951146}
     tempoLimite: 0
     pontoInicial: {fileID: 0}
     alvoParaDerrotar: {fileID: 0}
     exigeComboCarregado: 1
-    instrucao: "Segure o botão esquerdo para o ataque ascendente; solte e segure de novo para o descendente."
+    instrucao: "Segure o clique esquerdo ou RT / R2 para o golpe ascendente. Solte e segure de novo para o descendente."
   - grupoCreditos: {fileID: 4115951146}
     tempoLimite: 0
     pontoInicial: {fileID: 0}
     alvoParaDerrotar: {fileID: 0}
     exigeComboLeve: 1
-    instrucao: "Clique três vezes seguidas com o botão esquerdo para usar o combo."
+    instrucao: "Aperte três vezes o clique esquerdo ou RB / R1 para fazer o combo."
   - grupoCreditos: {fileID: 5115951146}
     tempoLimite: 0
     pontoInicial: {fileID: 0}
     alvoParaDerrotar: {fileID: 0}
     exigeAtaqueAereoGiratorio: 1
-    instrucao: "Aperte Espaço para pular; no ar, clique com o botão esquerdo para atingir o manequim."
+    instrucao: "Pule com Espaço ou A / X. No ar, ataque com o clique esquerdo ou RB / R1."
   - grupoCreditos: {fileID: 6115951146}
     tempoLimite: 0
     pontoInicial: {fileID: 0}
     alvoParaDerrotar: {fileID: 0}
     exigeArremessoHashi: 1
-    instrucao: "Segure Q para mirar; clique com o botão direito para arremessar o Hashi."
+    instrucao: "Segure Q ou LB / L1 para mirar. Use o clique direito ou LT / L2 para arremessar o Hashi."
   - grupoCreditos: {fileID: 0}
     tempoLimite: 0
     pontoInicial: {fileID: 0}
     alvoParaDerrotar: {fileID: 0}
     exigeCura: 1
-    instrucao: "Pressione E para se curar. Cada gato no HUD representa uma carga."
+    instrucao: "Pressione E ou X / Quadrado para se curar. Cada gato no HUD representa uma carga."
   - grupoCreditos: {fileID: 6115951146}
     tempoLimite: 0
     pontoInicial: {fileID: 0}
     alvoParaDerrotar: {fileID: 0}
     ehRodadaRevisao: 1
-    instrucao: "Treino livre. Aperte F1 para ver os comandos detalhados."
+    instrucao: "Treino livre. Abra Controles na pausa (Esc ou Menu / Options) para rever os comandos."
   textoTempo: {fileID: 2025003692}
   jogador: {fileID: 1139482912}
   atrasoRespawn: 0.35
@@ -4865,7 +4864,7 @@ MonoBehaviour:
   m_ScrollWheelAction: {fileID: 6240969308177333660, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
   m_TrackedDevicePositionAction: {fileID: 6564999863303420839, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
   m_TrackedDeviceOrientationAction: {fileID: 7970375526676320489, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
-  m_DeselectOnBackgroundClick: 1
+  m_DeselectOnBackgroundClick: 0
   m_PointerBehavior: 0
   m_CursorLockBehavior: 0
   m_ScrollDeltaPerTick: 6

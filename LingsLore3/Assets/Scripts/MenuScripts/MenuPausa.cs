@@ -24,7 +24,12 @@ public class MenuPausa : MonoBehaviour
     [SerializeField] private string cenaMenu = "MenuInicial";
     [SerializeField] private string cenaAvanco;
     [SerializeField] private ContadorCreditos tutorialDoCircuito;
+    [SerializeField] private InputActionAsset playerControls;
 
+    private InputActionMap menuActions;
+    private InputAction pauseAction;
+    private InputAction backAction;
+    private InputAction advanceAction;
     private bool pausado;
     private bool carregandoAvanco;
     private bool volumesAlterados;
@@ -68,15 +73,17 @@ public class MenuPausa : MonoBehaviour
     private void OnEnable()
     {
         Ativo = this;
+        menuActions = playerControls?.FindActionMap("Menus");
+        pauseAction = menuActions?.FindAction("Pause");
+        backAction = menuActions?.FindAction("BackFromPause");
+        advanceAction = menuActions?.FindAction("AdvanceTutorial");
+        menuActions?.Enable();
     }
 
     private void Update()
     {
-        Keyboard teclado = Keyboard.current;
-        if (teclado == null)
-            return;
-
-        if (teclado.escapeKey.wasPressedThisFrame)
+        if (pauseAction?.WasPressedThisFrame() == true ||
+            (pausado && backAction?.WasPressedThisFrame() == true))
         {
             if (pausado && painelControles.activeSelf)
                 VoltarDosControles();
@@ -85,7 +92,7 @@ public class MenuPausa : MonoBehaviour
             else
                 Pausar();
         }
-        else if (TemAvanco && teclado.enterKey.wasPressedThisFrame)
+        else if (TemAvanco && advanceAction?.WasPressedThisFrame() == true)
         {
             Avancar();
         }
@@ -272,6 +279,8 @@ public class MenuPausa : MonoBehaviour
 
     private void OnDisable()
     {
+        menuActions?.Disable();
+
         if (pausado)
             Fechar(restaurarCursor: true);
 

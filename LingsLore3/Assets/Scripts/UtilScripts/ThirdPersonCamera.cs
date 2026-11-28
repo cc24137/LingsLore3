@@ -9,6 +9,7 @@ public class ThirdPersonCamera : MonoBehaviour
     [SerializeField] private float targetHeight = 1.2f;
     [SerializeField, Min(0.1f)] private float distance = 6f;
     [SerializeField, Min(0f)] private float mouseSensitivity = 0.12f;
+    [SerializeField, Min(0f)] private float stickDegreesPerSecond = 180f;
 
     [SerializeField] private float minPitch = -58f;
     [SerializeField] private float maxPitch = 65f;
@@ -26,6 +27,7 @@ public class ThirdPersonCamera : MonoBehaviour
     private float fovChangeSpeed = 60f;
     
     private Camera cameraComponent;
+    private InputAction lookStickAction;
     private float normalFieldOfView;
 
     private float yaw;
@@ -40,6 +42,8 @@ public class ThirdPersonCamera : MonoBehaviour
     private void OnEnable()
     {
         lookAction.action.Enable();
+        lookStickAction = lookAction.action.actionMap.FindAction("LookStick");
+        lookStickAction?.Enable();
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
@@ -48,6 +52,7 @@ public class ThirdPersonCamera : MonoBehaviour
     private void OnDisable()
     {
         lookAction.action.Disable();
+        lookStickAction?.Disable();
 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
@@ -62,9 +67,11 @@ public class ThirdPersonCamera : MonoBehaviour
             return;
 
         Vector2 mouseDelta = lookAction.action.ReadValue<Vector2>();
+        Vector2 stick = lookStickAction?.ReadValue<Vector2>() ?? Vector2.zero;
+        Vector2 rotationDelta = mouseDelta * mouseSensitivity + stick * (stickDegreesPerSecond * Time.deltaTime);
 
-        yaw += mouseDelta.x * mouseSensitivity;
-        pitch -= mouseDelta.y * mouseSensitivity;
+        yaw += rotationDelta.x;
+        pitch -= rotationDelta.y;
 
         pitch = Mathf.Clamp(pitch, minPitch, maxPitch);
     }

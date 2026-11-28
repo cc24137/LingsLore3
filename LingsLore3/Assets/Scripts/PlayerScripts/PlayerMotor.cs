@@ -52,15 +52,20 @@ public class PlayerMotor : MonoBehaviour
     private const float HealingMovementMultiplier = 0.3f;
 
     private InputAction healAction;
+    private InputAction aimHashiAction;
+    private InputAction chargedAttackAction;
     private bool healRequested;
     private PlayerHashi hashi;
     private bool throwHashiRequested;
     private PlayerMelee melee;
     private enum ChargeIntent { None, Up, Down }
     private ChargeIntent chargeIntent;
+    private InputAction chargeInput;
     private bool attackPressed;
+    private bool mouseAttackPressed;
     private bool attackReleased;
-    private bool attackHeld;
+    private bool chargedAttackPressed;
+    private bool chargedAttackReleased;
     private bool queuedLightAttack;
     private PlayerMelee.AttackType queuedChargedAttack;
     private float pendingHitBounceHeight;
@@ -99,6 +104,7 @@ public class PlayerMotor : MonoBehaviour
     public bool IsHealing => resources != null && resources.IsHealing;
     public bool IsAttacking => melee != null && melee.IsActive;
     public bool IsCharging { get; private set; }
+    internal bool IsAimingHashi => aimHashiAction?.IsPressed() == true;
     public bool IsChargingDown => IsCharging && chargeIntent == ChargeIntent.Down;
     public float ChargeProgress => IsCharging
         ? Mathf.Clamp01(chargeTimer / Mathf.Max(0.05f,
@@ -204,8 +210,13 @@ public class PlayerMotor : MonoBehaviour
         attackAction.action.Enable();
         if (throwHashiAction != null)
             throwHashiAction.action.Enable();
-        healAction = moveAction.action.actionMap.FindAction("Heal");
+        InputActionMap gameplay = moveAction.action.actionMap;
+        healAction = gameplay.FindAction("Heal");
+        aimHashiAction = gameplay.FindAction("AimHashi");
+        chargedAttackAction = gameplay.FindAction("ChargedAttack");
         healAction?.Enable();
+        aimHashiAction?.Enable();
+        chargedAttackAction?.Enable();
     }
 
     private void OnDisable()
@@ -222,6 +233,8 @@ public class PlayerMotor : MonoBehaviour
         if (throwHashiAction != null)
             throwHashiAction.action.Disable();
         healAction?.Disable();
+        aimHashiAction?.Disable();
+        chargedAttackAction?.Disable();
 
         StopActions();
         IsGrounded = false;
@@ -250,20 +263,24 @@ public class PlayerMotor : MonoBehaviour
         moveInput = Vector2.ClampMagnitude(moveAction.action.ReadValue<Vector2>(), 1f);
         jumpHeld = jumpAction.action.IsPressed();
 
-        bool sobreBotao = MenuPausa.Ativo != null && MenuPausa.Ativo.PonteiroSobreBotao();
-        attackHeld = !sobreBotao && attackAction.action.IsPressed();
+        attackReleased |= attackAction.action.WasReleasedThisFrame();
+        chargedAttackReleased |= chargedAttackAction?.WasReleasedThisFrame() == true;
 
         if (MenuPausa.BloqueiaEntradaDeJogo)
         {
+            // Cancela o Tap/Hold para que soltar o botao da pausa nao inicie uma esquiva.
+            dodgeSprintAction.action.Disable();
             jumpRequested = false;
             dodgeRequested = false;
             healRequested = false;
             throwHashiRequested = false;
             attackPressed = false;
-            attackReleased |= attackAction.action.WasReleasedThisFrame();
+            mouseAttackPressed = false;
+            chargedAttackPressed = false;
             return;
         }
 
+        dodgeSprintAction.action.Enable();
         Keyboard teclado = Keyboard.current;
         if (MenuPausa.Ativo == null && teclado != null && teclado.escapeKey.wasPressedThisFrame)
         {
@@ -280,12 +297,20 @@ public class PlayerMotor : MonoBehaviour
         if (!IsHealing && healAction != null && healAction.WasPressedThisFrame())
             healRequested = true;
 
-        if (!sobreBotao && attackAction.action.WasPressedThisFrame())
+        bool sobreBotao = MenuPausa.Ativo != null && MenuPausa.Ativo.PonteiroSobreBotao();
+        bool ataqueComControle = attackAction.action.activeControl?.device is Gamepad;
+        attackReleased |= sobreBotao;
+        if ((!sobreBotao || ataqueComControle) && attackAction.action.WasPressedThisFrame())
+        {
             attackPressed = true;
-        if (attackAction.action.WasReleasedThisFrame())
-            attackReleased = true;
+            mouseAttackPressed = !ataqueComControle;
+        }
 
-        if (!sobreBotao && throwHashiAction != null && throwHashiAction.action.WasPressedThisFrame())
+        chargedAttackPressed |= chargedAttackAction?.WasPressedThisFrame() == true;
+
+        InputAction arremesso = throwHashiAction?.action;
+        if (arremesso != null && arremesso.WasPressedThisFrame() &&
+            (!sobreBotao || arremesso.activeControl?.device is Gamepad))
             throwHashiRequested = true;
     }
 
@@ -464,20 +489,29 @@ public class PlayerMotor : MonoBehaviour
     {
         // Soltar cancela apenas o carregamento ainda incompleto.
         // Um golpe ja confirmado continua aguardando o fim da animacao atual.
-        if (attackReleased || !IsGrounded)
+        bool chargeReleased = chargeInput == attackAction.action ? attackReleased : chargedAttackReleased;
+        if (chargeReleased || !IsGrounded)
             CancelCharge();
 
         ConsumeQueuedAttacks(direction);
 
-        if (attackPressed)
+        if (chargedAttackPressed &&
+            (attackLessonMode == AttackLessonMode.All || attackLessonMode == AttackLessonMode.ChargedComboOnly))
+        {
+            if (melee.CurrentAttack == PlayerMelee.AttackType.ChargedUp || melee.CanChainChargedDown)
+                ArmCharge(ChargeIntent.Down, chargedAttackAction);
+            else if (CanStartAttack || (melee.IsLightAttack && melee.CanQueueNext))
+                ArmCharge(ChargeIntent.Up, chargedAttackAction);
+        }
+        else if (attackPressed)
         {
             if (IsAttacking)
             {
-                if (attackLessonMode != AttackLessonMode.LightComboOnly &&
+                if (mouseAttackPressed && attackLessonMode != AttackLessonMode.LightComboOnly &&
                     melee.CurrentAttack == PlayerMelee.AttackType.ChargedUp)
                 {
                     // Exige uma nova pressao: manter o primeiro hold nao encadeia.
-                    ArmCharge(ChargeIntent.Down);
+                    ArmCharge(ChargeIntent.Down, attackAction.action);
                 }
                 else if (attackLessonMode != AttackLessonMode.ChargedComboOnly &&
                     attackLessonMode != AttackLessonMode.AirSpinOnly &&
@@ -486,8 +520,8 @@ public class PlayerMotor : MonoBehaviour
                     if (melee.CurrentAttack != PlayerMelee.AttackType.Light3)
                         queuedLightAttack = true;
 
-                    if (attackLessonMode == AttackLessonMode.All)
-                        ArmCharge(ChargeIntent.Up);
+                    if (mouseAttackPressed && attackLessonMode == AttackLessonMode.All)
+                        ArmCharge(ChargeIntent.Up, attackAction.action);
                 }
             }
             else if (CanStartAttack)
@@ -496,14 +530,16 @@ public class PlayerMotor : MonoBehaviour
                 {
                     if (attackLessonMode == AttackLessonMode.ChargedComboOnly)
                     {
-                        ArmCharge(ChargeIntent.Up);
+                        if (mouseAttackPressed)
+                            ArmCharge(ChargeIntent.Up, attackAction.action);
                     }
                     else if (attackLessonMode != AttackLessonMode.AirSpinOnly &&
                         TryStartAttack(melee.NextLightAttack, direction) &&
+                        mouseAttackPressed &&
                         attackLessonMode == AttackLessonMode.All)
                     {
                         // No modo normal, o golpe leve sai antes de sabermos se sera um hold.
-                        ArmCharge(ChargeIntent.Up);
+                        ArmCharge(ChargeIntent.Up, attackAction.action);
                     }
                 }
                 else if (attackLessonMode == AttackLessonMode.All ||
@@ -529,7 +565,7 @@ public class PlayerMotor : MonoBehaviour
         ConsumeQueuedAttacks(direction);
     }
 
-    private void ArmCharge(ChargeIntent intent)
+    private void ArmCharge(ChargeIntent intent, InputAction input)
     {
         PlayerMelee.AttackType type = intent == ChargeIntent.Down
             ? PlayerMelee.AttackType.ChargedDown : PlayerMelee.AttackType.ChargedUp;
@@ -538,6 +574,7 @@ public class PlayerMotor : MonoBehaviour
             return;
 
         chargeIntent = intent;
+        chargeInput = input;
         chargeTimer = 0f;
         IsCharging = true;
     }
@@ -547,7 +584,7 @@ public class PlayerMotor : MonoBehaviour
         if (!IsCharging)
             return;
 
-        if (!attackHeld || !IsGrounded || !melee.enabled)
+        if (!chargeInput.IsPressed() || !IsGrounded || !melee.enabled)
         {
             CancelCharge();
             return;
@@ -662,13 +699,17 @@ public class PlayerMotor : MonoBehaviour
     private void ClearCombatInputRequests()
     {
         attackPressed = false;
+        mouseAttackPressed = false;
         attackReleased = false;
+        chargedAttackPressed = false;
+        chargedAttackReleased = false;
     }
 
     private void CancelCharge()
     {
         IsCharging = false;
         chargeIntent = ChargeIntent.None;
+        chargeInput = null;
         chargeTimer = 0f;
     }
 
@@ -821,7 +862,6 @@ public class PlayerMotor : MonoBehaviour
         airSpinCount = 0;
         airborneReferenceSpeed = 0f;
         IsSprinting = false;
-        attackHeld = false;
         CancelCombat();
 
         if (jump != null)

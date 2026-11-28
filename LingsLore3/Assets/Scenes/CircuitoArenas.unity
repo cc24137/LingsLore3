@@ -24652,7 +24652,7 @@ MonoBehaviour:
     exigeArremessoHashi: 0
     exigeCura: 0
     ehRodadaRevisao: 0
-    instrucao: "Use W, A, S, D para andar e passe sobre as notas para colet\xE1-las."
+    instrucao: "Mova-se com WASD ou o analógico esquerdo e passe sobre as notas para coletá-las."
   - grupoCreditos: {fileID: 75796922}
     tempoLimite: 0
     pontoInicial: {fileID: 64731671}
@@ -24663,7 +24663,7 @@ MonoBehaviour:
     exigeArremessoHashi: 0
     exigeCura: 0
     ehRodadaRevisao: 0
-    instrucao: "Aperte Espa\xE7o para pular as estruturas e alcan\xE7ar as notas."
+    instrucao: "Aperte Espaço ou A / X para pular as estruturas e alcançar as notas."
   - grupoCreditos: {fileID: 362483028}
     tempoLimite: 15
     pontoInicial: {fileID: 64577040}
@@ -24674,8 +24674,7 @@ MonoBehaviour:
     exigeArremessoHashi: 0
     exigeCura: 0
     ehRodadaRevisao: 0
-    instrucao: Segure Shift enquanto anda para correr e colete as notas antes do
-      tempo acabar.
+    instrucao: "Segure Shift esquerdo ou B / Círculo enquanto se move para correr. Colete as notas a tempo."
   - grupoCreditos: {fileID: 1504465854}
     tempoLimite: 0
     pontoInicial: {fileID: 1363493122}
@@ -24686,7 +24685,7 @@ MonoBehaviour:
     exigeArremessoHashi: 0
     exigeCura: 0
     ehRodadaRevisao: 0
-    instrucao: Toque Shift perto do laser para esquivar e atravessar sem ser atingido.
+    instrucao: "Toque Shift esquerdo ou B / Círculo perto do laser para esquivar e atravessar."
   - grupoCreditos: {fileID: 2035164071}
     tempoLimite: 0
     pontoInicial: {fileID: 1429409506}
@@ -24697,8 +24696,7 @@ MonoBehaviour:
     exigeArremessoHashi: 0
     exigeCura: 0
     ehRodadaRevisao: 0
-    instrucao: "V\xE1 em dire\xE7\xE3o ao poste e toque no Shift esquerdo para rolar
-      pela base. Pouse no topo para pegar a nota."
+    instrucao: "Vá em direção ao poste e toque Shift esquerdo ou B / Círculo para rolar pela base. Pouse no topo."
   - grupoCreditos: {fileID: 2115951146}
     tempoLimite: 0
     pontoInicial: {fileID: 0}
@@ -24709,7 +24707,7 @@ MonoBehaviour:
     exigeArremessoHashi: 0
     exigeCura: 0
     ehRodadaRevisao: 0
-    instrucao: "Use o bot\xE3o esquerdo para atacar."
+    instrucao: "Ataque com o clique esquerdo ou RB / R1."
   - grupoCreditos: {fileID: 3115951146}
     tempoLimite: 0
     pontoInicial: {fileID: 0}
@@ -24720,8 +24718,7 @@ MonoBehaviour:
     exigeArremessoHashi: 0
     exigeCura: 0
     ehRodadaRevisao: 0
-    instrucao: "Segure o bot\xE3o esquerdo para o ataque ascendente; solte e segure
-      de novo para o descendente."
+    instrucao: "Segure o clique esquerdo ou RT / R2 para o golpe ascendente. Solte e segure de novo para o descendente."
   - grupoCreditos: {fileID: 4115951146}
     tempoLimite: 0
     pontoInicial: {fileID: 0}
@@ -24732,8 +24729,7 @@ MonoBehaviour:
     exigeArremessoHashi: 0
     exigeCura: 0
     ehRodadaRevisao: 0
-    instrucao: "Clique tr\xEAs vezes seguidas com o bot\xE3o esquerdo para usar o
-      combo."
+    instrucao: "Aperte três vezes o clique esquerdo ou RB / R1 para fazer o combo."
   - grupoCreditos: {fileID: 5115951146}
     tempoLimite: 0
     pontoInicial: {fileID: 0}
@@ -24744,8 +24740,7 @@ MonoBehaviour:
     exigeArremessoHashi: 0
     exigeCura: 0
     ehRodadaRevisao: 0
-    instrucao: "Aperte Espa\xE7o para pular; no ar, clique com o bot\xE3o esquerdo
-      para atingir o manequim."
+    instrucao: "Pule com Espaço ou A / X. No ar, ataque com o clique esquerdo ou RB / R1."
   - grupoCreditos: {fileID: 6115951146}
     tempoLimite: 0
     pontoInicial: {fileID: 0}
@@ -24756,8 +24751,7 @@ MonoBehaviour:
     exigeArremessoHashi: 1
     exigeCura: 0
     ehRodadaRevisao: 0
-    instrucao: "Segure Q para mirar; clique com o bot\xE3o direito para arremessar
-      o Hashi."
+    instrucao: "Segure Q ou LB / L1 para mirar. Use o clique direito ou LT / L2 para arremessar o Hashi."
   - grupoCreditos: {fileID: 0}
     tempoLimite: 0
     pontoInicial: {fileID: 0}
@@ -24768,7 +24762,7 @@ MonoBehaviour:
     exigeArremessoHashi: 0
     exigeCura: 1
     ehRodadaRevisao: 0
-    instrucao: Pressione E para se curar. Cada gato no HUD representa uma carga.
+    instrucao: "Pressione E ou X / Quadrado para se curar. Cada gato no HUD representa uma carga."
   - grupoCreditos: {fileID: 6115951146}
     tempoLimite: 0
     pontoInicial: {fileID: 0}
@@ -24779,7 +24773,7 @@ MonoBehaviour:
     exigeArremessoHashi: 0
     exigeCura: 0
     ehRodadaRevisao: 1
-    instrucao: Treino livre. Abra Controles no menu de pausa para rever os comandos.
+    instrucao: "Treino livre. Abra Controles na pausa (Esc ou Menu / Options) para rever os comandos."
   textoTempo: {fileID: 2025003692}
   jogador: {fileID: 28656684}
   saidaDoTutorial: {fileID: 1817572457}
@@ -44355,7 +44349,7 @@ MonoBehaviour:
   m_ScrollWheelAction: {fileID: 6240969308177333660, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
   m_TrackedDevicePositionAction: {fileID: 6564999863303420839, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
   m_TrackedDeviceOrientationAction: {fileID: 7970375526676320489, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
-  m_DeselectOnBackgroundClick: 1
+  m_DeselectOnBackgroundClick: 0
   m_PointerBehavior: 0
   m_CursorLockBehavior: 0
   m_ScrollDeltaPerTick: 6
