@@ -122,7 +122,7 @@ public sealed partial class BossTungTungTungSahur : MonoBehaviour
         aviso.shadowCastingMode = ShadowCastingMode.Off;
         aviso.receiveShadows = false;
         aviso.enabled = false;
-        PrepararArticulacaoDoTaco();
+        PrepararArticulacaoDoModelo();
         PrepararVisuaisDasFases();
     }
 
@@ -137,6 +137,7 @@ public sealed partial class BossTungTungTungSahur : MonoBehaviour
 
     private void FixedUpdate()
     {
+        velocidadeDaCaminhada = 0f;
         if (vida.IsDead || ling == null || ling.IsDead || !ling.isActiveAndEnabled)
         {
             if (estado != Estado.Encerrado)
@@ -268,6 +269,7 @@ public sealed partial class BossTungTungTungSahur : MonoBehaviour
 
         corpo.MoveRotation(Quaternion.LookRotation(deslocamento));
         corpo.MovePosition(corpo.position + deslocamento);
+        velocidadeDaCaminhada = deslocamento.magnitude / Time.fixedDeltaTime;
     }
 
     private bool VarrerCorpo(Vector3 deslocamento, int mascara, out RaycastHit hit)
@@ -545,7 +547,7 @@ public sealed partial class BossTungTungTungSahur : MonoBehaviour
         if (vida != null)
             vida.HealthBarChanged -= AoMudarDeFase;
         CancelarAtaque();
-        ReiniciarPoseDoTaco();
+        ReiniciarPoseDoModelo();
         estado = Estado.Encerrado;
     }
 
