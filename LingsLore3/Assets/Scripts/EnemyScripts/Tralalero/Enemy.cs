@@ -755,7 +755,8 @@ private void AtualizarAnimacao(bool andando = true)
         float tempoCauda = (Time.time - inicioAtaqueCauda) / EscalaDoTempoDaCauda;
         return parte switch
         {
-            HitboxParte.ParteCorpo.Frente => estado == State.jumpAttack || estado == State.groundAttack,
+            HitboxParte.ParteCorpo.Frente => estado == State.jumpAttack ||
+                (estado == State.groundAttack && etapaAtaqueChao == EtapaAtaqueChao.subindo),
             HitboxParte.ParteCorpo.Barbatana => estado != State.groundAttack,
             HitboxParte.ParteCorpo.Cauda => estado == State.tailAttack && alvoCaudaTravado &&
                 tempoCauda >= inicioDanoCauda && tempoCauda < fimDanoCauda,

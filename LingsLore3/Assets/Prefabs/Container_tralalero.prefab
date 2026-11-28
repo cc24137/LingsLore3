@@ -292,26 +292,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3295788631210261642, guid: 6c05e70ae1611a84797e1a85cd5e61b8, type: 3}
-      propertyPath: m_Size.x
-      value: 0.013898694
-      objectReference: {fileID: 0}
-    - target: {fileID: 3295788631210261642, guid: 6c05e70ae1611a84797e1a85cd5e61b8, type: 3}
-      propertyPath: m_Size.z
-      value: 0.020708311
-      objectReference: {fileID: 0}
-    - target: {fileID: 3295788631210261642, guid: 6c05e70ae1611a84797e1a85cd5e61b8, type: 3}
-      propertyPath: m_Center.x
-      value: 0.00029762386
-      objectReference: {fileID: 0}
-    - target: {fileID: 3295788631210261642, guid: 6c05e70ae1611a84797e1a85cd5e61b8, type: 3}
-      propertyPath: m_Center.y
-      value: -0.0031789173
-      objectReference: {fileID: 0}
-    - target: {fileID: 3295788631210261642, guid: 6c05e70ae1611a84797e1a85cd5e61b8, type: 3}
-      propertyPath: m_Center.z
-      value: 0.0142212035
-      objectReference: {fileID: 0}
     - target: {fileID: 3821461692428011350, guid: 6c05e70ae1611a84797e1a85cd5e61b8, type: 3}
       propertyPath: m_Enabled
       value: 0
@@ -321,20 +301,12 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 7728082970839460024}
     - target: {fileID: 6071569347225823035, guid: 6c05e70ae1611a84797e1a85cd5e61b8, type: 3}
-      propertyPath: parte
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 6071569347225823035, guid: 6c05e70ae1611a84797e1a85cd5e61b8, type: 3}
       propertyPath: inimigo
       value: 
       objectReference: {fileID: 7728082970839460024}
     - target: {fileID: 6226770200441505517, guid: 6c05e70ae1611a84797e1a85cd5e61b8, type: 3}
       propertyPath: m_Enabled
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7139628189240601429, guid: 6c05e70ae1611a84797e1a85cd5e61b8, type: 3}
-      propertyPath: parte
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7139628189240601429, guid: 6c05e70ae1611a84797e1a85cd5e61b8, type: 3}
       propertyPath: inimigo

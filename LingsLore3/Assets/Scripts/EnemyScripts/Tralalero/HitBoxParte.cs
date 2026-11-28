@@ -62,4 +62,34 @@ public class HitboxParte : MonoBehaviour
         if (isActiveAndEnabled && inimigo != null)
             inimigo.JogadorEntrouNaHitbox(parte, outro);
     }
+
+    private void OnDrawGizmos()
+    {
+        if (!TryGetComponent(out BoxCollider caixa))
+            return;
+
+        bool ativa = Application.isPlaying && caixa.enabled && caixa.isTrigger &&
+            isActiveAndEnabled && inimigo != null && inimigo.HitboxAtiva(parte);
+        Color cor = parte switch
+        {
+            ParteCorpo.Frente => new Color(1f, 0.5f, 0.15f),
+            ParteCorpo.Barbatana => new Color(0.15f, 0.8f, 1f),
+            ParteCorpo.Cauda => new Color(0.85f, 0.45f, 1f),
+            _ => Color.white
+        };
+
+        Matrix4x4 matrizAnterior = Gizmos.matrix;
+        Color corAnterior = Gizmos.color;
+        Gizmos.matrix = caixa.transform.localToWorldMatrix;
+        if (ativa)
+        {
+            Gizmos.color = new Color(cor.r, cor.g, cor.b, 0.23f);
+            Gizmos.DrawCube(caixa.center, caixa.size);
+        }
+        cor.a = ativa || !Application.isPlaying ? 1f : 0.4f;
+        Gizmos.color = cor;
+        Gizmos.DrawWireCube(caixa.center, caixa.size);
+        Gizmos.matrix = matrizAnterior;
+        Gizmos.color = corAnterior;
+    }
 }
