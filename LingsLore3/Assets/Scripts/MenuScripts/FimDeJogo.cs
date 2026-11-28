@@ -29,6 +29,7 @@ public class FimDeJogo : MonoBehaviour
 
     private bool encerrando;
     private bool foiVitoria;
+    private bool mostrarAgradecimentoDepoisDoPainel;
     private bool carregandoCena;
     private bool pausou;
     private float escalaAnterior;
@@ -65,30 +66,15 @@ public class FimDeJogo : MonoBehaviour
 
     internal void ExibirVitoriaFinal(bool executou)
     {
-        if (!Application.isPlaying || !isActiveAndEnabled || encerrando)
-            return;
-
-        if (capaFinal != null)
-        {
-            encerrando = true;
-            foiVitoria = true;
-            StartCoroutine(ExibirAgradecimento());
-            return;
-        }
-
         string epilogo = executou
             ? "O garfo voltou pesado na mão de Ling. Na porta do restaurante vazio, ele ainda procurou alguém a quem culpar."
             : "Ling deixou o garfo sobre o balcão. Pela primeira vez desde a invasão, pensou no que serviria se abrisse as portas amanhã.";
-        Encerrar("VITÓRIA", epilogo, true);
+        Encerrar("VITÓRIA", epilogo, true, vitoriaFinal: true);
     }
 
     private IEnumerator ExibirAgradecimento()
     {
         double inicio = Time.realtimeSinceStartupAsDouble;
-        escalaAnterior = Time.timeScale;
-        pausou = true;
-        Time.timeScale = 0f;
-        Cursor.lockState = CursorLockMode.None;
         Cursor.visible = false;
         EventSystem.current?.SetSelectedGameObject(null);
 
@@ -137,7 +123,7 @@ public class FimDeJogo : MonoBehaviour
         entradaDaTelaFinal.Dispose();
         entradaDaTelaFinal = null;
         Cursor.visible = true;
-        VoltarAoMenu();
+        CarregarCena(cenaMenu);
     }
 
     private static Image CriarImagem(string nome, Transform pai, Color cor)
@@ -241,13 +227,14 @@ public class FimDeJogo : MonoBehaviour
         }
     }
 
-    private void Encerrar(string textoTitulo, string textoMensagem, bool vitoria)
+    private void Encerrar(string textoTitulo, string textoMensagem, bool vitoria, bool vitoriaFinal = false)
     {
         if (!Application.isPlaying || !isActiveAndEnabled || encerrando)
             return;
 
         encerrando = true;
         foiVitoria = vitoria;
+        mostrarAgradecimentoDepoisDoPainel = vitoriaFinal && capaFinal != null;
         StartCoroutine(ExibirPainel(textoTitulo, textoMensagem, vitoria));
     }
 
@@ -281,6 +268,9 @@ public class FimDeJogo : MonoBehaviour
         {
             var rectBotao = (RectTransform)botaoVoltarAoMenu.transform;
             rectBotao.anchoredPosition = new Vector2(0f, rectBotao.anchoredPosition.y);
+            if (mostrarAgradecimentoDepoisDoPainel &&
+                botaoVoltarAoMenu.GetComponentInChildren<TMP_Text>(true) is TMP_Text legenda)
+                legenda.text = "Continuar";
         }
 
         painel.SetActive(true);
@@ -328,6 +318,16 @@ public class FimDeJogo : MonoBehaviour
 
     public void VoltarAoMenu()
     {
+        if (mostrarAgradecimentoDepoisDoPainel)
+        {
+            if (!pausou || !painel.activeSelf)
+                return;
+
+            painel.SetActive(false);
+            StartCoroutine(ExibirAgradecimento());
+            return;
+        }
+
         CarregarCena(cenaMenu);
     }
 
