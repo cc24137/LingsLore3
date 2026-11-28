@@ -714,6 +714,7 @@ MonoBehaviour:
   botaoVoltarAoMenu: {fileID: 2982278017970711895}
   atrasoParaExibir: 1.5
   cenaMenu: MenuInicial
+  capaFinal: {fileID: 21300000, guid: 6f043638531349a3a61d735d3566a934, type: 3}
 --- !u!1 &4996088353591800783
 GameObject:
   m_ObjectHideFlags: 0

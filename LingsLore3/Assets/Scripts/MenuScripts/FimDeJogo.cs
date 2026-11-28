@@ -3,6 +3,8 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Utilities;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -19,12 +21,18 @@ public class FimDeJogo : MonoBehaviour
     [Header("Configuracao")]
     [SerializeField, Min(0f)] private float atrasoParaExibir = 1.5f;
     [SerializeField] private string cenaMenu = "MenuInicial";
+    [SerializeField] private Sprite capaFinal;
+
+    private const float DuracaoDoFadeParaPreto = 0.65f;
+    private const float DuracaoDoFadeDaCapa = 0.75f;
+    private const float TempoMinimoDaTelaFinal = 3f;
 
     private bool encerrando;
     private bool foiVitoria;
     private bool carregandoCena;
     private bool pausou;
     private float escalaAnterior;
+    private IDisposable entradaDaTelaFinal;
 
     public event Action RepetindoAposDerrota;
 
@@ -57,10 +65,103 @@ public class FimDeJogo : MonoBehaviour
 
     internal void ExibirVitoriaFinal(bool executou)
     {
+        if (!Application.isPlaying || !isActiveAndEnabled || encerrando)
+            return;
+
+        if (capaFinal != null)
+        {
+            encerrando = true;
+            foiVitoria = true;
+            StartCoroutine(ExibirAgradecimento());
+            return;
+        }
+
         string epilogo = executou
             ? "O garfo voltou pesado na mão de Ling. Na porta do restaurante vazio, ele ainda procurou alguém a quem culpar."
             : "Ling deixou o garfo sobre o balcão. Pela primeira vez desde a invasão, pensou no que serviria se abrisse as portas amanhã.";
         Encerrar("VITÓRIA", epilogo, true);
+    }
+
+    private IEnumerator ExibirAgradecimento()
+    {
+        double inicio = Time.realtimeSinceStartupAsDouble;
+        escalaAnterior = Time.timeScale;
+        pausou = true;
+        Time.timeScale = 0f;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = false;
+        EventSystem.current?.SetSelectedGameObject(null);
+
+        Image fundo = CriarImagem("Tela de agradecimento", transform, Color.clear);
+        Image cortina = CriarImagem("Fade", fundo.transform, Color.clear);
+        cortina.raycastTarget = false;
+        yield return AnimarCortina(cortina, 0f, 1f, DuracaoDoFadeParaPreto);
+        fundo.color = Color.black;
+
+        Image capa = CriarImagem("Capa do jogo", fundo.transform, Color.white);
+        capa.sprite = capaFinal;
+        capa.raycastTarget = false;
+        var proporcao = capa.gameObject.AddComponent<AspectRatioFitter>();
+        proporcao.aspectRatio = capaFinal.rect.width / capaFinal.rect.height;
+        proporcao.aspectMode = AspectRatioFitter.AspectMode.FitInParent;
+
+        Image faixa = CriarImagem("Fundo da mensagem", capa.transform, new Color(0f, 0f, 0f, 0.65f));
+        faixa.raycastTarget = false;
+        faixa.rectTransform.anchorMax = new Vector2(1f, 0.14f);
+
+        var agradecimento = new GameObject("Agradecimento", typeof(RectTransform), typeof(TextMeshProUGUI))
+            .GetComponent<TextMeshProUGUI>();
+        agradecimento.rectTransform.SetParent(faixa.transform, false);
+        agradecimento.rectTransform.anchorMin = new Vector2(0.05f, 0.08f);
+        agradecimento.rectTransform.anchorMax = new Vector2(0.95f, 0.92f);
+        agradecimento.rectTransform.offsetMin = agradecimento.rectTransform.offsetMax = Vector2.zero;
+        agradecimento.font = mensagem != null ? mensagem.font : TMP_Settings.defaultFontAsset;
+        agradecimento.text = "Agradecemos por jogar!";
+        agradecimento.color = Color.white;
+        agradecimento.alignment = TextAlignmentOptions.Center;
+        agradecimento.enableAutoSizing = true;
+        agradecimento.fontSizeMin = 12f;
+        agradecimento.fontSizeMax = 56f;
+        agradecimento.raycastTarget = false;
+
+        cortina.transform.SetAsLastSibling();
+        yield return AnimarCortina(cortina, 1f, 0f, DuracaoDoFadeDaCapa);
+        while (Time.realtimeSinceStartupAsDouble - inicio < TempoMinimoDaTelaFinal)
+            yield return null;
+
+        bool recebeuEntrada = false;
+        entradaDaTelaFinal = InputSystem.onAnyButtonPress.Call(_ => recebeuEntrada = true);
+        while (!recebeuEntrada)
+            yield return null;
+
+        entradaDaTelaFinal.Dispose();
+        entradaDaTelaFinal = null;
+        Cursor.visible = true;
+        VoltarAoMenu();
+    }
+
+    private static Image CriarImagem(string nome, Transform pai, Color cor)
+    {
+        var imagem = new GameObject(nome, typeof(RectTransform), typeof(Image)).GetComponent<Image>();
+        RectTransform area = imagem.rectTransform;
+        area.SetParent(pai, false);
+        area.anchorMin = Vector2.zero;
+        area.anchorMax = Vector2.one;
+        area.offsetMin = area.offsetMax = Vector2.zero;
+        imagem.color = cor;
+        return imagem;
+    }
+
+    private static IEnumerator AnimarCortina(Image cortina, float de, float ate, float duracao)
+    {
+        double inicio = Time.realtimeSinceStartupAsDouble;
+        float progresso;
+        while ((progresso = (float)(Time.realtimeSinceStartupAsDouble - inicio) / duracao) < 1f)
+        {
+            cortina.color = new Color(0f, 0f, 0f, Mathf.SmoothStep(de, ate, progresso));
+            yield return null;
+        }
+        cortina.color = new Color(0f, 0f, 0f, ate);
     }
 
     internal void MostrarEscolhaFinal(Action<bool> aoEscolher)
@@ -243,6 +344,7 @@ public class FimDeJogo : MonoBehaviour
 
     private void OnDestroy()
     {
+        entradaDaTelaFinal?.Dispose();
         RetomarTempo();
     }
 }

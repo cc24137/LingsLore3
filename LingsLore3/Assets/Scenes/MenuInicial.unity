@@ -2877,7 +2877,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 48, y: -228}
-  m_SizeDelta: {x: 362, y: 230}
+  m_SizeDelta: {x: 362, y: 270}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &2026100602
 CanvasRenderer:
@@ -2907,7 +2907,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Eduardo Tribst\nJ\xFAlio Pacheco Stein\nRafael Fazion B. Dias"
+  m_text: "Eduardo Tribst\nJ\xFAlio Pacheco Stein\nRafael Fazion B. Dias\n\n<color=#FF8179><size=33>Arte</size></color>\nGiardini \"Honno\" da Silva"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 985e8991e4960f049ae0799350741e86, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 985e8991e4960f049ae0799350741e86, type: 2}
