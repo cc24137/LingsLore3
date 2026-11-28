@@ -205,6 +205,22 @@ public class FimDeJogo : MonoBehaviour
             area.anchorMin = new Vector2(centro - 0.20f, 0.08f);
             area.anchorMax = new Vector2(centro + 0.20f, 0.39f);
             area.offsetMin = area.offsetMax = Vector2.zero;
+
+            // A cor de foco define a moldura; o fundo escuro mantém o texto legível.
+            botao.targetGraphic.color = Color.white;
+            ColorBlock cores = botao.colors;
+            cores.normalColor = new Color32(96, 85, 98, 255);
+            cores.highlightedColor = new Color32(157, 128, 99, 255);
+            cores.selectedColor = new Color32(255, 212, 137, 255);
+            cores.pressedColor = new Color32(214, 164, 83, 255);
+            botao.colors = cores;
+
+            Image fundo = CriarImagem("Fundo da opção", area, new Color(0f, 0f, 0f, 0.82f));
+            fundo.rectTransform.offsetMin = new Vector2(4f, 4f);
+            fundo.rectTransform.offsetMax = new Vector2(-4f, -4f);
+            fundo.transform.SetAsFirstSibling();
+            fundo.raycastTarget = false;
+
             var texto = botao.GetComponentInChildren<TMP_Text>(true);
             texto.text = legenda;
             texto.enableAutoSizing = true;
