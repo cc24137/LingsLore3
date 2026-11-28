@@ -82,7 +82,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -12.8, y: 0.18, z: -0.13}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.4, y: 1.4, z: 1.4}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4374509166797612316}
@@ -149,8 +149,8 @@ MonoBehaviour:
   delayAfterAttack: 1.5
   tempoDaAnimacaoCue: 2
   apoioPiso: {fileID: 1265534116933469670}
-  profundidadeAtaqueChao: 4
-  velocidadeVerticalAtaqueChao: 10
+  profundidadeAtaqueChao: 5.6
+  velocidadeVerticalAtaqueChao: 14
   tempoSubmerso: 1
   delayAntesDeEmergir: 0.8
   prefabMarcadorEmergencia: {fileID: 4992360360281387392, guid: 67b6c77265d139445957c5a9963524e5, type: 3}

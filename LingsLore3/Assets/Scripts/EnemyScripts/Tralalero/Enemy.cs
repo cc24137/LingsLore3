@@ -184,6 +184,13 @@ public class Enemy : EnemyHealth
         //Debug.Log(estado);
         if (IsDead || jogadorPosition == null || !jogadorPosition.gameObject.activeInHierarchy)
         {
+            if (etapaAtaqueChao != EtapaAtaqueChao.nenhuma)
+            {
+                FinalizarAtaqueChao(true);
+                MudarEstado(State.idle);
+                return;
+            }
+
             PararMovimento();
             AtualizarAnimacao();
             return;
@@ -454,15 +461,10 @@ public class Enemy : EnemyHealth
 
     private void AtualizarAtaqueChao()
     {
-        Vector3 destino;
         switch (etapaAtaqueChao)
         {
             case EtapaAtaqueChao.descendo:
-                destino = posicaoAntesDeSubmergir - Vector3.up * profundidadeAtaqueChao;
-                body.MovePosition(Vector3.MoveTowards(body.position, destino,
-                    BalanceamentoDificuldade.Atual.Velocidade(velocidadeVerticalAtaqueChao) * Time.fixedDeltaTime));
-                if (Vector3.Distance(body.position, destino) <=
-                    BalanceamentoDificuldade.Atual.Velocidade(velocidadeVerticalAtaqueChao) * Time.fixedDeltaTime + 0.001f)
+                if (MoverDuranteAtaqueChao(posicaoAntesDeSubmergir - Vector3.up * profundidadeAtaqueChao))
                 {
                     etapaAtaqueChao = EtapaAtaqueChao.submerso;
                     fimDaEtapaAtaqueChao = Time.time + tempoSubmerso;
@@ -503,10 +505,7 @@ public class Enemy : EnemyHealth
             case EtapaAtaqueChao.avisando:
                 if (Time.time >= fimDaEtapaAtaqueChao)
                 {
-                    if (marcadorEmergencia != null)
-                        Destroy(marcadorEmergencia);
-
-                    marcadorEmergencia = null;
+                    LimparMarcadorDeEmergencia();
                     inclinacaoVisualX = 270f;
                     etapaAtaqueChao = EtapaAtaqueChao.subindo;
                     EfeitosSonoros.Tocar(Som.Bonk, posicaoDeEmergencia);
@@ -514,13 +513,8 @@ public class Enemy : EnemyHealth
                 break;
 
             case EtapaAtaqueChao.subindo:
-                destino = posicaoDeEmergencia;
-                body.MovePosition(Vector3.MoveTowards(body.position, destino,
-                    BalanceamentoDificuldade.Atual.Velocidade(velocidadeVerticalAtaqueChao) * Time.fixedDeltaTime));
-                if (Vector3.Distance(body.position, destino) <=
-                    BalanceamentoDificuldade.Atual.Velocidade(velocidadeVerticalAtaqueChao) * Time.fixedDeltaTime + 0.001f)
+                if (MoverDuranteAtaqueChao(posicaoDeEmergencia))
                 {
-                    body.position = destino;
                     FinalizarAtaqueChao(false);
                     fimDoDescanso = Time.time + BalanceamentoDificuldade.Atual.Descanso(delayAfterAttack);
                     MudarEstado(State.idle);
@@ -530,6 +524,18 @@ public class Enemy : EnemyHealth
         AtualizarAnimacao();
     }
 
+    private bool MoverDuranteAtaqueChao(Vector3 destino)
+    {
+        Vector3 posicaoAtual = body.position;
+        // Confirma a chegada antes de trocar a etapa ou reativar a fisica do corpo.
+        if ((posicaoAtual - destino).sqrMagnitude <= 0.000001f)
+            return true;
+
+        float passo = BalanceamentoDificuldade.Atual.Velocidade(velocidadeVerticalAtaqueChao) * Time.fixedDeltaTime;
+        body.MovePosition(Vector3.MoveTowards(posicaoAtual, destino, passo));
+        return false;
+    }
+
     private void FinalizarAtaqueChao(bool interrompido)
     {
         if (etapaAtaqueChao == EtapaAtaqueChao.nenhuma)
@@ -537,6 +543,7 @@ public class Enemy : EnemyHealth
 
         if (interrompido)
             body.position = posicaoAntesDeSubmergir;
+        LimparMarcadorDeEmergencia();
 
         inclinacaoVisualX = 0f;
         if (pivotVisual != null)
@@ -547,6 +554,13 @@ public class Enemy : EnemyHealth
         colisorPrincipal.enabled = colisorPrincipalEstavaAtivo;
         apoioPiso.enabled = apoioPisoEstavaAtivo;
         etapaAtaqueChao = EtapaAtaqueChao.nenhuma;
+    }
+
+    private void LimparMarcadorDeEmergencia()
+    {
+        if (marcadorEmergencia != null)
+            Destroy(marcadorEmergencia);
+        marcadorEmergencia = null;
     }
     
     /*
