@@ -83,7 +83,7 @@ public class FimDeJogo : MonoBehaviour
         fala.enableAutoSizing = true;
         fala.fontSizeMin = 18f;
         fala.fontSizeMax = 36f;
-        fala.text = "Quando destruíram meu restaurante, eu queria que alguém tivesse parado.\nAgora sou eu quem segura o garfo.";
+        fala.text = "Quando destruíram meu restaurante, eu queria que alguém os tivessem impedido.\nAgora, sou eu quem segura o garfo...";
         fala.gameObject.SetActive(true);
 
         Button poupar = CriarOpcao("Baixar o garfo e partir", 0.26f, false);
