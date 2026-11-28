@@ -48,9 +48,9 @@ public sealed partial class BossNetanyahu
 
         CriarEfeitos("Zona da bomba massiva");
         var volume = CriarVolumeMassivo(centro, raio);
-        LineRenderer baseDoVolume = MarcarArea(centro, raio, Vector3.forward, 180f);
-        LineRenderer limite = MarcarArea(centro + Vector3.up * alturaDaExplosaoMassiva, raio, Vector3.forward, 180f);
-        LineRenderer contagem = MarcarArea(centro, raio, Vector3.forward, 180f);
+        LineRenderer baseDoVolume = MarcarArea(centro, raio, Vector3.forward, 180f, preencher: false);
+        LineRenderer limite = MarcarArea(centro + Vector3.up * alturaDaExplosaoMassiva, raio, Vector3.forward, 180f, preencher: false);
+        LineRenderer contagem = MarcarArea(centro, raio, Vector3.forward, 180f, preencher: false);
         Colorir(contagem, Vermelho);
 
         Bomba bomba = Instantiate(prefabBomba, PosicaoDaBombaMassiva(), Quaternion.identity, efeitosDoAtaque.transform);

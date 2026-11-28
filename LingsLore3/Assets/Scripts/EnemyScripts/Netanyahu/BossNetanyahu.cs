@@ -733,6 +733,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         PosicionarOndaNoPiso(aviso, centro, RaioDoBoss + 1.2f, ateCentroDoPiso, raioDoPiso);
         LineRenderer limiteDaOnda = CriarLinha("Limite da onda", 96);
         PosicionarOndaNoPiso(limiteDaOnda, centro, alcance, ateCentroDoPiso, raioDoPiso);
+        PreenchimentoAviso.Adicionar(limiteDaOnda, fechamento: FecharLimiteDaOnda(limiteDaOnda, centro, ateCentroDoPiso, raioDoPiso));
         yield return new WaitForSeconds(BalanceamentoDificuldade.Atual.Aviso(avisoDaPisada));
 
         estado = Estado.Atacando;
@@ -792,6 +793,28 @@ public sealed partial class BossNetanyahu : MonoBehaviour
         float cosseno = (raio * raio + distancia * distancia - raioDoPiso * raioDoPiso) / (2f * raio * distancia);
         float semiAngulo = Mathf.Acos(Mathf.Clamp(cosseno, -1f, 1f)) * Mathf.Rad2Deg;
         PosicionarArco(linha, centro, raio, ateCentroDoPiso / distancia, semiAngulo, fecharSetor: false);
+    }
+
+    private static Vector3[] FecharLimiteDaOnda(LineRenderer linha, Vector3 centro, Vector3 ateCentroDoPiso, float raioDoPiso)
+    {
+        if (linha.loop)
+            return null;
+
+        const int segmentos = 96;
+        Vector3 primeiro = linha.GetPosition(0);
+        Vector3 ultimo = linha.GetPosition(linha.positionCount - 1);
+        Vector3 centroDoPiso = centro + ateCentroDoPiso;
+        centroDoPiso.y = primeiro.y;
+        Vector3 frente = -ateCentroDoPiso.normalized;
+        float inicio = Vector3.SignedAngle(frente, ultimo - centroDoPiso, Vector3.up);
+        float fim = Vector3.SignedAngle(frente, primeiro - centroDoPiso, Vector3.up);
+        var bordaDoPiso = new Vector3[segmentos - 1];
+        for (int i = 1; i < segmentos; i++)
+        {
+            float angulo = Mathf.Lerp(inicio, fim, i / (float)segmentos);
+            bordaDoPiso[i - 1] = centroDoPiso + Quaternion.AngleAxis(angulo, Vector3.up) * frente * raioDoPiso;
+        }
+        return bordaDoPiso;
     }
 
     private bool Mover(Vector3 destino)
@@ -893,12 +916,14 @@ public sealed partial class BossNetanyahu : MonoBehaviour
 
     private void CriarEfeitos(string nome) => efeitosDoAtaque = new GameObject(nome);
 
-    private LineRenderer MarcarArea(Vector3 centro, float raio, Vector3 frente, float semiAngulo)
+    private LineRenderer MarcarArea(Vector3 centro, float raio, Vector3 frente, float semiAngulo, bool preencher = true)
     {
         const int segmentos = 40;
         bool fecharSetor = semiAngulo != 180f;
         LineRenderer linha = CriarLinha("Área de dano", segmentos + (fecharSetor ? 2 : 0));
         PosicionarArco(linha, centro, raio, frente, semiAngulo, fecharSetor);
+        if (preencher)
+            PreenchimentoAviso.Adicionar(linha, lequeNoUltimoPonto: fecharSetor);
         return linha;
     }
 
@@ -930,6 +955,7 @@ public sealed partial class BossNetanyahu : MonoBehaviour
             linha.SetPosition(i, inicio + borda);
             linha.SetPosition(segmentosPorPonta + 1 + i, fim - borda);
         }
+        PreenchimentoAviso.Adicionar(linha);
         return linha;
     }
 

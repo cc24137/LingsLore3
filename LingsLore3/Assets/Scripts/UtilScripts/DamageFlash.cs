@@ -60,7 +60,8 @@ public class DamageFlash : MonoBehaviour
 
         foreach (Renderer renderer in renderers)
         {
-            if (!renderer.enabled || !(renderer is MeshRenderer || renderer is SkinnedMeshRenderer))
+            if (!renderer.enabled || !(renderer is MeshRenderer || renderer is SkinnedMeshRenderer) ||
+                renderer.TryGetComponent<PreenchimentoAviso>(out _))
                 continue;
 
             renderer.GetSharedMaterials(materials);

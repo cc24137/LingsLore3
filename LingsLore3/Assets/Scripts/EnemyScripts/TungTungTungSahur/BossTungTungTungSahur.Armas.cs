@@ -320,6 +320,7 @@ public sealed partial class BossTungTungTungSahur
         linha.shadowCastingMode = ShadowCastingMode.Off;
         linha.receiveShadows = false;
         ColorirAvisoDaArma(linha, ArmasGuiadas ? Dourado : Amarelo);
+        PreenchimentoAviso.Adicionar(linha);
         return linha;
     }
 

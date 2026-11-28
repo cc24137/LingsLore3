@@ -122,6 +122,7 @@ public sealed partial class BossTungTungTungSahur : MonoBehaviour
         aviso.shadowCastingMode = ShadowCastingMode.Off;
         aviso.receiveShadows = false;
         aviso.enabled = false;
+        PreenchimentoAviso.Adicionar(aviso);
         PrepararArticulacaoDoModelo();
         PrepararVisuaisDasFases();
     }

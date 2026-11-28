@@ -136,6 +136,7 @@ public sealed class Bomba : MonoBehaviour
             float angulo = 360f * i / segmentos;
             linha.SetPosition(i, centro + Quaternion.Euler(0f, angulo, 0f) * Vector3.forward * raioDaExplosao);
         }
+        PreenchimentoAviso.Adicionar(linha);
         return linha;
     }
 
